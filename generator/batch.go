@@ -2,10 +2,10 @@ package generator
 
 import (
 	"fmt"
-	"os"
-	"strings"
-	"path"
 	"github.com/h2non/bimg"
+	"os"
+	"path"
+	"strings"
 )
 
 // BatchOperationOnFiles
@@ -37,7 +37,7 @@ func BatchOperationOnFiles(files []string, fn func(string, int) error) error {
 func BatchCopyFile(files []string, directory string) error {
 	wd, _ := os.Getwd()
 	verbose("Attempting a batch copy from " + wd + " to " + directory)
-	batchCopyFile := func (file string, index int) error {
+	batchCopyFile := func(file string, index int) error {
 		err := CopyFile(file, file, directory)
 		if err != nil {
 			return err
@@ -62,8 +62,8 @@ func BatchCopyFile(files []string, directory string) error {
 func BatchImageConversion(files []string, prefix string, directory string, ScalingOptions ImageScale) error {
 	wd, _ := os.Getwd()
 	verbose("Generating thumbnails in " + wd + " and placing them in " + directory)
-	batchResizeImage := func (file string, index int) error {
-		err := ResizeImage(file, prefix + "_" + strings.Split(path.Base(file), ".")[0] + ".jpg", ScalingOptions, directory, bimg.JPEG)
+	batchResizeImage := func(file string, index int) error {
+		err := ResizeImage(file, prefix+"_"+strings.Split(path.Base(file), ".")[0]+".jpg", ScalingOptions, directory, bimg.JPEG)
 		if err != nil && err != fmt.Errorf("skip") {
 			return err
 		}

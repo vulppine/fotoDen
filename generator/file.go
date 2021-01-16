@@ -1,9 +1,9 @@
 package generator
 
 import (
-	"path"
-	"os"
 	"io/ioutil"
+	"os"
+	"path"
 )
 
 // GetArrayOfFilesAndFolders
@@ -37,7 +37,6 @@ func GetArrayOfFolders(directory []os.FileInfo) []string {
 	_, folderArray := GetArrayOfFilesAndFolders(directory)
 	return folderArray
 }
-
 
 // CopyFile
 //

@@ -1,8 +1,8 @@
 package tool
 
 import (
-	"github.com/vulppine/fotoDen/generator"
 	"fmt"
+	"github.com/vulppine/fotoDen/generator"
 	"path"
 )
 

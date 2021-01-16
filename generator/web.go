@@ -1,12 +1,12 @@
 package generator
 
 import (
+	"encoding/json"
 	"fmt"
-	"text/template"
+	"net/url"
 	"os"
 	"path"
-	"encoding/json"
-	"net/url"
+	"text/template"
 )
 
 // WebConfig
@@ -15,12 +15,12 @@ import (
 
 type WebConfig struct {
 	WorkingDirectory string
-	PhotoURLBase string
-	PhotoExtension string
+	PhotoURLBase     string
+	PhotoExtension   string
 	DisplayImageFrom string
-	ImageThumbDir string
-	ImageLargeDir string
-	ImageSrcDir string
+	ImageThumbDir    string
+	ImageLargeDir    string
+	ImageSrcDir      string
 }
 
 // WebVars
@@ -28,8 +28,8 @@ type WebConfig struct {
 // These will dictate where fotoDen gets its JavaScript and CSS files per page.
 
 type WebVars struct {
-	BaseURL string
-	JSLocation string
+	BaseURL     string
+	JSLocation  string
 	CSSLocation string
 }
 
@@ -43,13 +43,19 @@ type WebVars struct {
 
 func GenerateWebRoot(filepath string) error {
 	err := os.Mkdir(filepath, 0755)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 
 	err = os.Mkdir(path.Join(filepath, "js"), 0755)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 
 	err = os.Mkdir(path.Join(filepath, "css"), 0755)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -84,14 +90,15 @@ func NewWebConfig(rooturl string) *WebConfig {
 //
 // If an error occurs, returns an empty WebVars and the error, otherwise returns a filled WebVars.
 
-
 func NewWebVars(u string) (*WebVars, error) {
 
 	webvars := new(WebVars)
 	url, err := url.Parse(u)
 	jsurl, err := url.Parse(u)
 	cssurl, err := url.Parse(u)
-	if err != nil { return webvars, err }
+	if err != nil {
+		return webvars, err
+	}
 
 	webvars.BaseURL = url.String()
 
@@ -111,7 +118,9 @@ func NewWebVars(u string) (*WebVars, error) {
 
 func (config *WebConfig) GenerateWebConfig(filepath string) error {
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil { panic(err) }
+	if err != nil {
+		panic(err)
+	}
 	defer file.Close()
 
 	fileinfo, _ := file.Stat()
@@ -121,7 +130,9 @@ func (config *WebConfig) GenerateWebConfig(filepath string) error {
 
 	configjson, _ := json.Marshal(config)
 	_, err = file.Write(configjson)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -138,14 +149,20 @@ func (config *WebConfig) GenerateWebConfig(filepath string) error {
 
 func ConfigureWebFile(source string, dest string, config *WebVars) error {
 	webpage, err := template.ParseFiles(source)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 
 	file, err := os.OpenFile(dest, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755) // just rewrite the entire thing
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	defer file.Close()
 
 	err = webpage.Execute(file, config)
-	if err != nil { panic(err) } // means something wrong happened during file write
+	if err != nil {
+		panic(err)
+	} // means something wrong happened during file write
 
 	return nil
 }

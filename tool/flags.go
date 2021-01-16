@@ -1,10 +1,10 @@
 package tool
 
 import (
-	"os"
+	"flag"
 	"fmt"
 	"github.com/vulppine/fotoDen/generator"
-	"flag"
+	"os"
 	"path"
 )
 
@@ -47,19 +47,27 @@ func ParseGen(mode string, arg string, options *GeneratorOptions) error {
 		case arg == "":
 			if *NameFlag == "" {
 				err := GenerateFolder(path.Base(wd), path.Base(wd), options)
-				if checkError(err) { return err }
+				if checkError(err) {
+					return err
+				}
 			} else {
 				err := GenerateFolder(*NameFlag, path.Base(wd), options)
-				if checkError(err) { return err }
+				if checkError(err) {
+					return err
+				}
 			}
 		case arg != "":
 			if *NameFlag == "" {
 				name := path.Base(wd)
 				err := GenerateFolder(name, arg, options)
-				if checkError(err) { return err }
+				if checkError(err) {
+					return err
+				}
 			} else {
 				err := GenerateFolder(*NameFlag, arg, options)
-				if checkError(err) { return err }
+				if checkError(err) {
+					return err
+				}
 			}
 		default:
 			fmt.Println("Something really wrong happened. How the hell did you do that?")
@@ -70,19 +78,27 @@ func ParseGen(mode string, arg string, options *GeneratorOptions) error {
 		case arg == "":
 			if *NameFlag == "" {
 				err := GenerateFolderStructure(path.Base(wd), path.Base(wd))
-				if checkError(err) { return err }
+				if checkError(err) {
+					return err
+				}
 			} else {
 				err := GenerateFolderStructure(*NameFlag, path.Base(wd))
-				if checkError(err) { return err }
+				if checkError(err) {
+					return err
+				}
 			}
 		case arg != "":
 			if *NameFlag == "" {
 				name := path.Base(wd)
 				err := GenerateFolderStructure(name, arg)
-				if checkError(err) { return err }
+				if checkError(err) {
+					return err
+				}
 			} else {
 				err := GenerateFolderStructure(*NameFlag, arg)
-				if checkError(err) { return err }
+				if checkError(err) {
+					return err
+				}
 			}
 		default:
 			fmt.Println("Something really wrong happened. How the hell did you do that?")
@@ -132,12 +148,14 @@ func ParseCmd() error {
 	genoptions.large = *LargeFlag
 	verbose("Current generator options [source/copy/thumb]: " + fmt.Sprint(genoptions))
 
-	flag.Visit(func (flag *flag.Flag) { verbose("Flag setting: " + fmt.Sprint(flag.Name, " ", flag.Value)) })
+	flag.Visit(func(flag *flag.Flag) { verbose("Flag setting: " + fmt.Sprint(flag.Name, " ", flag.Value)) })
 
 	if *ConfigSrc == "" && *InitFlag != "config" {
 		err := generator.OpenfotoDenConfig(path.Join(generator.FotoDenConfigDir, "config.json"))
 		verbose("Generator config: " + fmt.Sprint(generator.CurrentConfig))
-		if checkError(err) { return err }
+		if checkError(err) {
+			return err
+		}
 	}
 
 	if *InitFlag != "" {
@@ -163,10 +181,14 @@ func ParseCmd() error {
 	switch {
 	case *GenFlag != "":
 		err := ParseGen(*GenFlag, arg, genoptions)
-		if checkError(err) { return err }
+		if checkError(err) {
+			return err
+		}
 	case *UpdFlag:
 		err := UpdateFolderSubdirectories(arg)
-		if checkError(err) { return err }
+		if checkError(err) {
+			return err
+		}
 	default:
 		return fmt.Errorf("-init, -generate or -update must be defined. Aborting.")
 	}

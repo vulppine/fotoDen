@@ -1,11 +1,11 @@
 package generator
 
 import (
-	"fmt"
-	"os"
-	"io/ioutil"
-	"path"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
 )
 
 // Structs for fotoDen JSON files
@@ -22,27 +22,27 @@ type Album struct {
 */
 
 type Folder struct {
-	FolderName string				// The name of the folder.
-	FolderShortName string			// The shortname of the folder (can be taken from the filesystem folder name)
-	SupFolderName string			// The name of the folder above it (for presentation purposes).
-	FolderType string				// The type of folder (currently supports only album or folder)
-	FolderThumbnail bool			// If the folder has a thumbnail or not
-	ItemsInFolder []string			// All the items in the folder, by name.
-	SubfolderShortNames []string	// Any folders that are within the folder (updated whenever the generator is called in the folder)
+	FolderName          string   // The name of the folder.
+	FolderShortName     string   // The shortname of the folder (can be taken from the filesystem folder name)
+	SupFolderName       string   // The name of the folder above it (for presentation purposes).
+	FolderType          string   // The type of folder (currently supports only album or folder)
+	FolderThumbnail     bool     // If the folder has a thumbnail or not
+	ItemsInFolder       []string // All the items in the folder, by name.
+	SubfolderShortNames []string // Any folders that are within the folder (updated whenever the generator is called in the folder)
 }
 
 type GeneratorConfig struct {
-	ThumbMaxHeight int
-	ThumbMaxWidth int
-	ThumbScalePercent float32
-	LargeScalePercent float32
-	ImageRootDirectory string		// where all images are stored (default: img)
-	ImageThumbDirectory string		// where all thumbnails are stored (default: ImageRootDirectory/thumb)
-	ImageLargeDirectory string      // where all 'large' display images are stored (default: ImageRootDirectory/large)
-	ImageSrcDirectory string		// where all source images are stored (default: ImageRootDirectory/src)
-	ImageJSONDirectory string		// where all JSON files per image are stored (default: ImageRootDirectory/json)
-	WebSourceLocation string		// where all html/css/js files are stored for fotoDen's functionality
-	WebBaseURL string				// what the base URL is (aka, fotoDen's location)
+	ThumbMaxHeight      int
+	ThumbMaxWidth       int
+	ThumbScalePercent   float32
+	LargeScalePercent   float32
+	ImageRootDirectory  string // where all images are stored (default: img)
+	ImageThumbDirectory string // where all thumbnails are stored (default: ImageRootDirectory/thumb)
+	ImageLargeDirectory string // where all 'large' display images are stored (default: ImageRootDirectory/large)
+	ImageSrcDirectory   string // where all source images are stored (default: ImageRootDirectory/src)
+	ImageJSONDirectory  string // where all JSON files per image are stored (default: ImageRootDirectory/json)
+	WebSourceLocation   string // where all html/css/js files are stored for fotoDen's functionality
+	WebBaseURL          string // what the base URL is (aka, fotoDen's location)
 }
 
 // some defaults in case we never have a fotoDen config file opened
@@ -50,23 +50,22 @@ type GeneratorConfig struct {
 var userConfigDir, _ = os.UserConfigDir()
 var FotoDenConfigDir = path.Join(userConfigDir, "fotoDen")
 var DefaultConfig GeneratorConfig = GeneratorConfig{
-	ThumbMaxHeight: 800,
-	LargeScalePercent: 0.5,
-	ImageRootDirectory: "img",
+	ThumbMaxHeight:      800,
+	LargeScalePercent:   0.5,
+	ImageRootDirectory:  "img",
 	ImageThumbDirectory: "img/thumb",
 	ImageLargeDirectory: "img/large",
-	ImageSrcDirectory: "img/src",
-	ImageJSONDirectory: "img/json",
-	WebSourceLocation: path.Join(FotoDenConfigDir, "web"), // remember when $HOME webpage folders were a thing?
-	WebBaseURL: "", // this should be set during configuration generation
+	ImageSrcDirectory:   "img/src",
+	ImageJSONDirectory:  "img/json",
+	WebSourceLocation:   path.Join(FotoDenConfigDir, "web"), // remember when $HOME webpage folders were a thing?
+	WebBaseURL:          "",                                 // this should be set during configuration generation
 }
 var CurrentConfig GeneratorConfig
 var ThumbScalingOptions ImageScale
 var LargeScalingOptions ImageScale
 
-
 var WorkingDirectory, _ = os.Getwd()
-var Verbose bool; // if this is set, everything important is printed
+var Verbose bool // if this is set, everything important is printed
 
 func verbose(print string) {
 	if Verbose {
@@ -88,8 +87,8 @@ func OpenfotoDenConfig(configLocation string) error {
 	}
 
 	ThumbScalingOptions = ImageScale{
-		maxheight: CurrentConfig.ThumbMaxHeight,
-		maxwidth: CurrentConfig.ThumbMaxWidth,
+		maxheight:    CurrentConfig.ThumbMaxHeight,
+		maxwidth:     CurrentConfig.ThumbMaxWidth,
 		scalepercent: CurrentConfig.ThumbScalePercent,
 	}
 

@@ -1,10 +1,10 @@
 package tool
 
 import (
+	"fmt"
 	"github.com/vulppine/fotoDen/generator"
 	"path"
 	"sync"
-	"fmt"
 )
 
 // UpdateFolderImages
@@ -43,7 +43,9 @@ func InsertImage(folder string, files []string) error {
 	folderInfo := new(generator.Folder)
 
 	err := folderInfo.ReadFolderInfo(path.Join(folder, "folderInfo.json"))
-	if checkError(err) { return err }
+	if checkError(err) {
+		return err
+	}
 
 	for file := range files {
 		folderInfo.ItemsInFolder = append(folderInfo.ItemsInFolder, files[file])
@@ -51,13 +53,13 @@ func InsertImage(folder string, files []string) error {
 
 	var waitgroup sync.WaitGroup
 
-	go func(wg *sync.WaitGroup){
+	go func(wg *sync.WaitGroup) {
 		defer wg.Done()
 		fmt.Println("Copying files...")
 		err = generator.BatchCopyFile(files, path.Join(folder, generator.CurrentConfig.ImageSrcDirectory))
 	}(&waitgroup)
 
-	go func(wg *sync.WaitGroup){
+	go func(wg *sync.WaitGroup) {
 		defer wg.Done()
 		fmt.Println("Generating thumbnails...")
 		err = generator.BatchImageConversion(files, "thumb", path.Join(folder, generator.CurrentConfig.ImageThumbDirectory), generator.ThumbScalingOptions)

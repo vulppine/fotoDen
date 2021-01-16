@@ -2,9 +2,9 @@ package generator
 
 import (
 	"fmt"
-	"strconv"
-	"path"
 	"github.com/h2non/bimg"
+	"path"
+	"strconv"
 )
 
 // IsolateImages
@@ -22,7 +22,7 @@ func IsolateImages(files []string) []string {
 			if bimg.DetermineImageType(image) == bimg.UNKNOWN {
 				verbose("File " + files[i] + " is not an image. Removing.")
 				files = RemoveItemFromStringArray(files, files[i]) // replace this with an append later
-				i-- // because now everything is shifted one backwards
+				i--                                                // because now everything is shifted one backwards
 			}
 		}
 	}
@@ -47,8 +47,8 @@ func IsolateImages(files []string) []string {
 // It will return an error if the filename given already exists in the destination directory.
 
 type ImageScale struct {
-	maxheight int
-	maxwidth int
+	maxheight    int
+	maxwidth     int
 	scalepercent float32
 }
 
@@ -67,7 +67,6 @@ func ResizeImage(imageName string, newName string, scale ImageScale, dest string
 	if err != nil {
 		return err
 	}
-
 
 	size, err := bimg.NewImage(image).Size()
 	width := float32(size.Width)
@@ -89,7 +88,6 @@ func ResizeImage(imageName string, newName string, scale ImageScale, dest string
 		return fmt.Errorf("ResizeImage: Image scaling undefined. Aborting. scale: " + fmt.Sprint(scale))
 	}
 
-
 	verbose("Resizing " + imageName + " to " + strconv.Itoa(int(width)) + "," + strconv.Itoa(int(height)) + " and attempting to place it in " + path.Join(dest, newName))
 	newImage, err = bimg.NewImage(newImage).Resize(int(width), int(height))
 	if err != nil {
@@ -108,7 +106,6 @@ func ResizeImage(imageName string, newName string, scale ImageScale, dest string
 // MakeThumbnail
 //
 // This is only here to make fotoDen's command line tool look cleaner in code, and avoid importing more than needed.
-
 
 func MakeFolderThumbnail(file string, directory string) error {
 	err := ResizeImage(file, "thumb.jpg", ThumbScalingOptions, directory, bimg.JPEG)

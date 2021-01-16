@@ -1,10 +1,10 @@
 package tool
 
 import (
+	"fmt"
 	"github.com/vulppine/fotoDen/generator"
 	"os"
 	"path"
-	"fmt"
 	"path/filepath"
 	"sync"
 )
@@ -22,11 +22,10 @@ import (
 
 type GeneratorOptions struct {
 	source string
-	copy bool
-	thumb bool
-	large bool
+	copy   bool
+	thumb  bool
+	large  bool
 }
-
 
 // GenerateFolderStructure
 //
@@ -78,12 +77,16 @@ func UpdateFolderSubdirectories(fpath string) error {
 	folder := new(generator.Folder)
 
 	err := folder.ReadFolderInfo(path.Join(fpath, "folderInfo.json"))
-	if checkError(err) { return err }
+	if checkError(err) {
+		return err
+	}
 
 	folder.UpdateSubdirectories(fpath)
 
 	err = folder.WriteFolderInfo(path.Join(fpath, "folderInfo.json"))
-	if checkError(err) { return err }
+	if checkError(err) {
+		return err
+	}
 
 	return nil
 }
@@ -103,7 +106,6 @@ func UpdateFolderSubdirectories(fpath string) error {
 // Takes the folder's name, as well as its path.
 // Returns an error if any occur.
 
-
 func GenerateFolder(name string, fpath string, options *GeneratorOptions) error {
 
 	err := os.Mkdir(fpath, 0755)
@@ -112,7 +114,9 @@ func GenerateFolder(name string, fpath string, options *GeneratorOptions) error 
 	}
 
 	err = generator.MakeAlbumDirectoryStructure(fpath)
-	if checkError(err) { panic(err) }
+	if checkError(err) {
+		panic(err)
+	}
 
 	var waitgroup sync.WaitGroup
 
@@ -132,11 +136,15 @@ func GenerateFolder(name string, fpath string, options *GeneratorOptions) error 
 
 	dir, err := os.Open("./")
 	defer dir.Close()
-	if checkError(err) { panic(err) }
+	if checkError(err) {
+		panic(err)
+	}
 
 	verbose("Reading items in folder: " + options.source)
 	dirContents, err := dir.Readdir(0)
-	if checkError(err) { return err }
+	if checkError(err) {
+		return err
+	}
 	fileArray := generator.IsolateImages(generator.GetArrayOfFiles(dirContents))
 
 	if *ThumbSrc != "" {
@@ -145,7 +153,9 @@ func GenerateFolder(name string, fpath string, options *GeneratorOptions) error 
 	}
 
 	folder, err := generator.GenerateFolderInfo(fpath, name)
-	if checkError(err) { return err }
+	if checkError(err) {
+		return err
+	}
 
 	if len(fileArray) > 0 {
 		folder.FolderType = "album"
@@ -154,7 +164,7 @@ func GenerateFolder(name string, fpath string, options *GeneratorOptions) error 
 
 		if options.copy == true {
 			waitgroup.Add(1)
-			go func(wg *sync.WaitGroup){
+			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
 				fmt.Println("Copying files...")
 				err = generator.BatchCopyFile(fileArray, path.Join(fpath, generator.CurrentConfig.ImageSrcDirectory))
@@ -163,7 +173,7 @@ func GenerateFolder(name string, fpath string, options *GeneratorOptions) error 
 
 		if options.thumb == true {
 			waitgroup.Add(1)
-			go func(wg *sync.WaitGroup){
+			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
 				fmt.Println("Generating thumbnails...")
 				err = generator.BatchImageConversion(fileArray, "thumb", path.Join(fpath, generator.CurrentConfig.ImageThumbDirectory), generator.ThumbScalingOptions)
@@ -172,7 +182,7 @@ func GenerateFolder(name string, fpath string, options *GeneratorOptions) error 
 
 		if options.large == true {
 			waitgroup.Add(1)
-			go func (wg *sync.WaitGroup){
+			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
 				fmt.Println("Generating display images...")
 				err = generator.BatchImageConversion(fileArray, "large", path.Join(fpath, generator.CurrentConfig.ImageLargeDirectory), generator.LargeScalingOptions)
@@ -195,7 +205,9 @@ func GenerateFolder(name string, fpath string, options *GeneratorOptions) error 
 	}
 
 	err = folder.WriteFolderInfo(path.Join(fpath, "folderInfo.json"))
-	if checkError(err) { return err }
+	if checkError(err) {
+		return err
+	}
 
 	return nil
 }

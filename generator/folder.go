@@ -1,10 +1,10 @@
 package generator
 
 import (
-	"os"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"encoding/json"
+	"os"
 	"path"
 )
 
@@ -36,7 +36,7 @@ func GenerateFolderInfo(directory string, name string) (*Folder, error) {
 	currentDirectory, _ := os.Getwd()
 	verbose("Generating folder info from: " + currentDirectory)
 
-	if (name == "") {
+	if name == "" {
 		folder.FolderName = path.Base(currentDirectory)
 	} else {
 		folder.FolderName = name
@@ -125,8 +125,10 @@ func (folder *Folder) WriteFolderInfo(filePath string) error {
 func (folder *Folder) UpdateSubdirectories(directory string) (int, error) {
 	var currentDirectory string
 	switch directory {
-	case "": currentDirectory, _ = os.Getwd()
-	default: currentDirectory = directory
+	case "":
+		currentDirectory, _ = os.Getwd()
+	default:
+		currentDirectory = directory
 	}
 
 	verbose("Updating subdirectories in " + directory)
