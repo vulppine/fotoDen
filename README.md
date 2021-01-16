@@ -7,7 +7,7 @@ _A stucturally static, dynamically generated photo gallery_
 ## Installing
 
 1. Install the latest version of [libvips](https://github.com/libvips/libvips).
-2. Run `go install https://github.com/vulppine/fotoDen` in your command line.
+2. Run `go install github.com/vulppine/fotoDen` in your command line.
 
 ---
 
