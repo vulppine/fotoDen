@@ -47,10 +47,32 @@ func IsolateImages(files []string) []string {
 // It will return an error if the filename given already exists in the destination directory.
 
 type ImageScale struct {
-	maxheight    int
-	maxwidth     int
-	scalepercent float32
+	MaxHeight    int
+	MaxWidth     int
+	ScalePercent float32
 }
+
+type ImageScaleJSON struct {
+	MaxHeight    string
+	MaxWidth     string
+	ScalePercent string
+}
+
+/*
+func jsonToImageScale(i ImageScaleJSON) ImageScale {
+	scale := new(ImageScale)
+
+	maxheight, _ := strconv.ParseInt(i.MaxHeight, 10, 0)
+	maxwidth, _ := strconv.ParseInt(i.MaxWidth, 10, 0)
+	scalepercent, _ := strconv.ParseFloat(i.ScalePercent, 32)
+
+	scale.maxheight = int(maxheight)
+	scale.maxwidth = int(maxwidth)
+	scale.scalepercent = float32(scalepercent)
+
+	return *scale
+}
+*/
 
 func ResizeImage(imageName string, newName string, scale ImageScale, dest string, imageFormat bimg.ImageType) error {
 	image, err := bimg.Read(imageName)
@@ -73,17 +95,17 @@ func ResizeImage(imageName string, newName string, scale ImageScale, dest string
 	height := float32(size.Height)
 
 	switch {
-	case scale.maxheight != 0:
-		scale := float32(scale.maxheight) / height
+	case scale.MaxHeight != 0:
+		scale := float32(scale.MaxHeight) / height
 		width = width * scale
 		height = height * scale
-	case scale.maxwidth != 0:
-		scale := float32(scale.maxwidth) / width
+	case scale.MaxWidth != 0:
+		scale := float32(scale.MaxWidth) / width
 		width = width * scale
 		height = height * scale
-	case scale.scalepercent != 0:
-		width = width * scale.scalepercent
-		height = height * scale.scalepercent
+	case scale.ScalePercent != 0:
+		width = width * scale.ScalePercent
+		height = height * scale.ScalePercent
 	default:
 		return fmt.Errorf("ResizeImage: Image scaling undefined. Aborting. scale: " + fmt.Sprint(scale))
 	}
@@ -108,7 +130,7 @@ func ResizeImage(imageName string, newName string, scale ImageScale, dest string
 // This is only here to make fotoDen's command line tool look cleaner in code, and avoid importing more than needed.
 
 func MakeFolderThumbnail(file string, directory string) error {
-	err := ResizeImage(file, "thumb.jpg", ThumbScalingOptions, directory, bimg.JPEG)
+	err := ResizeImage(file, "thumb.jpg", ScalingOptions["thumb"], directory, bimg.JPEG)
 	if err != nil {
 		return err
 	}

@@ -14,10 +14,12 @@ import (
 // The structure of the JSON config file that fotoDen uses.
 
 type WebConfig struct {
+	WebsiteTitle     string
 	WorkingDirectory string
 	PhotoURLBase     string
 	PhotoExtension   string
 	DisplayImageFrom string
+	DownloadImageFrom string
 	ImageThumbDir    string
 	ImageLargeDir    string
 	ImageSrcDir      string
@@ -70,6 +72,7 @@ func NewWebConfig(rooturl string) *WebConfig {
 
 	webconfig := new(WebConfig)
 	webconfig.DisplayImageFrom = "large" // default, for saving bandwidth
+	webconfig.DownloadImageFrom = "src"
 	webconfig.PhotoURLBase = rooturl
 
 	return webconfig

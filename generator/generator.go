@@ -24,18 +24,18 @@ type Album struct {
 type Folder struct {
 	FolderName          string   // The name of the folder.
 	FolderShortName     string   // The shortname of the folder (can be taken from the filesystem folder name)
-	SupFolderName       string   // The name of the folder above it (for presentation purposes).
 	FolderType          string   // The type of folder (currently supports only album or folder)
-	FolderThumbnail     bool     // If the folder has a thumbnail or not
-	ItemsInFolder       []string // All the items in the folder, by name.
+	FolderThumbnail     string   // The path to the thumbnail, relative to the current folder.
 	SubfolderShortNames []string // Any folders that are within the folder (updated whenever the generator is called in the folder)
 }
 
+type Items struct {
+	ItemsInFolder       []string // All the items in a folder, by name, in an array.
+}
+
 type GeneratorConfig struct {
-	ThumbMaxHeight      int
-	ThumbMaxWidth       int
-	ThumbScalePercent   float32
-	LargeScalePercent   float32
+	ThumbImageScale     ImageScale
+	LargeImageScale     ImageScale
 	ImageRootDirectory  string // where all images are stored (default: img)
 	ImageThumbDirectory string // where all thumbnails are stored (default: ImageRootDirectory/thumb)
 	ImageLargeDirectory string // where all 'large' display images are stored (default: ImageRootDirectory/large)
@@ -50,19 +50,18 @@ type GeneratorConfig struct {
 var userConfigDir, _ = os.UserConfigDir()
 var FotoDenConfigDir = path.Join(userConfigDir, "fotoDen")
 var DefaultConfig GeneratorConfig = GeneratorConfig{
-	ThumbMaxHeight:      800,
-	LargeScalePercent:   0.5,
+	ThumbImageScale:     ImageScale{MaxHeight: 800},
+	LargeImageScale:     ImageScale{ScalePercent: 0.5},
 	ImageRootDirectory:  "img",
-	ImageThumbDirectory: "img/thumb",
-	ImageLargeDirectory: "img/large",
-	ImageSrcDirectory:   "img/src",
-	ImageJSONDirectory:  "img/json",
+	ImageThumbDirectory: "thumb",
+	ImageLargeDirectory: "large",
+	ImageSrcDirectory:   "src",
+	ImageJSONDirectory:  "json",
 	WebSourceLocation:   path.Join(FotoDenConfigDir, "web"), // remember when $HOME webpage folders were a thing?
 	WebBaseURL:          "",                                 // this should be set during configuration generation
 }
 var CurrentConfig GeneratorConfig
-var ThumbScalingOptions ImageScale
-var LargeScalingOptions ImageScale
+var ScalingOptions map[string]ImageScale = make(map[string]ImageScale)
 
 var WorkingDirectory, _ = os.Getwd()
 var Verbose bool // if this is set, everything important is printed
@@ -73,28 +72,49 @@ func verbose(print string) {
 	}
 }
 
+func WriteJSON(filePath string, iface interface{}) error {
+	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		return err
+	}
+
+	toWrite, err := json.Marshal(iface)
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write(toWrite)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ReadJSON(filePath string, iface interface{}) error {
+	file, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(file, iface)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // sets the current fotoDen configuration to this
 
 func OpenfotoDenConfig(configLocation string) error {
-	configFile, err := ioutil.ReadFile(configLocation)
+	err := ReadJSON(configLocation, &CurrentConfig)
 	if err != nil {
 		return err
 	}
 
-	err = json.Unmarshal(configFile, &CurrentConfig)
-	if err != nil {
-		return err
-	}
-
-	ThumbScalingOptions = ImageScale{
-		maxheight:    CurrentConfig.ThumbMaxHeight,
-		maxwidth:     CurrentConfig.ThumbMaxWidth,
-		scalepercent: CurrentConfig.ThumbScalePercent,
-	}
-
-	LargeScalingOptions = ImageScale{
-		scalepercent: CurrentConfig.LargeScalePercent,
-	}
+	ScalingOptions["thumb"] = CurrentConfig.ThumbImageScale
+	ScalingOptions["large"] = CurrentConfig.LargeImageScale
 
 	return nil
 }
@@ -104,18 +124,7 @@ func OpenfotoDenConfig(configLocation string) error {
 // Attempts to write CurrentConfig to a new file at configLocation.
 
 func WritefotoDenConfig(config GeneratorConfig, configLocation string) error {
-	configFile, err := os.OpenFile(configLocation, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		return err
-	}
-	defer configFile.Close()
-
-	toWrite, err := json.Marshal(config)
-	if err != nil {
-		return err
-	}
-
-	_, err = configFile.Write(toWrite)
+	err := WriteJSON(configLocation, config)
 	if err != nil {
 		return err
 	}

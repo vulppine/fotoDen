@@ -1,8 +1,6 @@
 package generator
 
 import (
-	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -43,6 +41,8 @@ func GenerateFolderInfo(directory string, name string) (*Folder, error) {
 	}
 
 	folder.FolderShortName = path.Base(currentDirectory)
+
+	/* Move this to tool
 	_, err := os.Stat(path.Join(path.Dir(currentDirectory), "folderInfo.json"))
 	if err != nil {
 		fmt.Println("Directory above either is not a fotoDen directory, or is missing folderInfo.json. Skipping. Folder: ", directory)
@@ -52,12 +52,12 @@ func GenerateFolderInfo(directory string, name string) (*Folder, error) {
 		if err != nil {
 			fmt.Println("An error occurred during folder generation: ", err)
 		} else {
-			folder.SupFolderName = supFolder.FolderName
 			supFolder.SubfolderShortNames = append(supFolder.SubfolderShortNames, folder.FolderShortName)
 			supFolder.WriteFolderInfo(path.Join(path.Dir(currentDirectory), "folderInfo.json"))
 		}
-	}
+	}	*/
 
+	/* Move this to tool
 	_, err = os.Stat(path.Join(currentDirectory, "thumb"))
 	if err != nil {
 		fmt.Println("No thumbnail detected. (You can set this manually by placing a valid image into the folder named as 'thumb', and setting folderInfo.json's 'FolderThumbnail' to true.)")
@@ -65,25 +65,20 @@ func GenerateFolderInfo(directory string, name string) (*Folder, error) {
 	} else {
 		folder.FolderThumbnail = true
 	}
-
-	folder.UpdateSubdirectories(currentDirectory)
+	*/
 
 	return folder, nil
 }
 
-// ReadFolderInfo
+
+/// ReadFolderInfo
 //
 // A method for reading folder info from a file.
 // Returns an error if any occur.
 
 func (folder *Folder) ReadFolderInfo(filePath string) error {
 	verbose("Reading folder infomation from " + filePath)
-	file, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(file, folder)
+	err := ReadJSON(filePath, folder)
 	if err != nil {
 		return err
 	}
@@ -98,23 +93,71 @@ func (folder *Folder) ReadFolderInfo(filePath string) error {
 
 func (folder *Folder) WriteFolderInfo(filePath string) error {
 	verbose("Writing folder (" + folder.FolderShortName + ") to " + filePath)
-	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
-	if err != nil {
-		return err
-	}
-
-	toWrite, err := json.Marshal(folder)
-	if err != nil {
-		return err
-	}
-
-	_, err = file.Write(toWrite)
+	err := WriteJSON(filePath, folder)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
+
+// GenerateItemInfo
+//
+// Generates an Items object based on the contents of the directory.
+// This automatically strips non-images.
+
+func GenerateItemInfo(directory string) (*Items, error) {
+	items := new(Items)
+
+	verbose("Reading items in folder: " + directory)
+
+	dir, err := os.Open(directory)
+	defer dir.Close()
+	if err != nil {
+		return items, err
+	}
+
+	dirContents, err := dir.Readdir(0)
+	if err != nil {
+		return items, err
+	}
+
+	items.ItemsInFolder = IsolateImages(GetArrayOfFiles(dirContents))
+
+	return items, nil
+}
+
+// ReadItemsInfo
+//
+// A method for reading items info from a file.
+// Returns an error if any occur.
+
+func (items *Items) ReadItemsInfo(filePath string) error {
+	verbose("Reading items infomation from " + filePath)
+	err := ReadJSON(filePath, items)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// WriteItemsInfo
+//
+// A method for writing items info to a file.
+// Returns an error if any occur.
+
+func (items *Items) WriteItemsInfo(filePath string) error {
+	verbose("Writing items to " + filePath)
+	err := WriteJSON(filePath, items)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// perhaps this should be moved to tool?
 
 // UpdateSubdirectories
 //

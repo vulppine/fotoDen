@@ -2,6 +2,7 @@ package tool
 
 import (
 	"fmt"
+	"os"
 )
 
 // fotoDen tool:
@@ -16,6 +17,24 @@ import (
 // you can just call tool.UpdateFolder(pathname).
 //
 // for another example, this allows for the insertion/deletion of images
+
+// GenerationOptions
+//
+// Some options for the generator.
+// Includes:
+// - source
+// - copy
+// - thumb
+// - large
+//
+// from the flags.
+
+type GeneratorOptions struct {
+	source string
+	copy   bool
+	thumb  bool
+	large  bool
+}
 
 func checkError(err error) bool {
 	if err != nil {
@@ -32,4 +51,9 @@ func verbose(print string) {
 	if Verbose {
 		fmt.Println(print)
 	}
+}
+
+func fileCheck(filename string) bool {
+	_, err := os.Stat(filename)
+	return os.IsExist(err)
 }
