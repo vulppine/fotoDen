@@ -1,8 +1,6 @@
 package generator
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/url"
 	"os"
 	"path"
@@ -17,12 +15,20 @@ type WebConfig struct {
 	WebsiteTitle     string
 	WorkingDirectory string
 	PhotoURLBase     string
-	PhotoExtension   string
+	ImageRootDir     string
+	ThumbnailFrom    string
 	DisplayImageFrom string
-	DownloadImageFrom string
-	ImageThumbDir    string
-	ImageLargeDir    string
-	ImageSrcDir      string
+	ImageSizes		 []WebImageSize
+}
+
+// WebImageSize
+//
+// A structure for image size types that fotoDen will call on.
+
+type WebImageSize struct {
+	SizeName string			// the semantic name of the size
+	Directory string		// the directory the size is stored in, relative to ImageRootDir
+	LocalBool bool          // whether to download it remotely or locally
 }
 
 // WebVars
@@ -33,6 +39,54 @@ type WebVars struct {
 	BaseURL     string
 	JSLocation  string
 	CSSLocation string
+}
+
+// GenerateWebConfig
+//
+// Generates a new web configuration file in the given path.
+// This is required for fotoDen operation.
+
+// NewWebConfig
+//
+// Creates a new WebConfig object, and returns a WebConfig object with a populated ImageSizes
+// based on the current ScalingOptions map.
+
+func GenerateWebConfig(source string) *WebConfig {
+
+	webconfig := new(WebConfig)
+	webconfig.PhotoURLBase = source
+
+	for k, _ := range CurrentConfig.ImageSizes {
+		webconfig.ImageSizes = append(
+			webconfig.ImageSizes,
+			WebImageSize{
+				SizeName: k,
+				Directory: k,
+				LocalBool: true,
+			},
+		)
+	}
+
+	return webconfig
+}
+
+
+func (config *WebConfig) ReadWebConfig(filepath string) error {
+	err := ReadJSON(filepath, config)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (config *WebConfig) WriteWebConfig(filepath string) error {
+	err := WriteJSON(filepath, config)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // GenerateWebRoot
@@ -62,20 +116,36 @@ func GenerateWebRoot(filepath string) error {
 	return nil
 }
 
-// NewWebConfig
+// MakeAlbumDirectoryStructure
 //
-// Creates a new WebConfig object.
-// Takes the a string containing the root URL of where photos are stored.
-// Returns only a WebConfig object.
+// Makes a fotoDen-suitable album structure in the given rootDirectory (string).
+// The directory must exist beforehand.
 
-func NewWebConfig(rooturl string) *WebConfig {
+func MakeAlbumDirectoryStructure(rootDirectory string) error {
 
-	webconfig := new(WebConfig)
-	webconfig.DisplayImageFrom = "large" // default, for saving bandwidth
-	webconfig.DownloadImageFrom = "src"
-	webconfig.PhotoURLBase = rooturl
+	currentDirectory, _ := os.Getwd()
 
-	return webconfig
+	defer func() {
+		verbose("Changing back to " + currentDirectory)
+		os.Chdir(currentDirectory)
+	}()
+
+	verbose("Attempting to change to " + rootDirectory)
+	err := os.Chdir(rootDirectory)
+	if err != nil {
+		return err
+	}
+
+	verbose("Creating directories in " + rootDirectory)
+	os.Mkdir(CurrentConfig.ImageRootDirectory, 0777)
+	os.Mkdir(path.Join(CurrentConfig.ImageRootDirectory, CurrentConfig.ImageSrcDirectory), 0777)
+	os.Mkdir(path.Join(CurrentConfig.ImageRootDirectory, CurrentConfig.ImageMetaDirectory), 0777)
+
+	for k, _ := range CurrentConfig.ImageSizes {
+		os.Mkdir(path.Join(CurrentConfig.ImageRootDirectory, k), 0777)
+	}
+
+	return nil
 }
 
 // NewWebVars
@@ -114,31 +184,6 @@ func NewWebVars(u string) (*WebVars, error) {
 	return webvars, nil
 }
 
-// GenerateWebConfig
-//
-// Generates a new web configuration file in the given path.
-// This is required for fotoDen operation.
-
-func (config *WebConfig) GenerateWebConfig(filepath string) error {
-	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	fileinfo, _ := file.Stat()
-	if fileinfo.Size() > 0 {
-		return fmt.Errorf("GenerateWebConfig: file already exists")
-	}
-
-	configjson, _ := json.Marshal(config)
-	_, err = file.Write(configjson)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 // ConfigureWebFile
 //

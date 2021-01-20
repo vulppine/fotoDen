@@ -38,12 +38,10 @@ let isMobile
 let websiteTitle
 let workingDirectory
 let storageURLBase
+let imageRootDir
+let thumbnailFrom
 let displayImageFrom
-let downloadImageFrom
-let imageLargeDir
-let imageThumbDir
-let imageSrcDir
-let imageNamePrefix
+const imageSizes = Map()
 
 function setConfig () {
   const newURL = new URL(BaseURL)
@@ -70,27 +68,19 @@ function setConfig () {
 }
 
 function readConfig (info) {
-  websiteTitle = info.websiteTitle
+  websiteTitle = info.WebsiteTitle
   workingDirectory = info.WorkingDirectory
   storageURLBase = info.PhotoURLBase
+  thumbnailFrom = info.ThumbnailFrom
   displayImageFrom = info.DisplayImageFrom
-  downloadImageFrom = info.DownloadImageFrom
-  imageLargeDir = info.ImageLargeDir
-  imageThumbDir = info.ImageThumbDir
-  imageSrcDir = info.ImageSrcDir
+  imageRootDir = info.ImageRootDir
 
-  switch (displayImageFrom) {
-    case 'src':
-      displayImageFrom = imageSrcDir
-      break
-    case 'large':
-      displayImageFrom = imageLargeDir
-      imageNamePrefix = 'large_'
-      break
-    default:
-      console.log('Image display directory unknown, setting to thumb')
-      displayImageFrom = imageThumbDir
-  }
+  info.ImageSizes.forEach((i) => {
+    imageSizes.set(i.SizeName, {
+      directory: [imageRootDir, i.Directory].join('/'),
+      localBool: i.LocalBool
+    })
+  })
 }
 
 // generic functions
@@ -178,8 +168,8 @@ function getPageInfo (url) {
  *
  */
 
-function makePhotoURL (photoName, dir) {
-  if (storageURLBase === 'local' || storageURLBase === '') {
+function makePhotoURL (photoName, dir, localBool) {
+  if (storageURLBase === 'local' || storageURLBase === '' || localBool === true) {
     return getAlbumURL() + '/' + dir + '/' + photoName
   } else {
     const newURL = new URL(document.URL)
@@ -288,8 +278,8 @@ class PhotoViewer extends Viewer {
   }
 
   setPhoto (image) {
-    document.getElementsByClassName('mainPhoto')[0].src = makePhotoURL(imageNamePrefix + image, displayImageFrom)
-    document.getElementsByClassName('downloadButton')[0].href = makePhotoURL(imageNamePrefix + image, downloadImageFrom)
+    document.getElementsByClassName('mainPhoto')[0].src = makePhotoURL(displayImageFrom + '_' + image, imageSizes.get(displayImageFrom).directory, imageSizes.get(displayImageFrom).localBool)
+    document.getElementsByClassName('downloadButton')[0].href = makePhotoURL(displayImageFrom + '_' + image, imageSizes.get(displayImageFrom).directory, imageSizes.get(displayImageFrom).localBool)
   }
 }
 
@@ -321,8 +311,15 @@ class AlbumViewer extends Viewer {
 
     if (isNaN(this.currentPage)) { this.currentPage = 1 }
 
-    this.photos = this.info.ItemsInFolder
-    this.maxPhotos = this.info.ItemsInFolder.length
+    fetch(getAlbumURL() + 'itemsInfo.json')
+      .then(response => {
+        if (!response.ok) {
+          setError('Error: Could not access album items. Code: ' + response.status)
+        }
+        return response.json()
+      })
+      .then((data) => { this.photos = data.ItemsInFolder })
+    this.maxPhotos = this.photos.ItemsInFolder.length
     this.pageAmount = Math.ceil(this.maxPhotos / this.imagesPerPage)
 
     this.thumbnailContainer = this.container.getElementsByClassName('albumThumbnailContainer')[0]
@@ -371,7 +368,7 @@ class AlbumViewer extends Viewer {
     thumbnailAnchor.setAttribute('class', 'albumThumbnailLink')
 
     thumbnail.setAttribute('class', 'albumThumbnailImage')
-    thumbnail.setAttribute('src', imageThumbDir + '/thumb_' + photoName)
+    thumbnail.setAttribute('src', makePhotoURL(photoName, imageSizes.get(thumbnailFrom).directory, imageSizes.get(thumbnailFrom).localBool))
 
     return thumbnailContainer
   }
@@ -501,7 +498,7 @@ class FolderViewer extends Viewer {
 
       if (info.ItemsInFolder != null) {
         const newDiv = document.createElement('div')
-        newDiv.innerHTML = 'Photos: ' + info.ItemsInFolder.length // remember, this is still photo oriented...
+        newDiv.innerHTML = 'Photos: ' + info.ItemsAmount // remember, this is still photo oriented...
         folderItemCount.appendChild(newDiv)
       };
 

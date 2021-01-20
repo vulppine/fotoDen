@@ -25,24 +25,23 @@ import (
 //
 // -update updates the folder. (If the given args are null, or if there is no info file, it will return an error.)
 
-var GenFlag = flag.String("generate", "", "Generates a fotoDen structure in the current folder, or the default config in the configuration directory. Accepted modes: full, structure, config.")
+var GenFlag = flag.String("generate", "", "Generates a fotoDen structure in the current folder, or the default config in the configuration directory. Accepted modes: album, folder, config.")
 var NameFlag = flag.String("name", "", "The name of the folder (not the path). If this is blank, or not called, the current name of the folder will be used in generation.")
 var UpdFlag = flag.Bool("update", false, "Updates the fotoDen folder. (Currently only updates the folder subdirectories)")
 var SourceFlag = flag.String("source", "", "The source used for fotoDen images. This is multi-context - calling this during -generate full will take images from the source directory as its base, and calling this during -init root will use this as the fotoDen image storage provider.")
 var CopyFlag = flag.Bool("copy", false, "Copies files over to GeneratorConfig.ImageSrcDirectory. Useful if you're copying over to a remote directory.")
-var ThumbBool = flag.Bool("thumb", true, "Generates thumbnails to GeneratorConfig.ImageThumbDirectory. Is automatically set to true.")
 var ThumbSrc = flag.String("folthumb", "", "The name of the thumbnail in the source directory. This will be selected as the thumbnail of the folder, and is copied over to the root of the folder.")
-var LargeFlag = flag.Bool("large", true, "Generates a 'large' version of your image, which is actually a scaled down version of the image meant for display. The default setting is 'true', and all images are put into a folder called 'img/large'.")
+var GenSizeFlag = flag.Bool("gensizes", true, "Tells the generator to generate all sizes in the config. This is automatically set to true.")
 var ConfigSrc = flag.String("config", "", "The name of the config file to use. If this isn't set, the one is $CONFIG/fotoDen is used - otherwise, an error is returned. Call 'fotoDen -generate config' to create a config in either $CONFIG/fotoden, or in a relative folder if defined.")
 var InitFlag = flag.String("init", "", "Initializes various aspects of fotoDen. Accepted values: config, root, templates, js. config should only be done if the config folder was removed, as it is automatically called at the first start of the program.")
 var VerboseFlag = flag.Bool("verbose", false, "Sets verbose mode.")
 var VerboseFlagShort = flag.Bool("v", false, "Sets verbose mode.")
 
-func ParseGen(mode string, arg string, options *GeneratorOptions) error {
+func ParseGen(mode string, arg string, options GeneratorOptions) error {
 	wd, _ := os.Getwd()
 	verbose("Starting from " + wd)
 	switch mode {
-	case "full":
+	case "album", "folder":
 		switch {
 		case arg == "":
 			if *NameFlag == "" {
@@ -65,37 +64,6 @@ func ParseGen(mode string, arg string, options *GeneratorOptions) error {
 				}
 			} else {
 				err := GenerateFolder(*NameFlag, arg, options)
-				if checkError(err) {
-					return err
-				}
-			}
-		default:
-			fmt.Println("Something really wrong happened. How the hell did you do that?")
-			return fmt.Errorf("Unexplainable error occurred")
-		}
-	case "structure":
-		switch {
-		case arg == "":
-			if *NameFlag == "" {
-				err := GenerateFolderStructure(path.Base(wd), path.Base(wd))
-				if checkError(err) {
-					return err
-				}
-			} else {
-				err := GenerateFolderStructure(*NameFlag, path.Base(wd))
-				if checkError(err) {
-					return err
-				}
-			}
-		case arg != "":
-			if *NameFlag == "" {
-				name := path.Base(wd)
-				err := GenerateFolderStructure(name, arg)
-				if checkError(err) {
-					return err
-				}
-			} else {
-				err := GenerateFolderStructure(*NameFlag, arg)
 				if checkError(err) {
 					return err
 				}
@@ -141,11 +109,15 @@ func ParseCmd() error {
 		verbose(fmt.Sprint("Generator verbosity: ", generator.Verbose))
 	}
 
-	genoptions := new(GeneratorOptions)
-	genoptions.source = *SourceFlag
-	genoptions.copy = *CopyFlag
-	genoptions.thumb = *ThumbBool
-	genoptions.large = *LargeFlag
+	genoptions := GeneratorOptions{
+		source: *SourceFlag,
+		copy: *CopyFlag,
+		gensizes: *GenSizeFlag,
+	}
+
+	if *GenFlag == "folder" {
+		genoptions.imagegen = false
+	}
 	verbose("Current generator options [source/copy/thumb]: " + fmt.Sprint(genoptions))
 
 	flag.Visit(func(flag *flag.Flag) { verbose("Flag setting: " + fmt.Sprint(flag.Name, " ", flag.Value)) })

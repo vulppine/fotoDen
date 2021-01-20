@@ -30,10 +30,11 @@ import (
 // from the flags.
 
 type GeneratorOptions struct {
-	source string
-	copy   bool
-	thumb  bool
-	large  bool
+	source   string
+	copy     bool
+	gensizes bool
+	imagegen bool
+	sort     bool
 }
 
 func checkError(err error) bool {

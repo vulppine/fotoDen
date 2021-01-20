@@ -11,59 +11,64 @@ import (
 	"path/filepath"
 )
 
-func GenerateItems(fpath string, options *GeneratorOptions) (int, error) {
+func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 	verbose("Generating item information to " + fpath)
 	var waitgroup sync.WaitGroup
 
-	if options.source != "" {
-		verbose("Changing to directory: " + options.source)
-		wd, err := os.Getwd()
-		checkError(err)
-		fpath, err = filepath.Abs(fpath)
-		checkError(err)
-		source, err := filepath.Abs(options.source)
-		checkError(err)
-
-		defer os.Chdir(wd)
-		os.Chdir(source)
-		verbose("Current directory: " + source)
-	}
-
-	dir, err := os.Open("./")
-	defer dir.Close()
-	if checkError(err) {
-		panic(err)
-	}
-
 	items, err := generator.GenerateItemInfo(options.source)
-	fileArray := items.ItemsInFolder
 
-	if len(fileArray) > 0 {
+	if len(items.ItemsInFolder) > 0 {
+		if options.sort == true {
+			sort.Strings(items.ItemsInFolder)
+		}
+		err = generator.MakeAlbumDirectoryStructure(fpath)
+		if checkError(err) {
+			panic(err)
+		}
+
+		if options.source != "" {
+			verbose("Changing to directory: " + options.source)
+			wd, err := os.Getwd()
+			checkError(err)
+			fpath, err = filepath.Abs(fpath)
+			checkError(err)
+			source, err := filepath.Abs(options.source)
+			checkError(err)
+
+			defer os.Chdir(wd)
+			os.Chdir(source)
+			verbose("Current directory: " + func() string {
+				dir, _ := os.Getwd()
+				return dir
+			}())
+		}
+
+		dir, err := os.Open("./")
+		defer dir.Close()
+		if checkError(err) {
+			panic(err)
+		}
+
 		if options.copy == true {
 			waitgroup.Add(1)
 			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
 				fmt.Println("Copying files...")
-				err = generator.BatchCopyFile(fileArray, path.Join(fpath, generator.CurrentConfig.ImageSrcDirectory))
+				err = generator.BatchCopyFile(items.ItemsInFolder, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageSrcDirectory))
 			}(&waitgroup)
 		}
 
-		if options.thumb == true {
-			waitgroup.Add(1)
-			go func(wg *sync.WaitGroup) {
-				defer wg.Done()
-				fmt.Println("Generating thumbnails...")
-				err = generator.BatchImageConversion(fileArray, "thumb", path.Join(fpath, generator.CurrentConfig.ImageThumbDirectory), generator.ScalingOptions["thumb"])
-			}(&waitgroup)
-		}
-
-		if options.large == true {
-			waitgroup.Add(1)
-			go func(wg *sync.WaitGroup) {
-				defer wg.Done()
-				fmt.Println("Generating display images...")
-				err = generator.BatchImageConversion(fileArray, "large", path.Join(fpath, generator.CurrentConfig.ImageLargeDirectory), generator.ScalingOptions["large"])
-			}(&waitgroup)
+		if options.gensizes == true {
+			for k, v := range generator.CurrentConfig.ImageSizes {
+				sizeName := k
+				sizeOpts := v
+				waitgroup.Add(1)
+				go func(wg *sync.WaitGroup) {
+					defer wg.Done()
+					fmt.Printf("Generating size %s...\n", sizeName)
+					err = generator.BatchImageConversion(items.ItemsInFolder, sizeName, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, sizeName), sizeOpts)
+				}(&waitgroup)
+			}
 		}
 
 		err = items.WriteItemsInfo(path.Join(fpath, "itemsInfo.json"))
@@ -80,9 +85,7 @@ func GenerateItems(fpath string, options *GeneratorOptions) (int, error) {
 		// therefore, we need to immediately panic before continuing onwards
 	}
 
-
-
-	return len(fileArray), nil
+	return len(items.ItemsInFolder), nil
 }
 
 // UpdateFolderImages
@@ -93,22 +96,44 @@ func GenerateItems(fpath string, options *GeneratorOptions) (int, error) {
 //
 // This should, in fact, make a difference between the arrays and copy over any new files...
 
-func UpdateFolderImages(folder string, mode string) error {
+func UpdateImages(folder string, options GeneratorOptions) error {
 	items := new(generator.Items)
 
-	err := items.ReadItemsInfo(path.Join(folder, "items.json"))
+	err := items.ReadItemsInfo(path.Join(folder, "itemsInfo.json"))
 	if checkError(err) {
 		return err
 	}
 
-	dir, err := ioutil.ReadDir(folder)
+	dir, err := ioutil.ReadDir(options.source)
 	if checkError(err) {
 		return err
 	}
 
-	items.ItemsInFolder = generator.GetArrayOfFiles(dir)
-	if mode == "sort" {
+	if options.source != "" {
+		verbose("Changing to directory: " + options.source)
+		wd, err := os.Getwd()
+		checkError(err)
+		folder, err = filepath.Abs(folder)
+		checkError(err)
+		source, err := filepath.Abs(options.source)
+		checkError(err)
+
+		defer os.Chdir(wd)
+		os.Chdir(source)
+		verbose("Current directory: " + func() string {
+			dir, _ := os.Getwd()
+			return dir
+		}())
+	}
+
+	items.ItemsInFolder = generator.IsolateImages(generator.GetArrayOfFiles(dir))
+	if options.sort {
 		sort.Strings(items.ItemsInFolder)
+	}
+
+	err = items.WriteItemsInfo(path.Join(folder, "itemsInfo.json"))
+	if checkError(err) {
+		return err
 	}
 
 	return nil
@@ -125,32 +150,30 @@ func UpdateFolderImages(folder string, mode string) error {
 // If the items in the folder are sorted, it uses sort.SearchStrings to find it in O(log n) time.
 // Otherwise, it will go through it in O(n) time.
 
-func DeleteImage(folder string, files []string) error {
+func DeleteImage(folder string, file string) error {
 	items := new(generator.Items)
 
-	err := items.ReadItemsInfo(path.Join(folder, "items.json"))
+	err := items.ReadItemsInfo(path.Join(folder, "itemsInfo.json"))
 	if checkError(err) {
 		return err
 	}
 
 	if sort.StringsAreSorted(items.ItemsInFolder) {
-		for i, _ := range files {
-			result := sort.SearchStrings(files, files[i])
-			if result != len(files) {
-				items.ItemsInFolder = append(items.ItemsInFolder[0:i-1], items.ItemsInFolder[i+1:len(items.ItemsInFolder)]...)
-			} else if files[result] == files[i] {
-				copy(items.ItemsInFolder[0:len(files)-1], items.ItemsInFolder)
-			} else {
-				fmt.Printf("File %s not found in items, skipping.", files[i])
-			}
+		result := sort.SearchStrings(items.ItemsInFolder, file)
+		if result == len(items.ItemsInFolder) {
+			copy(items.ItemsInFolder[0:result-1], items.ItemsInFolder)
+		} else if result == 0 {
+			copy(items.ItemsInFolder[1:len(items.ItemsInFolder)], items.ItemsInFolder)
+		} else if result != len(items.ItemsInFolder) && items.ItemsInFolder[result] == file {
+			items.ItemsInFolder = append(items.ItemsInFolder[0:result-1], items.ItemsInFolder[result+1:len(items.ItemsInFolder)]...)
+		} else {
+			fmt.Printf("File %s not found in items.", file)
 		}
 	} else {
-		for i, _ := range files {
-			items.ItemsInFolder = generator.RemoveItemFromStringArray(items.ItemsInFolder, files[i])
-		}
+		items.ItemsInFolder = generator.RemoveItemFromStringArray(items.ItemsInFolder, file)
 	}
 
-	err = items.WriteItemsInfo(path.Join(folder, "items.json"))
+	err = items.WriteItemsInfo(path.Join(folder, "itemsInfo.json"))
 	if checkError(err) {
 		return err
 	}
@@ -166,36 +189,69 @@ func DeleteImage(folder string, files []string) error {
 // Generates thumbnails for the given filenames, and copies them over,
 // and updates items.json accordingly.
 
-func InsertImage(folder string, files []string, mode string) error {
+func InsertImage(folder string, file string, mode string, options GeneratorOptions) error {
 	items := new(generator.Items)
 
-	err := items.ReadItemsInfo(path.Join(folder, "items.json"))
+	err := items.ReadItemsInfo(path.Join(folder, "itemsInfo.json"))
 	if checkError(err) {
 		return err
 	}
 
 	switch (mode) {
 	case "append":
-		items.ItemsInFolder = append(items.ItemsInFolder, files...)
+		items.ItemsInFolder = append(items.ItemsInFolder, file)
 	case "sort":
-		items.ItemsInFolder = append(items.ItemsInFolder, files...)
+		items.ItemsInFolder = append(items.ItemsInFolder, file)
 
 		sort.Strings(items.ItemsInFolder)
 	}
 
 	var waitgroup sync.WaitGroup
 
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-		fmt.Println("Copying files...")
-		err = generator.BatchCopyFile(files, path.Join(folder, generator.CurrentConfig.ImageSrcDirectory))
-	}(&waitgroup)
+	if options.source != "" {
+		verbose("Changing to directory: " + options.source)
+		wd, err := os.Getwd()
+		checkError(err)
+		folder, err = filepath.Abs(folder)
+		checkError(err)
+		source, err := filepath.Abs(options.source)
+		checkError(err)
 
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-		fmt.Println("Generating thumbnails...")
-		err = generator.BatchImageConversion(files, "thumb", path.Join(folder, generator.CurrentConfig.ImageThumbDirectory), generator.ScalingOptions["thumb"])
-	}(&waitgroup)
+		defer os.Chdir(wd)
+		os.Chdir(source)
+		verbose("Current directory: " + func() string {
+			dir, _ := os.Getwd()
+			return dir
+		}())
+	}
+
+	dir, err := os.Open("./")
+	defer dir.Close()
+	if checkError(err) {
+		panic(err)
+	}
+
+	if options.copy {
+		waitgroup.Add(1)
+		go func(wg *sync.WaitGroup) {
+			defer wg.Done()
+			fmt.Println("Copying file...")
+			err = generator.BatchCopyFile([]string{file}, path.Join(folder, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageSrcDirectory))
+		}(&waitgroup)
+	}
+
+	if options.gensizes {
+		for k, v := range generator.CurrentConfig.ImageSizes {
+			sizeName := k
+			sizeOpts := v
+			waitgroup.Add(1)
+			go func(wg *sync.WaitGroup) {
+				defer wg.Done()
+				fmt.Printf("Generating size %s...\n", sizeName)
+				err = generator.BatchImageConversion([]string{file}, sizeName, path.Join(folder, sizeName), sizeOpts)
+			}(&waitgroup)
+		}
+	}
 
 	waitgroup.Wait()
 	if checkError(err) {
@@ -205,7 +261,7 @@ func InsertImage(folder string, files []string, mode string) error {
 		// therefore, we need to immediately panic before continuing onwards
 	}
 
-	err = items.WriteItemsInfo(path.Join(folder, "folderInfo.json"))
+	err = items.WriteItemsInfo(path.Join(folder, "itemsInfo.json"))
 	checkError(err)
 
 	return nil

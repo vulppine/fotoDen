@@ -67,32 +67,3 @@ func CopyFile(file string, name string, dest string) error {
 	return nil
 }
 
-// MakeAlbumDirectoryStructure
-//
-// Makes a fotoDen-suitable album structure in the given rootDirectory (string).
-// The directory must exist beforehand.
-
-func MakeAlbumDirectoryStructure(rootDirectory string) error {
-
-	currentDirectory, _ := os.Getwd()
-
-	defer func() {
-		verbose("Changing back to " + currentDirectory)
-		os.Chdir(currentDirectory)
-	}()
-
-	verbose("Attempting to change to " + rootDirectory)
-	err := os.Chdir(rootDirectory)
-	if err != nil {
-		return err
-	}
-
-	verbose("Creating directories in " + rootDirectory)
-	os.Mkdir(CurrentConfig.ImageRootDirectory, 0777)
-	os.Mkdir(CurrentConfig.ImageThumbDirectory, 0777)
-	os.Mkdir(CurrentConfig.ImageSrcDirectory, 0777)
-	os.Mkdir(CurrentConfig.ImageLargeDirectory, 0777)
-	os.Mkdir(CurrentConfig.ImageJSONDirectory, 0777)
-
-	return nil
-}

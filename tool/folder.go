@@ -6,45 +6,6 @@ import (
 	"path"
 )
 
-// GenerateFolderStructure
-//
-// Generates a fotoDen-compatible folder structure,
-// without copying over any images.
-//
-// It will be up to the end user to update the folder information file.
-//
-// Takes the folder's name, as well as its path.
-// Returns an error if any occur.
-
-func GenerateFolderStructure(name string, fpath string) error {
-	verbose("Generating folder structure...")
-	verbose("Making folder " + fpath)
-	err := os.Mkdir(fpath, 0755)
-	if checkError(err) {
-		panic(err) // can't continue!
-	}
-
-	err = generator.MakeAlbumDirectoryStructure(fpath)
-	if checkError(err) {
-		panic(err)
-	}
-
-	newFolder, err := generator.GenerateFolderInfo(fpath, name)
-	if checkError(err) {
-		return err
-	}
-
-	err = CopyWeb("folder", fpath) // it's automatically a folder because of the 0 image amount
-	checkError(err)
-
-	err = newFolder.WriteFolderInfo(path.Join(fpath, "folderInfo.json"))
-	if checkError(err) {
-		return err
-	}
-
-	return nil
-}
-
 // UpdateFolderSubdirectories
 //
 // A function to easily update a folder's subdirectories.
@@ -87,15 +48,10 @@ func UpdateFolderSubdirectories(fpath string) error {
 // Takes the folder's name, as well as its path.
 // Returns an error if any occur.
 
-func GenerateFolder(name string, fpath string, options *GeneratorOptions) error {
+func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 	err := os.Mkdir(fpath, 0755)
 	if checkError(err) {
 		panic(err) // can't continue!
-	}
-
-	err = generator.MakeAlbumDirectoryStructure(fpath)
-	if checkError(err) {
-		panic(err)
 	}
 
 	if *ThumbSrc != "" {
@@ -108,13 +64,15 @@ func GenerateFolder(name string, fpath string, options *GeneratorOptions) error 
 		return err
 	}
 
-	fileAmount, err := GenerateItems(fpath, options)
-	if fileAmount > 0 {
-		err = CopyWeb("album", fpath)
-		checkError(err)
-	} else {
-		err = CopyWeb("folder", fpath)
-		checkError(err)
+	if options.imagegen == true {
+		fileAmount, err := GenerateItems(fpath, options)
+		if fileAmount > 0 {
+			err = CopyWeb("album", fpath)
+			checkError(err)
+		} else {
+			err = CopyWeb("folder", fpath)
+			checkError(err)
+		}
 	}
 
 	err = folder.WriteFolderInfo(path.Join(fpath, "folderInfo.json"))

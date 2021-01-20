@@ -30,17 +30,23 @@ type Folder struct {
 }
 
 type Items struct {
+	Metadata			bool	 // Dictates whether or not each image has its own ImageMeta object.
+								 // If this is false, then no metadata will be read.
 	ItemsInFolder       []string // All the items in a folder, by name, in an array.
 }
 
+// TODO: Implement this!
+
+type ImageMeta struct {
+	ImageName			string   // The name of an image.
+	ImageDesc			string   // The description of an image.
+}
+
 type GeneratorConfig struct {
-	ThumbImageScale     ImageScale
-	LargeImageScale     ImageScale
 	ImageRootDirectory  string // where all images are stored (default: img)
-	ImageThumbDirectory string // where all thumbnails are stored (default: ImageRootDirectory/thumb)
-	ImageLargeDirectory string // where all 'large' display images are stored (default: ImageRootDirectory/large)
 	ImageSrcDirectory   string // where all source images are stored (default: ImageRootDirectory/src)
-	ImageJSONDirectory  string // where all JSON files per image are stored (default: ImageRootDirectory/json)
+	ImageMetaDirectory  string // where all meta files per image are stored (default: ImageRootDirectory/meta)
+	ImageSizes			map[string]ImageScale
 	WebSourceLocation   string // where all html/css/js files are stored for fotoDen's functionality
 	WebBaseURL          string // what the base URL is (aka, fotoDen's location)
 }
@@ -50,18 +56,17 @@ type GeneratorConfig struct {
 var userConfigDir, _ = os.UserConfigDir()
 var FotoDenConfigDir = path.Join(userConfigDir, "fotoDen")
 var DefaultConfig GeneratorConfig = GeneratorConfig{
-	ThumbImageScale:     ImageScale{MaxHeight: 800},
-	LargeImageScale:     ImageScale{ScalePercent: 0.5},
 	ImageRootDirectory:  "img",
-	ImageThumbDirectory: "thumb",
-	ImageLargeDirectory: "large",
+	ImageMetaDirectory:  "meta",
+	ImageSizes: map[string]ImageScale{
+		"thumb": ImageScale{MaxHeight: 800},
+		"large": ImageScale{ScalePercent: 0.5},
+	},
 	ImageSrcDirectory:   "src",
-	ImageJSONDirectory:  "json",
 	WebSourceLocation:   path.Join(FotoDenConfigDir, "web"), // remember when $HOME webpage folders were a thing?
 	WebBaseURL:          "",                                 // this should be set during configuration generation
 }
 var CurrentConfig GeneratorConfig
-var ScalingOptions map[string]ImageScale = make(map[string]ImageScale)
 
 var WorkingDirectory, _ = os.Getwd()
 var Verbose bool // if this is set, everything important is printed
@@ -112,9 +117,6 @@ func OpenfotoDenConfig(configLocation string) error {
 	if err != nil {
 		return err
 	}
-
-	ScalingOptions["thumb"] = CurrentConfig.ThumbImageScale
-	ScalingOptions["large"] = CurrentConfig.LargeImageScale
 
 	return nil
 }

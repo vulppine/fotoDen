@@ -79,17 +79,13 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 	err = generator.CopyFile(path.Join(generator.CurrentConfig.WebSourceLocation, "theme.css"), "theme.css", path.Join(rootpath, "css"))
 	checkError(err)
 
-	webconfig := generator.NewWebConfig(*SourceFlag)
+	webconfig := generator.GenerateWebConfig(*SourceFlag)
 	if *SourceFlag == "" {
-		fmt.Println("You will have to configure your photo storage provider in %v.", path.Join(rootpath, "config.json"))
+		fmt.Printf("You will have to configure your photo storage provider in %v.", path.Join(rootpath, "config.json"))
 	}
 	webconfig.WorkingDirectory = path.Base(rootpath)
-	webconfig.ImageThumbDir = generator.CurrentConfig.ImageThumbDirectory
-	webconfig.ImageSrcDir = generator.CurrentConfig.ImageSrcDirectory
-	webconfig.ImageLargeDir = generator.CurrentConfig.ImageLargeDirectory
-	webconfig.PhotoExtension = ".jpg"
 
-	err = webconfig.GenerateWebConfig(path.Join(rootpath, "config.json"))
+	err = webconfig.WriteWebConfig(path.Join(rootpath, "config.json"))
 	if checkError(err) {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"path"
 	"fmt"
+	"os"
 )
 
 func TestJSONRW(t *testing.T) {
@@ -42,7 +43,7 @@ func TestFotoDenConfigRW(t *testing.T) {
 	}
 
 	f, _ := ioutil.ReadFile(path.Join(dir, "tmp_config.json"))
-	t.Log(fmt.Printf("%s", f))
+	t.Log(string(f))
 
 	err = OpenfotoDenConfig(path.Join(dir, "tmp_config.json"))
 	if err != nil {
@@ -69,4 +70,68 @@ func TestFolderInfoCRW(t *testing.T) {
 		t.Errorf("Error - ReadFolderInfo: " + fmt.Sprint(err))
 	}
 	t.Log(fmt.Sprint(folder))
+}
+
+func TestItemsInfoCRW(t *testing.T) {
+	dir := t.TempDir()
+
+	items, err := GenerateItemInfo("../test_images")
+	if err != nil {
+		t.Errorf("Error - GenerateItemInfo: " + fmt.Sprint(err))
+	}
+
+	err = items.WriteItemsInfo(path.Join(dir, "itemsInfo.json"))
+	if err != nil {
+		t.Errorf("Error - WriteItemsInfo: " + fmt.Sprint(err))
+	}
+
+	err = items.ReadItemsInfo(path.Join(dir, "itemsInfo.json"))
+	if err != nil {
+		t.Errorf("Error: ReadItemsInfo: " + fmt.Sprint(err))
+	}
+	t.Log(fmt.Sprint(items))
+}
+
+func TestBatchCopyConvert(t *testing.T) {
+	dir := t.TempDir()
+	dir2 := path.Join(dir, t.TempDir())
+
+	src, err := ioutil.ReadDir("../test_images")
+	if err != nil {
+		t.Errorf("Error: Opening test images folder: " + fmt.Sprint(err))
+	}
+	srcfiles := GetArrayOfFiles(src)
+
+	defer os.Chdir(WorkingDirectory)
+	os.Chdir("../test_images")
+
+	err = BatchCopyFile(srcfiles, dir)
+	if err != nil {
+		t.Errorf("Error: BatchCopyFile: " + fmt.Sprint(err))
+	}
+
+	os.Chdir(dir)
+
+	err = BatchImageConversion(srcfiles, "test", dir2, ImageScale{ScalePercent:0.99})
+	if err != nil {
+		t.Errorf("Error: BatchImageConversion: " + fmt.Sprint(err))
+	}
+}
+
+func TestWebConfigCRW(t *testing.T) {
+	dir := t.TempDir()
+
+	webconfig := GenerateWebConfig("https://localhost/")
+
+	err := webconfig.WriteWebConfig(path.Join(dir, "config.json"))
+	if err != nil {
+		t.Errorf("Error - WriteWebConfig: " + fmt.Sprint(err))
+	}
+
+	err = webconfig.ReadWebConfig(path.Join(dir, "config.json"))
+	if err != nil {
+		t.Errorf("Error - ReadWebConfig: " + fmt.Sprint(err))
+	}
+
+	t.Log(fmt.Sprint(webconfig))
 }

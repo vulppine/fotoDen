@@ -122,6 +122,8 @@ func GenerateItemInfo(directory string) (*Items, error) {
 		return items, err
 	}
 
+	defer os.Chdir(WorkingDirectory)
+	os.Chdir(directory)
 	items.ItemsInFolder = IsolateImages(GetArrayOfFiles(dirContents))
 
 	return items, nil

@@ -130,7 +130,7 @@ func ResizeImage(imageName string, newName string, scale ImageScale, dest string
 // This is only here to make fotoDen's command line tool look cleaner in code, and avoid importing more than needed.
 
 func MakeFolderThumbnail(file string, directory string) error {
-	err := ResizeImage(file, "thumb.jpg", ScalingOptions["thumb"], directory, bimg.JPEG)
+	err := ResizeImage(file, "thumb.jpg", CurrentConfig.ImageSizes["thumb"], directory, bimg.JPEG)
 	if err != nil {
 		return err
 	}
