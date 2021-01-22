@@ -12,7 +12,6 @@ import (
 // Isolates images in an array.
 //
 // Checks all image files at O(n), if a file is not an image, removes it from the current slice.
-
 func IsolateImages(files []string) []string {
 	for i := 0; i < len(files); i++ {
 		image, err := bimg.Read(files[i])
@@ -30,6 +29,12 @@ func IsolateImages(files []string) []string {
 	return files
 }
 
+type ImageScale struct {
+	MaxHeight    int
+	MaxWidth     int
+	ScalePercent float32
+}
+
 // ResizeImage
 //
 // Resizes a single image.
@@ -45,35 +50,6 @@ func IsolateImages(files []string) []string {
 //
 // The function will output the image to the given directory, without changing the name.
 // It will return an error if the filename given already exists in the destination directory.
-
-type ImageScale struct {
-	MaxHeight    int
-	MaxWidth     int
-	ScalePercent float32
-}
-
-type ImageScaleJSON struct {
-	MaxHeight    string
-	MaxWidth     string
-	ScalePercent string
-}
-
-/*
-func jsonToImageScale(i ImageScaleJSON) ImageScale {
-	scale := new(ImageScale)
-
-	maxheight, _ := strconv.ParseInt(i.MaxHeight, 10, 0)
-	maxwidth, _ := strconv.ParseInt(i.MaxWidth, 10, 0)
-	scalepercent, _ := strconv.ParseFloat(i.ScalePercent, 32)
-
-	scale.maxheight = int(maxheight)
-	scale.maxwidth = int(maxwidth)
-	scale.scalepercent = float32(scalepercent)
-
-	return *scale
-}
-*/
-
 func ResizeImage(imageName string, newName string, scale ImageScale, dest string, imageFormat bimg.ImageType) error {
 	image, err := bimg.Read(imageName)
 	if err != nil {
@@ -128,7 +104,6 @@ func ResizeImage(imageName string, newName string, scale ImageScale, dest string
 // MakeThumbnail
 //
 // This is only here to make fotoDen's command line tool look cleaner in code, and avoid importing more than needed.
-
 func MakeFolderThumbnail(file string, directory string) error {
 	err := ResizeImage(file, "thumb.jpg", CurrentConfig.ImageSizes["thumb"], directory, bimg.JPEG)
 	if err != nil {

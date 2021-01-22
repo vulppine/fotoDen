@@ -10,7 +10,6 @@ import (
 //
 // Takes an array of os.FileInfo (from os.Readdir()), and returns a string array of all non-directories.
 // Also returns a string array of directories, so we don't have to copy and paste this function.
-
 func GetArrayOfFilesAndFolders(directory []os.FileInfo) ([]string, []string) {
 	fileArray := make([]string, 0)
 	folderArray := make([]string, 0)
@@ -27,7 +26,6 @@ func GetArrayOfFilesAndFolders(directory []os.FileInfo) ([]string, []string) {
 }
 
 // Wrappers for both, just in case only one of the two is needed
-
 func GetArrayOfFiles(directory []os.FileInfo) []string {
 	fileArray, _ := GetArrayOfFilesAndFolders(directory)
 	return fileArray
@@ -45,7 +43,6 @@ func GetArrayOfFolders(directory []os.FileInfo) []string {
 // via the current working directory.
 //
 // Returns an error if one occurs - otherwise returns nil.
-
 func CopyFile(file string, name string, dest string) error {
 	verbose("Copying " + file + " to " + path.Join(dest, name))
 	fileReader, err := ioutil.ReadFile(file)
@@ -66,4 +63,3 @@ func CopyFile(file string, name string, dest string) error {
 
 	return nil
 }
-

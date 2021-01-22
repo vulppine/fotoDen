@@ -10,7 +10,6 @@ import (
 // WebConfig
 //
 // The structure of the JSON config file that fotoDen uses.
-
 type WebConfig struct {
 	WebsiteTitle     string
 	WorkingDirectory string
@@ -24,7 +23,6 @@ type WebConfig struct {
 // WebImageSize
 //
 // A structure for image size types that fotoDen will call on.
-
 type WebImageSize struct {
 	SizeName string			// the semantic name of the size
 	Directory string		// the directory the size is stored in, relative to ImageRootDir
@@ -34,7 +32,6 @@ type WebImageSize struct {
 // WebVars
 //
 // These will dictate where fotoDen gets its JavaScript and CSS files per page.
-
 type WebVars struct {
 	BaseURL     string
 	JSLocation  string
@@ -43,14 +40,8 @@ type WebVars struct {
 
 // GenerateWebConfig
 //
-// Generates a new web configuration file in the given path.
-// This is required for fotoDen operation.
-
-// NewWebConfig
-//
 // Creates a new WebConfig object, and returns a WebConfig object with a populated ImageSizes
 // based on the current ScalingOptions map.
-
 func GenerateWebConfig(source string) *WebConfig {
 
 	webconfig := new(WebConfig)
@@ -81,7 +72,7 @@ func (config *WebConfig) ReadWebConfig(filepath string) error {
 }
 
 func (config *WebConfig) WriteWebConfig(filepath string) error {
-	err := WriteJSON(filepath, config)
+	err := WriteJSON(filepath, "multi", config)
 	if err != nil {
 		return err
 	}
@@ -96,7 +87,6 @@ func (config *WebConfig) WriteWebConfig(filepath string) error {
 //
 // It is up to the fotoDen tool to copy over the relevant files,
 // and folder configuration.
-
 func GenerateWebRoot(filepath string) error {
 	err := os.Mkdir(filepath, 0755)
 	if err != nil {
@@ -120,7 +110,6 @@ func GenerateWebRoot(filepath string) error {
 //
 // Makes a fotoDen-suitable album structure in the given rootDirectory (string).
 // The directory must exist beforehand.
-
 func MakeAlbumDirectoryStructure(rootDirectory string) error {
 
 	currentDirectory, _ := os.Getwd()
@@ -162,7 +151,6 @@ func MakeAlbumDirectoryStructure(rootDirectory string) error {
 // 								and is mostly an optional path.
 //
 // If an error occurs, returns an empty WebVars and the error, otherwise returns a filled WebVars.
-
 func NewWebVars(u string) (*WebVars, error) {
 
 	webvars := new(WebVars)
@@ -194,7 +182,6 @@ func NewWebVars(u string) (*WebVars, error) {
 // This should only be done once, ideally,
 // and copied over to a configuration directory
 // for fotoDen to use (in essence, CurrentConfig.WebSourceDirectory)
-
 func ConfigureWebFile(source string, dest string, config *WebVars) error {
 	webpage, err := template.ParseFiles(source)
 	if err != nil {

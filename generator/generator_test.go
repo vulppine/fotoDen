@@ -15,7 +15,7 @@ func TestJSONRW(t *testing.T) {
 		Test string
 	}
 
-	err := WriteJSON(path.Join(dir, "tmp_json.json"), JSON{"test"})
+	err := WriteJSON(path.Join(dir, "tmp_json.json"), "single", JSON{"test"})
 	if err != nil {
 		t.Errorf("Error - WriteJSON: " + fmt.Sprint(err))
 	}

@@ -15,7 +15,6 @@ import (
 //
 // Sets up web templates according to a given URL, and path containing templates.
 // All templates should be labelled with [photo, album, folder]-template.html.
-
 func InitializeWebTemplates(u string, srcpath string) error {
 
 	webvars, err := generator.NewWebVars(u)
@@ -38,7 +37,6 @@ func InitializeWebTemplates(u string, srcpath string) error {
 //
 // Sets a single variable as needed in fotoDen.js, from a path where it is located.
 // Copies it over to generator.CurrentConfig.WebSourceLocation afterwards.
-
 func InitializefotoDenjs(u string, fpath string) error {
 
 	webvars, err := generator.NewWebVars(u)
@@ -66,7 +64,6 @@ func InitializefotoDenjs(u string, fpath string) error {
 // A fotoDen page can be anything, as long as the required tags are there,
 // but if it is being generated via this tool,
 // it is, by default, a folder.
-
 func InitializefotoDenRoot(rootpath string, name string) error {
 
 	err := generator.GenerateWebRoot(rootpath)
@@ -79,11 +76,17 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 	err = generator.CopyFile(path.Join(generator.CurrentConfig.WebSourceLocation, "theme.css"), "theme.css", path.Join(rootpath, "css"))
 	checkError(err)
 
-	webconfig := generator.GenerateWebConfig(*SourceFlag)
-	if *SourceFlag == "" {
-		fmt.Printf("You will have to configure your photo storage provider in %v.", path.Join(rootpath, "config.json"))
+	var webconfig *generator.WebConfig
+
+	if *WizardFlag == true {
+		webconfig = SetupWebConfig(*SourceFlag)
+	} else {
+		webconfig = generator.GenerateWebConfig(*SourceFlag)
+		if *SourceFlag == "" {
+			fmt.Printf("You will have to configure your photo storage provider in %v.", path.Join(rootpath, "config.json"))
+		}
+		webconfig.WorkingDirectory = path.Base(rootpath)
 	}
-	webconfig.WorkingDirectory = path.Base(rootpath)
 
 	err = webconfig.WriteWebConfig(path.Join(rootpath, "config.json"))
 	if checkError(err) {
@@ -110,17 +113,27 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 // This should only be done once.
 //
 // Takes a single string to set WebBaseURL as.
-
-func InitializefotoDenConfig(u string) error {
+func InitializefotoDenConfig(u string, dest string) error {
 	fmt.Println("Initializing fotoDen config with base URL: ", u)
 	err := os.MkdirAll(generator.DefaultConfig.WebSourceLocation, 0755)
 	if checkError(err) {
 		panic(err)
 	}
 
-	generator.CurrentConfig.WebBaseURL = u
+	var config generator.GeneratorConfig
 
-	err = generator.WritefotoDenConfig(generator.DefaultConfig, path.Join(generator.FotoDenConfigDir, "config.json"))
+	if *WizardFlag == true {
+		config = SetupConfig()
+	} else {
+		config = generator.DefaultConfig
+		generator.CurrentConfig.WebBaseURL = u
+	}
+
+	if dest == "" {
+		dest = path.Join(generator.FotoDenConfigDir, "config.json")
+	}
+
+	err = generator.WritefotoDenConfig(config, dest)
 	if checkError(err) {
 		panic(err)
 	}

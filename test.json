@@ -1,0 +1,19 @@
+{
+	"ImageRootDirectory": "img",
+	"ImageSrcDirectory": "src",
+	"ImageMetaDirectory": "",
+	"ImageSizes": {
+		"test": {
+			"MaxHeight": 0,
+			"MaxWidth": 0,
+			"ScalePercent": 0
+		},
+		"test2": {
+			"MaxHeight": 0,
+			"MaxWidth": 0,
+			"ScalePercent": 0
+		}
+	},
+	"WebSourceLocation": "",
+	"WebBaseURL": "test"
+}

@@ -28,7 +28,6 @@ import (
 // - large
 //
 // from the flags.
-
 type GeneratorOptions struct {
 	source   string
 	copy     bool

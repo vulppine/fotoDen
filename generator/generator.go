@@ -77,16 +77,27 @@ func verbose(print string) {
 	}
 }
 
-func WriteJSON(filePath string, iface interface{}) error {
+func WriteJSON(filePath string, mode string, iface interface{}) error {
 	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
 	}
 
-	toWrite, err := json.Marshal(iface)
-	if err != nil {
-		return err
+	var toWrite []byte
+
+	switch mode {
+	case "single":
+		toWrite, err = json.Marshal(iface)
+		if err != nil {
+			return err
+		}
+	case "multi":
+		toWrite, err = json.MarshalIndent(iface, "", "\t")
+		if err != nil {
+			return err
+		}
 	}
+
 
 	_, err = file.Write(toWrite)
 	if err != nil {
@@ -124,9 +135,8 @@ func OpenfotoDenConfig(configLocation string) error {
 // WritefotoDenConfig
 //
 // Attempts to write CurrentConfig to a new file at configLocation.
-
 func WritefotoDenConfig(config GeneratorConfig, configLocation string) error {
-	err := WriteJSON(configLocation, config)
+	err := WriteJSON(configLocation, "multi", config)
 	if err != nil {
 		return err
 	}

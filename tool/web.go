@@ -19,7 +19,6 @@ import (
 // - folder-template.html
 //
 // Takes a string indicating the mode, and a destination folder. Returns an error if any occur.
-
 func CopyWeb(mode string, dest string) error {
 	var err error
 	inst := "One or more theme files may be missing. You'll need to download a valid fotoDen theme in order to use fotoDen. Once you have it downloaded, insert the files into $CONFIG/fotoDen/web, and try regenerating the folder."

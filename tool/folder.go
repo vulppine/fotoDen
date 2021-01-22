@@ -11,7 +11,6 @@ import (
 // A function to easily update a folder's subdirectories.
 //
 // Takes the path of the fotoDen folder.
-
 func UpdateFolderSubdirectories(fpath string) error {
 	folder := new(generator.Folder)
 
@@ -47,7 +46,6 @@ func UpdateFolderSubdirectories(fpath string) error {
 //
 // Takes the folder's name, as well as its path.
 // Returns an error if any occur.
-
 func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 	err := os.Mkdir(fpath, 0755)
 	if checkError(err) {

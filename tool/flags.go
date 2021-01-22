@@ -34,6 +34,7 @@ var ThumbSrc = flag.String("folthumb", "", "The name of the thumbnail in the sou
 var GenSizeFlag = flag.Bool("gensizes", true, "Tells the generator to generate all sizes in the config. This is automatically set to true.")
 var ConfigSrc = flag.String("config", "", "The name of the config file to use. If this isn't set, the one is $CONFIG/fotoDen is used - otherwise, an error is returned. Call 'fotoDen -generate config' to create a config in either $CONFIG/fotoden, or in a relative folder if defined.")
 var InitFlag = flag.String("init", "", "Initializes various aspects of fotoDen. Accepted values: config, root, templates, js. config should only be done if the config folder was removed, as it is automatically called at the first start of the program.")
+var WizardFlag = flag.Bool("interactive", true, "Enables interactive mode. Interactive mode occurs when settings need to be configured in files.")
 var VerboseFlag = flag.Bool("verbose", false, "Sets verbose mode.")
 var VerboseFlagShort = flag.Bool("v", false, "Sets verbose mode.")
 
@@ -134,7 +135,7 @@ func ParseCmd() error {
 		verbose("Checking init flag..." + fmt.Sprint(*InitFlag))
 		switch *InitFlag {
 		case "config":
-			err := InitializefotoDenConfig(arg)
+			err := InitializefotoDenConfig(*SourceFlag, arg)
 			return err
 		case "root":
 			err := InitializefotoDenRoot(arg, *NameFlag)

@@ -18,7 +18,6 @@ import (
 //
 // Returns a Folder object if successful, and a nil error,
 // otherwise returns a potentially incomplete object, and an error.
-
 func GenerateFolderInfo(directory string, name string) (*Folder, error) {
 	folder := new(Folder)
 
@@ -75,7 +74,6 @@ func GenerateFolderInfo(directory string, name string) (*Folder, error) {
 //
 // A method for reading folder info from a file.
 // Returns an error if any occur.
-
 func (folder *Folder) ReadFolderInfo(filePath string) error {
 	verbose("Reading folder infomation from " + filePath)
 	err := ReadJSON(filePath, folder)
@@ -90,10 +88,9 @@ func (folder *Folder) ReadFolderInfo(filePath string) error {
 //
 // A method for writing folder info to a file.
 // Returns an error if any occur.
-
 func (folder *Folder) WriteFolderInfo(filePath string) error {
 	verbose("Writing folder (" + folder.FolderShortName + ") to " + filePath)
-	err := WriteJSON(filePath, folder)
+	err := WriteJSON(filePath, "multi", folder)
 	if err != nil {
 		return err
 	}
@@ -105,7 +102,6 @@ func (folder *Folder) WriteFolderInfo(filePath string) error {
 //
 // Generates an Items object based on the contents of the directory.
 // This automatically strips non-images.
-
 func GenerateItemInfo(directory string) (*Items, error) {
 	items := new(Items)
 
@@ -133,7 +129,6 @@ func GenerateItemInfo(directory string) (*Items, error) {
 //
 // A method for reading items info from a file.
 // Returns an error if any occur.
-
 func (items *Items) ReadItemsInfo(filePath string) error {
 	verbose("Reading items infomation from " + filePath)
 	err := ReadJSON(filePath, items)
@@ -148,10 +143,9 @@ func (items *Items) ReadItemsInfo(filePath string) error {
 //
 // A method for writing items info to a file.
 // Returns an error if any occur.
-
 func (items *Items) WriteItemsInfo(filePath string) error {
 	verbose("Writing items to " + filePath)
-	err := WriteJSON(filePath, items)
+	err := WriteJSON(filePath, "single", items)
 	if err != nil {
 		return err
 	}
@@ -166,7 +160,6 @@ func (items *Items) WriteItemsInfo(filePath string) error {
 // Updates a Folder object's subdirectories according to the given directory.
 // If directory is an empty string, will attempt to update the Folder from the current working directory.
 // Returns an error, if any occurs, otherwise the number of directories and a nil error.
-
 func (folder *Folder) UpdateSubdirectories(directory string) (int, error) {
 	var currentDirectory string
 	switch directory {

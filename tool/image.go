@@ -95,7 +95,6 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 // The folder will be updated with all the images in the current folder.
 //
 // This should, in fact, make a difference between the arrays and copy over any new files...
-
 func UpdateImages(folder string, options GeneratorOptions) error {
 	items := new(generator.Items)
 
@@ -149,7 +148,6 @@ func UpdateImages(folder string, options GeneratorOptions) error {
 //
 // If the items in the folder are sorted, it uses sort.SearchStrings to find it in O(log n) time.
 // Otherwise, it will go through it in O(n) time.
-
 func DeleteImage(folder string, file string) error {
 	items := new(generator.Items)
 
@@ -188,7 +186,6 @@ func DeleteImage(folder string, file string) error {
 // Accepts a n amount of file names.
 // Generates thumbnails for the given filenames, and copies them over,
 // and updates items.json accordingly.
-
 func InsertImage(folder string, file string, mode string, options GeneratorOptions) error {
 	items := new(generator.Items)
 
