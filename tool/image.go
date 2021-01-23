@@ -12,10 +12,12 @@ import (
 )
 
 func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
+	verbose("GenerateItems: Current generator options: " + fmt.Sprint(options))
 	verbose("Generating item information to " + fpath)
 	var waitgroup sync.WaitGroup
 
 	items, err := generator.GenerateItemInfo(options.source)
+	verbose("Current images in folder: " + fmt.Sprint(items.ItemsInFolder))
 
 	if len(items.ItemsInFolder) > 0 {
 		if options.sort == true {
@@ -59,6 +61,7 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 		}
 
 		if options.gensizes == true {
+			verbose("Attempting to generate from sizes: " + fmt.Sprint(generator.CurrentConfig.ImageSizes))
 			for k, v := range generator.CurrentConfig.ImageSizes {
 				sizeName := k
 				sizeOpts := v

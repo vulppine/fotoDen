@@ -1,6 +1,7 @@
 package tool
 
 import (
+	"fmt"
 	"github.com/vulppine/fotoDen/generator"
 	"os"
 	"path"
@@ -63,14 +64,18 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 	}
 
 	if options.imagegen == true {
+		verbose("Generating album...")
 		fileAmount, err := GenerateItems(fpath, options)
 		if fileAmount > 0 {
 			err = CopyWeb("album", fpath)
 			checkError(err)
 		} else {
-			err = CopyWeb("folder", fpath)
-			checkError(err)
+			return fmt.Errorf("Error: No images detected in source! Use -generate folder or a valid source!")
 		}
+	} else {
+		verbose("Generating folder...")
+		err = CopyWeb("folder", fpath)
+		checkError(err)
 	}
 
 	err = folder.WriteFolderInfo(path.Join(fpath, "folderInfo.json"))

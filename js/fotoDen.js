@@ -262,6 +262,10 @@ class Viewer {
   }
 
   getNavContentMinMax (total, current) {
+    if (total < this.navContentRange) {
+      return [1, total]
+    }
+
     let eachSide
     if (this.navContentRange % 2 !== 0) {
       eachSide = this.navContentRange - 1 / 2

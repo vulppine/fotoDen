@@ -116,8 +116,8 @@ func ParseCmd() error {
 		gensizes: *GenSizeFlag,
 	}
 
-	if *GenFlag == "folder" {
-		genoptions.imagegen = false
+	if *GenFlag == "album" {
+		genoptions.imagegen = true
 	}
 	verbose("Current generator options [source/copy/thumb]: " + fmt.Sprint(genoptions))
 
@@ -125,11 +125,17 @@ func ParseCmd() error {
 
 	if *ConfigSrc == "" && *InitFlag != "config" {
 		err := generator.OpenfotoDenConfig(path.Join(generator.FotoDenConfigDir, "config.json"))
-		verbose("Generator config: " + fmt.Sprint(generator.CurrentConfig))
+		if checkError(err) {
+			return err
+		}
+	} else if *InitFlag != "config" {
+		err := generator.OpenfotoDenConfig(*ConfigSrc)
 		if checkError(err) {
 			return err
 		}
 	}
+
+	verbose("Generator config: " + fmt.Sprint(generator.CurrentConfig))
 
 	if *InitFlag != "" {
 		verbose("Checking init flag..." + fmt.Sprint(*InitFlag))

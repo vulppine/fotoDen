@@ -5,6 +5,7 @@ import (
 	"github.com/vulppine/fotoDen/generator"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 // Initialization
@@ -115,10 +116,6 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 // Takes a single string to set WebBaseURL as.
 func InitializefotoDenConfig(u string, dest string) error {
 	fmt.Println("Initializing fotoDen config with base URL: ", u)
-	err := os.MkdirAll(generator.DefaultConfig.WebSourceLocation, 0755)
-	if checkError(err) {
-		panic(err)
-	}
 
 	var config generator.GeneratorConfig
 
@@ -130,10 +127,21 @@ func InitializefotoDenConfig(u string, dest string) error {
 	}
 
 	if dest == "" {
-		dest = path.Join(generator.FotoDenConfigDir, "config.json")
+		dest = generator.FotoDenConfigDir
+	} else {
+		dest, err := filepath.Abs(dest)
+		if checkError(err) {
+			return err
+		}
+		config.WebSourceLocation = path.Join(dest, "web")
 	}
 
-	err = generator.WritefotoDenConfig(config, dest)
+	err := os.MkdirAll(config.WebSourceLocation, 0755)
+	if checkError(err) {
+		panic(err)
+	}
+
+	err = generator.WritefotoDenConfig(config, path.Join(dest, "config.json"))
 	if checkError(err) {
 		panic(err)
 	}
