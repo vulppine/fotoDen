@@ -17,6 +17,7 @@ type WebConfig struct {
 	ImageRootDir     string
 	ThumbnailFrom    string
 	DisplayImageFrom string
+	Theme			 string
 	ImageSizes		 []WebImageSize
 }
 

@@ -40,6 +40,7 @@ func GenerateFolderInfo(directory string, name string) (*Folder, error) {
 	}
 
 	folder.FolderShortName = path.Base(currentDirectory)
+	folder.SubfolderShortNames = []string{}
 
 	/* Move this to tool
 	_, err := os.Stat(path.Join(path.Dir(currentDirectory), "folderInfo.json"))

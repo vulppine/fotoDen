@@ -69,11 +69,14 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 		if fileAmount > 0 {
 			err = CopyWeb("album", fpath)
 			checkError(err)
+			folder.FolderType = "album"
+			folder.ItemAmount = fileAmount
 		} else {
 			return fmt.Errorf("Error: No images detected in source! Use -generate folder or a valid source!")
 		}
 	} else {
 		verbose("Generating folder...")
+		folder.FolderType = "folder"
 		err = CopyWeb("folder", fpath)
 		checkError(err)
 	}

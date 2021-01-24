@@ -26,6 +26,7 @@ type Folder struct {
 	FolderShortName     string   // The shortname of the folder (can be taken from the filesystem folder name)
 	FolderType          string   // The type of folder (currently supports only album or folder)
 	FolderThumbnail     string   // The path to the thumbnail, relative to the current folder.
+	ItemAmount			int
 	SubfolderShortNames []string // Any folders that are within the folder (updated whenever the generator is called in the folder)
 }
 
