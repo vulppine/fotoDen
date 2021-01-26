@@ -1,0 +1,96 @@
+<!doctype html">
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+
+    <title>fotoDen</title>
+  </head>
+
+  <body class="bg-dark text-white mt-5 pt-4">
+
+    <div class="modal fade fd-error" tab-index="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-danger">
+          <div class="modal-header">
+            <h5 class="modal-title">Error</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss"modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <span class="errorText"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="navbar fixed-top navbar-dark navbar-expand-md bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand">My Photo Website</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTop" aria-controls="navbarTop" aria-expanded="false" aria-label="Toggle navigation menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTop">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page">A link</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div id="fd-rootLoad">
+      <div class="d-flex justify-content-center">
+        <div class="spinner-border fd-loading text-light" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid fd-album fd-viewer fd-root d-none">
+      <div class="container-lg">
+        <div class="d-flex h-25 overflow-hidden">
+          <img class="d-block align-self-center w-100">
+        </div>
+        <h1 class="fd-folderName"></h1><h5 class="text-muted">in <a href="#" class="text-white fd-superFolder"></a></h3>
+        <hr>
+      </div>
+      <div class="container-lg fd-folder fd-viewer">
+        <div class="d-flex justify-content-center">
+          <div class="spinner-border fd-loading text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <div class="fd-folderLinks row row-cols-lg-4 d-none">
+          <!-- Folders go here... unless they don't exist. -->
+        </div>
+        <hr>
+      </div>
+      <div class="fd-albumThumbnails d-flex flex-wrap justify-content-center d-none" style="padding-left: 10px">
+        <!-- Photos go here... -->
+      </div>
+      <div class="d-flex justify-content-center">
+        <div class="spinner-border fd-loading text-light" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <nav class="mt-3 w-100" aria-label="Album navigation">
+        <ul class="pagination justify-content-center fd-navContents">
+          <li class="page-item fd-navPrev">
+            <a class="page-link bg-dark text-white">&laquo;</a>
+          </li>
+          <li class="page-item fd-navNext">
+            <a class="page-link bg-dark text-white" aria-disabled="true">&raquo;</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="http://localhost:80/js/fotoDen.js"></script>
+  </body>
+</html>
