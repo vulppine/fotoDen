@@ -24,6 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+const BaseURL = 'http://localhost:80'
+
 // global variables
 
 let isMobile
@@ -39,7 +41,6 @@ let displayImageFrom
 const imageSizes = new Map()
 
 // theme
-// note: this is polyfill until themes are implemented fully
 
 let theme = {
   config: {
@@ -75,11 +76,11 @@ let theme = {
     thumbnailLink.search = thumbnailLinkParams.toString()
 
     thumbnailContainer.appendChild(thumbnailAnchor)
-    thumbnailContainer.setAttribute('class', 'albumThumbnail')
+    thumbnailContainer.setAttribute('class', 'fd-albumThumbnail')
 
     thumbnailAnchor.appendChild(thumbnail)
     thumbnailAnchor.setAttribute('href', thumbnailLink.toString())
-    thumbnailAnchor.setAttribute('class', 'albumThumbnailLink')
+    thumbnailAnchor.setAttribute('class', 'fd-albumThumbnailLink')
 
     thumbnail.setAttribute('class', 'albumThumbnailImage')
     thumbnail.setAttribute('src', makePhotoURL(imageSizes.get(thumbnailFrom).prefix + photoName, imageSizes.get(thumbnailFrom).directory, imageSizes.get(thumbnailFrom).localBool))
@@ -112,7 +113,7 @@ let theme = {
       folderThumbnail.src = getAlbumURL() + info.FolderShortName + '/thumb.png'
     };
 
-    if (info.ItemsInFolder != null) {
+    if (info.ItemAmount != null) {
       const newDiv = document.createElement('div')
       newDiv.innerHTML = 'Photos: ' + info.ItemAmount // remember, this is still photo oriented...
       folderItemCount.appendChild(newDiv)
@@ -130,6 +131,23 @@ let theme = {
     folderAnchor.href = folderLink
 
     return folderAnchor
+  },
+
+  createNavPageLink (page, container) {
+    const newAnchor = document.createElement('a')
+    const newURL = getAlbumURL()
+
+    newAnchor.innerHTML = (page + 1)
+
+    if (page === this.currentPage) {
+      newAnchor.setAttribute('class', 'navLink active')
+    } else {
+      newURL.search = '?page=' + page
+      newAnchor.href = newURL.toString()
+      newAnchor.setAttribute('class', 'navLink')
+    }
+
+    container.appendChild(newAnchor)
   }
 }
 
@@ -187,6 +205,12 @@ function setText (element, text) {
   if (element === null) { return }
 
   element.innerText = text
+}
+
+function setLink (element, link) {
+  if (element === null) { return }
+
+  element.href = link
 }
 
 function getFolderURL (level) {
@@ -269,6 +293,9 @@ function PhotoObject () {
 // - navigation setting
 // - etc.
 
+const viewerLoad = new Event('fd-viewerLoad', { bubbles: true })
+const contentLoad = new Event('fd-contentLoad', { bubbles: true })
+
 class Viewer {
   constructor (container, info) {
     this.container = container
@@ -278,24 +305,29 @@ class Viewer {
     this.navContentRange = theme.config.navRange
 
     // SPANS/LINKS/TEXT //
-    this.name = container.querySelector('.name')
-    this.folderName = container.querySelector('.folderName')
-    this.superFolder = container.querySelector('.superFolder')
+    this.name = container.querySelector('.fd-name')
+    this.folderName = container.querySelector('.fd-folderName')
+    this.superFolder = container.querySelector('.fd-superFolder')
 
     // CONTAINERS //
-    this.folderSubtitle = container.querySelector('.folderSubtitle')
-    this.infoButtons = container.querySelector('.infoButtons')
-    this.navContents = container.querySelector('.navContents')
+    this.folderSubtitle = container.querySelector('.fd-folderSubtitle')
+    this.infoButtons = container.querySelector('.fd-infoButtons')
+    this.navContents = container.querySelector('.fd-navContents')
 
     // BUTTONS //
-    this.navNext = container.querySelector('.navNext')
-    this.navPrev = container.querySelector('.navPrev')
+    this.navNext = container.querySelector('.fd-navNext')
+    this.navPrev = container.querySelector('.fd-navPrev')
+
+    setText(this.folderName, info.FolderName)
+    this.setSuperFolder()
+
+    container.dispatchEvent(viewerLoad)
   }
 
   setSuperFolder () {
     getJSON(getFolderURL(1).toString() + 'folderInfo.json')
       .then((info) => {
-        this.superFolder.innerHTML = info.FolderName
+        setText(this.superFolder, info.FolderName)
         this.superFolder.href = getFolderURL(1).toString()
       })
       .catch(() => {
@@ -335,33 +367,35 @@ class PhotoViewer extends Viewer {
     if (isNaN(parseInt(photo.index))) {
       photo.index = 0
     }
-    photo.name = this.info.ItemsInFolder[photo.index]
-    photo.album = this.info.FolderName
-    this.setAlbum(photo.album)
 
-    if (parseInt(photo.index) === this.info.ItemsInFolder.length - 1) {
-      this.setPrev(setCurrentURLParam('index', (parseInt(photo.index) - 1)))
-      this.setNext(null)
-    } else if (parseInt(photo.index) === 0) {
-      this.setPrev(null)
-      this.setNext(setCurrentURLParam('index', 1))
-    } else {
-      this.setPrev(setCurrentURLParam('index', (parseInt(photo.index) - 1)))
-      this.setNext(setCurrentURLParam('index', (parseInt(photo.index) + 1)))
-    }
+    getJSON('itemsInfo.json')
+      .then(json => {
+        photo.name = json.ItemsInFolder[photo.index]
+        photo.album = this.info.FolderName
 
-    setTitle([photo.name, photo.album])
-    this.setPhoto(this.info.ItemsInFolder[photo.index])
-  }
+        if (parseInt(photo.index) === json.ItemsInFolder.length - 1) {
+          theme.setButton(this.navPrev, setCurrentURLParam('index', (parseInt(photo.index) - 1)))
+          theme.setButton(this.navNext)
+        } else if (parseInt(photo.index) === 0) {
+          theme.setButton(this.navPrev)
+          theme.setButton(this.navNext, setCurrentURLParam('index', 1))
+        } else {
+          theme.setButton(this.navPrev, setCurrentURLParam('index', (parseInt(photo.index) - 1)))
+          theme.setButton(this.navNext, setCurrentURLParam('index', (parseInt(photo.index) + 1)))
+        }
 
-  setAlbum (name) {
-    this.folderName.innerHTML = name
-    this.folderName.href = getAlbumURL().toString()
+        setText(this.name, photo.name)
+
+        setText(this.folderName, photo.album)
+        setLink(this.folderName, getAlbumURL().toString())
+        setTitle([photo.name, photo.album])
+        this.setPhoto(photo.name)
+      })
   }
 
   setPhoto (image) {
     setText(name, image)
-    document.getElementsByClassName('mainPhoto')[0].src = makePhotoURL(displayImageFrom.prefix + image, imageSizes.get(displayImageFrom.size).directory, imageSizes.get(displayImageFrom.size).localBool)
+    this.container.querySelector('.fd-photo').src = makePhotoURL(displayImageFrom.prefix + image, imageSizes.get(displayImageFrom.size).directory, imageSizes.get(displayImageFrom.size).localBool)
   }
 
   setDownloads (image) {
@@ -398,6 +432,8 @@ function getAlbumURL () {
 
 const AlbumViewers = []
 
+const imageLoad = new Event('fd-imgLoad', { bubbles: true })
+
 // constructor for AlbumViewer
 
 class AlbumViewer extends Viewer {
@@ -412,15 +448,14 @@ class AlbumViewer extends Viewer {
     this.maxPhotos = null
     this.pageAmount = null
 
-    this.thumbnailContainer = this.container.querySelector('.thumbnailContainer')
+    this.thumbnailContainer = this.container.querySelector('.fd-albumThumbnails')
     this.currentThumbnails = null
 
-    if (this.container.getElementsByClassName('folderLinks').length === 1) {
-      this.folderViewer = this.container.getElementsByClassName('folderLinks')[0]
+    if (this.container.querySelector('.fd-folder.fd-viewer') !== null) {
+      this.folderViewer = this.container.querySelector('.fd-folder.fd-viewer')
     };
 
     setTitle([info.FolderName])
-    this.setSuperFolder()
 
     getJSON(getAlbumURL() + 'itemsInfo.json')
       .then((json) => {
@@ -430,7 +465,10 @@ class AlbumViewer extends Viewer {
 
         this.update()
       })
-      .catch(error => { theme.setError('Could not load album properly. Code: ' + error) }) // you can't throw out of a constructor, sadly, so we'll just make it visible to the user
+      .catch(error => {
+        console.error(error)
+        theme.setError('Could not load album properly. Code: ' + error)
+      }) // you can't throw out of a constructor, sadly, so we'll just make it visible to the user
 
     if (isMobile) {
       this.thumbnailContainer.addEventListener('scroll', () => {
@@ -447,25 +485,8 @@ class AlbumViewer extends Viewer {
     }
   }
 
-  createNavPageLink (page) {
-    const newAnchor = document.createElement('a')
-    const newURL = getAlbumURL()
-
-    newAnchor.innerHTML = (page + 1)
-
-    if (page === this.currentPage) {
-      newAnchor.setAttribute('class', 'navLink active')
-    } else {
-      newURL.search = '?page=' + page
-      newAnchor.href = newURL.toString()
-      newAnchor.setAttribute('class', 'navLink')
-    }
-
-    return newAnchor
-  }
-
   setNavPageLinks () {
-    if (this.currentPage === 1) {
+    if (this.currentPage === 0) {
       theme.setButton(this.navPrev)
       theme.setButton(this.navNext, setCurrentURLParam('page', (this.currentPage + 1)))
     } else if (this.currentPage === this.pageAmount) {
@@ -479,7 +500,8 @@ class AlbumViewer extends Viewer {
     const range = this.getNavContentMinMax(Math.ceil(this.maxPhotos / this.imagesPerPage), this.currentPage)
 
     for (let i = range[0]; i < range[1]; i++) {
-      this.navContents.appendChild(this.createNavPageLink(i))
+      console.log(this.navContents)
+      theme.createNavPageLink(i, this.navContents)
     }
   }
 
@@ -490,10 +512,21 @@ class AlbumViewer extends Viewer {
       if (index === (this.imagesPerPage * this.currentPage) + this.imagesPerPage) {
         break
       } else {
-        this.thumbnailContainer.appendChild(theme.createThumbnail(index, this.photos[index]))
+        const newThumbnail = theme.createThumbnail(index, this.photos[index])
+        newThumbnail.getElementsByTagName('img')[0].addEventListener('load', () => newThumbnail.dispatchEvent(imageLoad))
+        this.thumbnailContainer.appendChild(newThumbnail)
       }
       index++
     }
+
+    let totalLoaded = 0
+    this.thumbnailContainer.addEventListener('fd-imgLoad', () => {
+      totalLoaded++
+
+      if (totalLoaded === this.imagesPerPage) {
+        this.thumbnailContainer.dispatchEvent(contentLoad)
+      }
+    })
   }
 
   update () {
@@ -503,10 +536,8 @@ class AlbumViewer extends Viewer {
     };
 
     if (this.folderViewer !== undefined) {
-      if (this.currentPage === 1 && this.info.SubfolderShortNames[0] !== undefined) {
-        // todo: put something here?
-      } else {
-        this.folderViewer.setAttribute('style', 'display: none')
+      if (this.currentPage !== 0) {
+        this.folderViewer.remove()
       };
     };
 
@@ -529,47 +560,61 @@ class AlbumViewer extends Viewer {
 
 const FolderViewers = []
 
+const folderLoad = new CustomEvent('fd-folderLoad', { bubbles: true })
+
 class FolderViewer extends Viewer {
   constructor (container, info) {
     super(container, info)
-    this.folderLinks = container.querySelector('.folderLinks')
+    this.folderLinks = container.querySelector('.fd-folderLinks')
     this.style = ''
 
     this.type = info.FolderType
 
     if (this.info.FolderType !== 'album') {
-      setText(this.name, info.FolderName)
       setTitle([info.FolderName])
-      this.setSuperFolder()
     }
 
-    this.populate()
+    if (this.info.SubfolderShortNames.length > 0) {
+      this.populate()
+    } else {
+      this.container.remove()
+    }
   }
 
   populate () {
     this.info.SubfolderShortNames.forEach(element => {
       getJSON(getFolderURL(0).toString() + element + '/folderInfo.json')
-        .then(json => this.folderLinks.appendChild(theme.createFolderLink(json)))
+        .then(json => {
+          this.folderLinks.appendChild(theme.createFolderLink(json))
+          this.container.dispatchEvent(folderLoad)
+        })
+    })
+
+    let totalLoaded = 0
+    this.container.addEventListener('fd-folderLoad', () => {
+      totalLoaded++
+      console.log(totalLoaded)
+
+      if (totalLoaded === this.info.SubfolderShortNames.length) {
+        this.folderLinks.dispatchEvent(contentLoad)
+      }
     })
   }
 }
 
 function setConfig () {
-  return getJSON('/config.json')
-    .then(json => {
-      if (json.Theme !== '') {
-        import('/js/theme.js')
-          .then(extheme => {
-            theme = extheme
-          })
-      }
+  return getJSON(BaseURL + '/config.json')
+    .then(async function (json) {
       readConfig(json)
+      if (json.Theme !== '') {
+        theme = await import(BaseURL + '/theme/theme.js')
+        theme.init()
+      }
       return Promise.resolve()
     })
     .catch(() => getJSON(new URL(document.URL).origin.toString())
       .then(json => {
         readConfig(json)
-        return Promise.resolve()
       })
       .catch(error => Promise.reject(error)))
 }
@@ -613,21 +658,21 @@ function pageInit () {
       getJSON(getAlbumURL() + 'folderInfo.json')
         .then((info) => {
           try {
-            if (document.getElementById('PhotoViewer')) {
-              const photoViewer = new PhotoViewer(document.getElementById('PhotoViewer'), info)
+            if (document.querySelector('.fd-photo.fd-viewer')) {
+              const photoViewer = new PhotoViewer(document.querySelector('.fd-photo.fd-viewer'), info)
               PhotoViewers.push(photoViewer)
             } else {
-              if (document.getElementById('FolderViewer')) {
-                const folderViewer = new FolderViewer(document.getElementById('FolderViewer'), info)
+              if (document.querySelector('.fd-folder.fd-viewer')) {
+                const folderViewer = new FolderViewer(document.querySelector('.fd-folder.fd-viewer'), info)
                 FolderViewers.push(folderViewer)
               }
-              if (document.getElementById('AlbumViewer')) {
-                const albumViewer = new AlbumViewer(document.getElementById('AlbumViewer'), info)
+              if (document.querySelector('.fd-album.fd-viewer')) {
+                const albumViewer = new AlbumViewer(document.querySelector('.fd-album.fd-viewer'), info)
                 AlbumViewers.push(albumViewer)
               }
             };
           } catch (err) {
-            console.log(err)
+            console.error(err)
           }
         })
         .catch(error => {

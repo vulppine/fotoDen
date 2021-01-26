@@ -20,3 +20,4 @@ TBD.
 ## Copyright
 
 Copyright (c) Flipp Syder under the MIT License (see LICENSE for more info)
+layout.js contains code copyright SmugMug under the MIT license (see theme/default/layout.js for more info).
