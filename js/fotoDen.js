@@ -396,6 +396,9 @@ class PhotoViewer extends Viewer {
   setPhoto (image) {
     setText(name, image)
     this.container.querySelector('.fd-photo').src = makePhotoURL(displayImageFrom.prefix + image, imageSizes.get(displayImageFrom.size).directory, imageSizes.get(displayImageFrom.size).localBool)
+    this.container.querySelector('.fd-photo').addEventListener('load', e => {
+      this.container.querySelector('.fd-photo').dispatchEvent(contentLoad)
+    })
   }
 
   setDownloads (image) {

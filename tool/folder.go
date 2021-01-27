@@ -5,6 +5,7 @@ import (
 	"github.com/vulppine/fotoDen/generator"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 // UpdateFolderSubdirectories
@@ -67,7 +68,7 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 		verbose("Generating album...")
 		fileAmount, err := GenerateItems(fpath, options)
 		if fileAmount > 0 {
-			err = CopyWeb("album", fpath)
+			err = GenerateWeb("album", fpath, folder, options)
 			checkError(err)
 			folder.FolderType = "album"
 			folder.ItemAmount = fileAmount
@@ -77,13 +78,20 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 	} else {
 		verbose("Generating folder...")
 		folder.FolderType = "folder"
-		err = CopyWeb("folder", fpath)
+		err = GenerateWeb("folder", fpath, folder, options)
 		checkError(err)
 	}
 
 	err = folder.WriteFolderInfo(path.Join(fpath, "folderInfo.json"))
 	if checkError(err) {
 		return err
+	}
+
+	fpath, _ = filepath.Abs(fpath)
+
+	if fileCheck(path.Join(path.Dir(fpath), "folderInfo.json")) {
+		err = UpdateFolderSubdirectories(path.Dir(fpath))
+		checkError(err)
 	}
 
 	return nil

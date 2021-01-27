@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"text/template"
 )
 
@@ -37,6 +38,20 @@ type WebVars struct {
 	BaseURL     string
 	JSLocation  string
 	CSSLocation string
+	StaticWebVars map[string]string
+}
+
+// StaticWebVars
+//
+// These are fields that a page can take in order to allow for static page generation.
+// If a folder is marked for dynamic generation, these will all automatically be blank.
+// Otherwise, these will have the relevant information inside. This only applies to folders.
+type StaticWebVars struct {
+	IsStatic bool
+	PageName string // the current name of the page, e.g. 'My album', or 'Photo name'
+	PageDesc string // the current description of the page
+	PageFolder string // the folder this is contained in
+	PageAuthor string // the author of the page, i.e. the photographer
 }
 
 // GenerateWebConfig
@@ -63,8 +78,8 @@ func GenerateWebConfig(source string) *WebConfig {
 }
 
 
-func (config *WebConfig) ReadWebConfig(filepath string) error {
-	err := ReadJSON(filepath, config)
+func (config *WebConfig) ReadWebConfig(fpath string) error {
+	err := ReadJSON(fpath, config)
 	if err != nil {
 		return err
 	}
@@ -72,8 +87,8 @@ func (config *WebConfig) ReadWebConfig(filepath string) error {
 	return nil
 }
 
-func (config *WebConfig) WriteWebConfig(filepath string) error {
-	err := WriteJSON(filepath, "multi", config)
+func (config *WebConfig) WriteWebConfig(fpath string) error {
+	err := WriteJSON(fpath, "multi", config)
 	if err != nil {
 		return err
 	}
@@ -83,23 +98,23 @@ func (config *WebConfig) WriteWebConfig(filepath string) error {
 
 // GenerateWebRoot
 //
-// Generates the root of a fotoDen website in filepath.
+// Generates the root of a fotoDen website in fpath.
 // Creates the folders for JS and CSS placement.
 //
 // It is up to the fotoDen tool to copy over the relevant files,
 // and folder configuration.
-func GenerateWebRoot(filepath string) error {
-	err := os.Mkdir(filepath, 0755)
+func GenerateWebRoot(fpath string) error {
+	err := os.Mkdir(fpath, 0755)
 	if err != nil {
 		return err
 	}
 
-	err = os.Mkdir(path.Join(filepath, "js"), 0755)
+	err = os.Mkdir(filepath.Join(fpath, "js"), 0755)
 	if err != nil {
 		return err
 	}
 
-	err = os.Mkdir(path.Join(filepath, "css"), 0755)
+	err = os.Mkdir(filepath.Join(fpath, "css"), 0755)
 	if err != nil {
 		return err
 	}
@@ -132,7 +147,7 @@ func MakeAlbumDirectoryStructure(rootDirectory string) error {
 	os.Mkdir(path.Join(CurrentConfig.ImageRootDirectory, CurrentConfig.ImageMetaDirectory), 0777)
 
 	for k, _ := range CurrentConfig.ImageSizes {
-		os.Mkdir(path.Join(CurrentConfig.ImageRootDirectory, k), 0777)
+		os.Mkdir(filepath.Join(CurrentConfig.ImageRootDirectory, k), 0777)
 	}
 
 	return nil
@@ -150,6 +165,9 @@ func MakeAlbumDirectoryStructure(rootDirectory string) error {
 // 								and needs to be processed during configuration.
 // 								This is really meant for themes that autoconfigure themselves,
 // 								and is mostly an optional path.
+//
+// Also includes a string map that contains all the static vars that a page can have,
+// for when a page is generated to have static parts as well.
 //
 // If an error occurs, returns an empty WebVars and the error, otherwise returns a filled WebVars.
 func NewWebVars(u string) (*WebVars, error) {
@@ -170,9 +188,55 @@ func NewWebVars(u string) (*WebVars, error) {
 	cssurl.Path = path.Join(cssurl.Path, "css", "theme.css")
 	webvars.CSSLocation = cssurl.String()
 
+	webvars.StaticWebVars = map[string]string{
+		"isStatic": "{{.IsStatic}}",
+		"name": "{{.PageName}}",
+		"desc": "{{.PageDesc}}",
+		"auth": "{{.PageAuthor}}",
+		"sfol": "{{.PageFolder}}",
+	}
+
 	return webvars, nil
 }
 
+// NewStaticWebVars
+//
+// Creates a new static web var set based on the folder given.
+// Returns a filled webvar set - save for superFolder, which only occurs
+// if the folder above is a fotoDen folder or not.
+//
+// If an error occurs, it returns a potentially incomplete StaticWebVars with an error.
+func NewStaticWebVars(folder string) (*StaticWebVars, error) {
+	swebvars := new(StaticWebVars)
+	f := new(Folder)
+	folder, _ = filepath.Abs(folder)
+
+	err := f.ReadFolderInfo(filepath.Join(folder, "folderInfo.json"))
+	if err != nil {
+		return swebvars, err
+	}
+
+	swebvars.IsStatic = true
+	swebvars.PageName = f.FolderName
+	swebvars.PageDesc = f.FolderDesc
+	swebvars.PageAuthor = f.FolderAuthor
+
+	superFolder := func() bool {
+		_, err := os.Stat(filepath.Join(filepath.Dir(folder), "folderInfo.json"))
+		return os.IsExist(err)
+	}()
+
+	if superFolder {
+		err = f.ReadFolderInfo(filepath.Join(filepath.Dir(folder), "folderInfo.json"))
+		if err != nil {
+			return swebvars, err
+		}
+
+		swebvars.PageFolder = f.FolderName
+	}
+
+	return swebvars, nil
+}
 
 // ConfigureWebFile
 //
@@ -183,7 +247,7 @@ func NewWebVars(u string) (*WebVars, error) {
 // This should only be done once, ideally,
 // and copied over to a configuration directory
 // for fotoDen to use (in essence, CurrentConfig.WebSourceDirectory)
-func ConfigureWebFile(source string, dest string, config *WebVars) error {
+func ConfigureWebFile(source string, dest string, vars interface{}) error {
 	webpage, err := template.ParseFiles(source)
 	if err != nil {
 		return err
@@ -195,10 +259,10 @@ func ConfigureWebFile(source string, dest string, config *WebVars) error {
 	}
 	defer file.Close()
 
-	err = webpage.Execute(file, config)
+	err = webpage.Execute(file, vars)
 	if err != nil {
-		panic(err)
-	} // means something wrong happened during file write
+		return err
+	}
 
 	return nil
 }

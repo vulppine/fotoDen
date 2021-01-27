@@ -17,12 +17,10 @@ function removeLoad (container) {
 }
 
 const imageRatios = []
+const loadedImages = []
 
-async function justifyThumbnails (container) {
-  const layout = await import(BaseURL + '/theme/layout.js')
-  const loadedImages = []
+function getLoadedImageRatios (container) {
   const thumbnails = container.getElementsByClassName('fd-albumThumbnail')
-
   for (let i = 0; i < thumbnails.length; i++) {
     loadedImages.push(thumbnails[i].getElementsByTagName('img')[0])
   }
@@ -33,6 +31,10 @@ async function justifyThumbnails (container) {
       height: img.height
     })
   })
+}
+
+async function justifyThumbnails (container) {
+  const layout = await import(BaseURL + '/theme/layout.js')
 
   const newImageSizes = layout.justifyImages(imageRatios, { containerWidth: container.offsetWidth })
 
@@ -42,15 +44,8 @@ async function justifyThumbnails (container) {
     loadedImages[i].setAttribute('style', 'padding: 5px;')
   })
 
-  const currentContainerWidth = container.scrollWidth
-
   window.onresize = () => {
-    console.log('Window resized')
-    console.log(currentContainerWidth)
-    console.log(container.scrollWidth)
-    if (currentContainerWidth !== container.scrollWidth) {
-      justifyThumbnails(container)
-    }
+    justifyThumbnails(container)
   }
 }
 
@@ -154,6 +149,12 @@ export function createFolderLink (info) {
   folderTitleContainer.appendChild(folderTitle)
   folderTitleContainer.setAttribute('class', 'row')
 
+  if (info.FolderThumbnail === true) {
+    folderThumb.src = info.FolderShortName + '/thumb.jpg'
+  } else {
+    folderThumb.src = BaseURL + 'thumb.png'
+  }
+
   if (info.ItemAmount != null) {
     const folderItemCountPhotos = document.createElement('div')
     folderInfoGrid.appendChild(folderItemCountPhotos)
@@ -217,6 +218,7 @@ export function init () {
   document.addEventListener('fd-contentLoad', e => {
     console.log(e.target)
     if (e.target.classList.contains('fd-albumThumbnails')) {
+      getLoadedImageRatios(e.target)
       justifyThumbnails(e.target)
     }
 

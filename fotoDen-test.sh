@@ -24,6 +24,7 @@ if [ "$1" == "mk-testdir" ] || [ "$1" == "mkall" ]; then
     fotoDen=$PWD'/fotoDen -config fotoDen_test/config.json -interactive=false'
 
     $fotoDen -init js js/fotoDen.js
+    $fotoDen -init templates theme/default/html/
     $fotoDen -init root -name "Test Root" -source "http://localhost/" fotoDen_test/test_root
     $fotoDen -generate folder -name "Test Folder" -v fotoDen_test/test_root/test_folder
     $fotoDen -generate album -name "Test Album" -source test_images -v fotoDen_test/test_root/test_folder/test_album

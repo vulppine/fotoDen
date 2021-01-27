@@ -21,11 +21,11 @@ func InitializeWebTemplates(u string, srcpath string) error {
 	webvars, err := generator.NewWebVars(u)
 	checkError(err)
 
-	err = generator.ConfigureWebFile(path.Join(srcpath, "photo-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "photo.html"), webvars)
+	err = generator.ConfigureWebFile(path.Join(srcpath, "photo-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "photo-template.html"), webvars)
 	checkError(err)
-	err = generator.ConfigureWebFile(path.Join(srcpath, "album-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "album.html"), webvars)
+	err = generator.ConfigureWebFile(path.Join(srcpath, "album-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "album-template.html"), webvars)
 	checkError(err)
-	err = generator.ConfigureWebFile(path.Join(srcpath, "folder-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "folder.html"), webvars)
+	err = generator.ConfigureWebFile(path.Join(srcpath, "folder-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "folder-template.html"), webvars)
 	checkError(err)
 
 	err = generator.CopyFile(path.Join(srcpath, "theme.css"), "theme.css", generator.CurrentConfig.WebSourceLocation)
@@ -94,14 +94,13 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 		return err
 	}
 
-	checkError(err)
-	err = CopyWeb("folder", rootpath)
-	checkError(err)
-
 	folder, err := generator.GenerateFolderInfo(rootpath, name) // do it in rootpath since we're not trying to scan for images in the current folder
 	folder.FolderType = "folder"
 	checkError(err)
 	err = folder.WriteFolderInfo(path.Join(rootpath, "folderInfo.json"))
+	checkError(err)
+
+	err = GenerateWeb("folder", rootpath, folder, genoptions)
 	checkError(err)
 
 	return nil

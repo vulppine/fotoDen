@@ -23,11 +23,14 @@ type Album struct {
 
 type Folder struct {
 	FolderName          string   // The name of the folder.
+	FolderDesc			string   // The description of a folder.
+	FolderAuthor		string   // The author of a folder.
 	FolderShortName     string   // The shortname of the folder (can be taken from the filesystem folder name)
 	FolderType          string   // The type of folder (currently supports only album or folder)
-	FolderThumbnail     string   // The path to the thumbnail, relative to the current folder.
+	FolderThumbnail     bool   	 // If a thumbnail exists or not. This is dictated by the generation of thumb.jpg.
 	ItemAmount			int
 	SubfolderShortNames []string // Any folders that are within the folder (updated whenever the generator is called in the folder)
+	IsStatic			bool     // If the folder was generated statically, or has information inserted dynamically.
 }
 
 type Items struct {

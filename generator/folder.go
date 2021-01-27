@@ -155,6 +155,7 @@ func (items *Items) WriteItemsInfo(filePath string) error {
 }
 
 // perhaps this should be moved to tool?
+// no - it's useful here
 
 // UpdateSubdirectories
 //

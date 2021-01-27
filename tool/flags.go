@@ -27,8 +27,11 @@ import (
 
 var GenFlag = flag.String("generate", "", "Generates a fotoDen structure in the current folder, or the default config in the configuration directory. Accepted modes: album, folder, config.")
 var NameFlag = flag.String("name", "", "The name of the folder (not the path). If this is blank, or not called, the current name of the folder will be used in generation.")
-var UpdFlag = flag.Bool("update", false, "Updates the fotoDen folder. (Currently only updates the folder subdirectories)")
+var UpdFlag = flag.String("update", "folder", "Updates fotoDen resources.")
+var RecursFlag = flag.Bool("recurse", false, "Recursively goes through fotoDen folders.")
+var RecursFlagShort = flag.Bool("r", false, "Recursively goes through fotoDen folders.")
 var SourceFlag = flag.String("source", "", "The source used for fotoDen images. This is multi-context - calling this during -generate full will take images from the source directory as its base, and calling this during -init root will use this as the fotoDen image storage provider.")
+var StaticFlag = flag.Bool("static", false, "Generates either a static or dynamic webpage. If you call this during folder/album generation, the folder will always be static - otherwise, it will generate a more static webpage in the given folder/album.")
 var CopyFlag = flag.Bool("copy", false, "Copies files over to GeneratorConfig.ImageSrcDirectory. Useful if you're copying over to a remote directory.")
 var ThumbSrc = flag.String("folthumb", "", "The name of the thumbnail in the source directory. This will be selected as the thumbnail of the folder, and is copied over to the root of the folder.")
 var GenSizeFlag = flag.Bool("gensizes", true, "Tells the generator to generate all sizes in the config. This is automatically set to true.")
@@ -38,7 +41,9 @@ var WizardFlag = flag.Bool("interactive", true, "Enables interactive mode. Inter
 var VerboseFlag = flag.Bool("verbose", false, "Sets verbose mode.")
 var VerboseFlagShort = flag.Bool("v", false, "Sets verbose mode.")
 
-func ParseGen(mode string, arg string, options GeneratorOptions) error {
+var genoptions GeneratorOptions
+
+func parseGen(mode string, arg string, options GeneratorOptions) error {
 	wd, _ := os.Getwd()
 	verbose("Starting from " + wd)
 	switch mode {
@@ -99,6 +104,40 @@ func ParseGen(mode string, arg string, options GeneratorOptions) error {
 	return nil
 }
 
+func parseUpdate(value string, arg string) error {
+	var err error
+	switch {
+	case *RecursFlag, *RecursFlagShort:
+		switch value {
+		case "folder":
+			err = RecursiveVisit(arg, UpdateFolderSubdirectories)
+			if checkError(err) {
+				return err
+			}
+		case "web":
+			err = RecursiveVisit(arg, UpdateWeb)
+			if checkError(err) {
+				return err
+			}
+		}
+	default:
+		switch value {
+		case "folder":
+			err = UpdateFolderSubdirectories(arg)
+			if checkError(err) {
+				return err
+			}
+		case "web":
+			err = UpdateWeb(arg)
+			if checkError(err) {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func ParseCmd() error {
 	flag.Parse()
 	arg := flag.Arg(0) // ignore the other flags silently
@@ -110,10 +149,11 @@ func ParseCmd() error {
 		verbose(fmt.Sprint("Generator verbosity: ", generator.Verbose))
 	}
 
-	genoptions := GeneratorOptions{
+	genoptions = GeneratorOptions{
 		source: *SourceFlag,
 		copy: *CopyFlag,
 		gensizes: *GenSizeFlag,
+		static: *StaticFlag,
 	}
 
 	if *GenFlag == "album" {
@@ -159,12 +199,12 @@ func ParseCmd() error {
 
 	switch {
 	case *GenFlag != "":
-		err := ParseGen(*GenFlag, arg, genoptions)
+		err := parseGen(*GenFlag, arg, genoptions)
 		if checkError(err) {
 			return err
 		}
-	case *UpdFlag:
-		err := UpdateFolderSubdirectories(arg)
+	case *UpdFlag != "":
+		err := parseUpdate(*UpdFlag, arg)
 		if checkError(err) {
 			return err
 		}

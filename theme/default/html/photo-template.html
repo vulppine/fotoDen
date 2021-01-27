@@ -29,12 +29,17 @@
 
     <div class="fd-photo fd-viewer">
       <div class="container-fluid vh-100 p-2 d-flex align-items-center justify-content-center " style="background-color: black">
-        <img class="fd-photo w-100 h-100" style="object-fit: contain">
+        <div class="position-absolute top-50 start-50 translate-middle">
+          <div class="spinner-border fd-loading text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <img class="fd-photo w-100 h-100 d-none" style="object-fit: contain">
       </div>
 
       <div class="container-lg my-3">
-        <h1 class="fd-name"></h1>
-        <h5 class="text-muted">in <a class="link-light fd-folderName"></a>
+        <h1 class="fd-name text-break"></h1>
+        <h5 class="text-muted text-break">in <a class="link-light fd-folderName"></a>
       </div>
     </div>
 
