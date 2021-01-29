@@ -114,7 +114,17 @@ func GenerateWebRoot(fpath string) error {
 		return err
 	}
 
-	err = os.Mkdir(filepath.Join(fpath, "css"), 0755)
+	err = os.Mkdir(filepath.Join(fpath, "theme"), 0755)
+	if err != nil {
+		return err
+	}
+
+	err = os.Mkdir(filepath.Join(fpath, "theme", "js"), 0755)
+	if err != nil {
+		return err
+	}
+
+	err = os.Mkdir(filepath.Join(fpath, "theme", "css"), 0755)
 	if err != nil {
 		return err
 	}

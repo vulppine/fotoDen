@@ -100,9 +100,12 @@ export function createNavPageLink (page, container) {
   newAnchor.classList.add('page-link', 'border-white')
   const newURL = getAlbumURL()
 
+  let currentPage = parseInt(getPageInfo(new URL(document.URL)).page)
+  if (isNaN(currentPage)) { currentPage = 0 }
+
   newAnchor.innerHTML = (page + 1)
 
-  if (page === parseInt(getPageInfo(new URL(document.URL)).page)) {
+  if (page === currentPage) {
     newPage.classList.add('active')
     newAnchor.classList.add('bg-white', 'text-dark')
   } else {
@@ -152,27 +155,29 @@ export function createFolderLink (info) {
   if (info.FolderThumbnail === true) {
     folderThumb.src = info.FolderShortName + '/thumb.jpg'
   } else {
-    folderThumb.src = BaseURL + 'thumb.png'
+    folderThumb.src = BaseURL + '/thumb.png'
   }
+
+  folderItemCountContainer.setAttribute('class', 'row')
 
   if (info.ItemAmount != null) {
     const folderItemCountPhotos = document.createElement('div')
-    folderInfoGrid.appendChild(folderItemCountPhotos)
+    folderItemCountContainer.appendChild(folderItemCountPhotos)
     folderItemCountPhotos.setAttribute('class', 'col')
 
-    const folderItemCountPhotosText = document.createElement('p')
+    const folderItemCountPhotosText = document.createElement('small')
     folderItemCountPhotos.appendChild(folderItemCountPhotosText)
-    folderItemCountPhotosText.setAttribute('mb-0 card-text')
+    folderItemCountPhotosText.setAttribute('class', 'mb-0 card-text')
 
     folderItemCountPhotosText.innerHTML = '<i class="bi bi-camera-fill"></i> : ' + info.ItemAmount
   }
 
   if (info.SubfolderShortNames.length > 0) {
     const folderItemCountFolders = document.createElement('div')
-    folderInfoGrid.appendChild(folderItemCountFolders)
+    folderItemCountContainer.appendChild(folderItemCountFolders)
     folderItemCountFolders.setAttribute('class', 'col')
 
-    const folderItemCountFolderText = document.createElement('p')
+    const folderItemCountFolderText = document.createElement('small')
     folderItemCountFolders.appendChild(folderItemCountFolderText)
     folderItemCountFolderText.setAttribute('class', 'mb-0 card-text')
 
@@ -210,6 +215,25 @@ export function init () {
     if (e.target.classList.contains('fd-root')) {
       removeLoad(document.querySelector('#fd-rootLoad'))
       toggleView(e.target)
+      if (e.target.classList.contains('fd-album') || e.target.classList.contains('fd-folder')) {
+        fetch('./thumb.jpg')
+          .then(response => {
+            if (!response.ok) {
+              console.error(response)
+              throw new Error()
+            }
+            return response.blob()
+          })
+          .then((blob) => {
+            console.log('Thumbnail detected')
+            e.target.querySelector('.fd-banner').getElementsByTagName('img')[0].src = URL.createObjectURL(blob)
+            e.target.querySelector('.fd-bannerload').remove()
+          })
+          .catch((err) => {
+            console.log(err)
+            e.target.querySelector('.fd-banner').remove()
+          })
+      }
     }
 
     console.log(e.target)

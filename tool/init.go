@@ -17,19 +17,49 @@ import (
 // Sets up web templates according to a given URL, and path containing templates.
 // All templates should be labelled with [photo, album, folder]-template.html.
 func InitializeWebTemplates(u string, srcpath string) error {
+	wd, _ := os.Getwd()
 
+	t, err := ReadThemeConfig(path.Join(srcpath, "theme.json"))
 	webvars, err := generator.NewWebVars(u)
 	checkError(err)
 
-	err = generator.ConfigureWebFile(path.Join(srcpath, "photo-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "photo-template.html"), webvars)
+	err = generator.CopyFile(path.Join(srcpath, "theme.json"), "theme.json", path.Join(generator.CurrentConfig.WebSourceLocation))
+
+	err = os.Mkdir(path.Join(generator.CurrentConfig.WebSourceLocation, "html"), 0755)
+	if checkError(err) {
+		return err
+	}
+
+	err = generator.ConfigureWebFile(path.Join(srcpath, "html", "photo-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "html", "photo-template.html"), webvars)
 	checkError(err)
-	err = generator.ConfigureWebFile(path.Join(srcpath, "album-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "album-template.html"), webvars)
+	err = generator.ConfigureWebFile(path.Join(srcpath, "html", "album-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "html", "album-template.html"), webvars)
 	checkError(err)
-	err = generator.ConfigureWebFile(path.Join(srcpath, "folder-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "folder-template.html"), webvars)
+	err = generator.ConfigureWebFile(path.Join(srcpath, "html", "folder-template.html"), path.Join(generator.CurrentConfig.WebSourceLocation, "html", "folder-template.html"), webvars)
 	checkError(err)
 
-	err = generator.CopyFile(path.Join(srcpath, "theme.css"), "theme.css", generator.CurrentConfig.WebSourceLocation)
-	checkError(err)
+	if len(t.Stylesheets) != 0 {
+		err = os.Mkdir(path.Join(generator.CurrentConfig.WebSourceLocation, "css"), 0755)
+		if checkError(err) {
+			return err
+		}
+
+		os.Chdir(path.Join(srcpath, "css"))
+		err = generator.BatchCopyFile(t.Stylesheets, path.Join(generator.CurrentConfig.WebSourceLocation, "css"))
+		checkError(err)
+		os.Chdir(wd)
+	}
+
+	if len(t.Scripts) != 0 {
+		err = os.Mkdir(path.Join(generator.CurrentConfig.WebSourceLocation, "js"), 0755)
+		if checkError(err) {
+			return err
+		}
+
+		os.Chdir(path.Join(srcpath, "js"))
+		err = generator.BatchCopyFile(t.Scripts, path.Join(generator.CurrentConfig.WebSourceLocation, "js"))
+		checkError(err)
+		os.Chdir(wd)
+	}
 
 	return nil
 }
@@ -66,6 +96,7 @@ func InitializefotoDenjs(u string, fpath string) error {
 // but if it is being generated via this tool,
 // it is, by default, a folder.
 func InitializefotoDenRoot(rootpath string, name string) error {
+	rootpath, _ = filepath.Abs(rootpath)
 
 	err := generator.GenerateWebRoot(rootpath)
 	if checkError(err) {
@@ -74,8 +105,33 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 
 	err = generator.CopyFile(path.Join(generator.CurrentConfig.WebSourceLocation, "fotoDen.js"), "fotoDen.js", path.Join(rootpath, "js"))
 	checkError(err)
-	err = generator.CopyFile(path.Join(generator.CurrentConfig.WebSourceLocation, "theme.css"), "theme.css", path.Join(rootpath, "css"))
-	checkError(err)
+
+	t, err := ReadThemeConfig(path.Join(generator.CurrentConfig.WebSourceLocation, "theme.json"))
+	if checkError(err) {
+		return err
+	}
+
+	wd, _ := os.Getwd()
+
+	os.Chdir(generator.CurrentConfig.WebSourceLocation)
+	if len(t.Stylesheets) != 0 {
+		os.Chdir("css")
+		err = generator.BatchCopyFile(t.Stylesheets, path.Join(rootpath, "theme", "css"))
+		if checkError(err) {
+			return err
+		}
+		os.Chdir(generator.CurrentConfig.WebSourceLocation)
+	}
+
+	if len(t.Scripts) != 0 {
+		os.Chdir("js")
+		err = generator.BatchCopyFile(t.Scripts, path.Join(rootpath, "theme", "js"))
+		if checkError(err) {
+			return err
+		}
+	}
+
+	os.Chdir(wd)
 
 	var webconfig *generator.WebConfig
 
@@ -137,12 +193,12 @@ func InitializefotoDenConfig(u string, dest string) error {
 
 	err := os.MkdirAll(config.WebSourceLocation, 0755)
 	if checkError(err) {
-		panic(err)
+		return err
 	}
 
 	err = generator.WritefotoDenConfig(config, path.Join(dest, "config.json"))
 	if checkError(err) {
-		panic(err)
+		return err
 	}
 
 	return nil

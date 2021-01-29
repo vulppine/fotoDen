@@ -50,15 +50,15 @@ type ImageScale struct {
 //
 // The function will output the image to the given directory, without changing the name.
 // It will return an error if the filename given already exists in the destination directory.
-func ResizeImage(imageName string, newName string, scale ImageScale, dest string, imageFormat bimg.ImageType) error {
-	image, err := bimg.Read(imageName)
+func ResizeImage(file string, imageName string, scale ImageScale, dest string, imageFormat bimg.ImageType) error {
+	image, err := bimg.Read(file)
 	if err != nil {
 		return err
 	}
 
 	imageType := bimg.DetermineImageType(image)
 	if imageType == bimg.UNKNOWN {
-		return fmt.Errorf("ResizeImage: Unknown file type. Skipping. Image: " + imageName)
+		return fmt.Errorf("ResizeImage: Unknown file type. Skipping. Image: ", imageName )
 	}
 
 	newImage, err := bimg.NewImage(image).Convert(imageFormat)
@@ -86,18 +86,68 @@ func ResizeImage(imageName string, newName string, scale ImageScale, dest string
 		return fmt.Errorf("ResizeImage: Image scaling undefined. Aborting. scale: " + fmt.Sprint(scale))
 	}
 
-	verbose("Resizing " + imageName + " to " + strconv.Itoa(int(width)) + "," + strconv.Itoa(int(height)) + " and attempting to place it in " + path.Join(dest, newName))
+	verbose("Resizing " + imageName + " to " + strconv.Itoa(int(width)) + "," + strconv.Itoa(int(height)) + " and attempting to place it in " + path.Join(dest, imageName))
 	newImage, err = bimg.NewImage(newImage).Resize(int(width), int(height))
 	if err != nil {
 		return err
 	}
 
-	destCheck, err := bimg.Read(path.Join(dest, newName))
+	destCheck, err := bimg.Read(path.Join(dest, imageName))
 	if destCheck != nil {
 		return err
 	}
 
-	bimg.Write(path.Join(dest, newName), newImage)
+	bimg.Write(path.Join(dest, imageName), newImage)
+	return nil
+}
+
+// ImageMeta
+//
+// Provides information on an image. Includes the entirety of the image's EXIF data (which can be modified post-generation).
+// ImageEXIF is included in case that an image does not already include EXIF data (e.g., film photography), so that the
+// data can be manually input on a per-image basis, if the user does not want to use an external editor.
+// This is subject to change!
+type ImageMeta struct {
+	ImageName			string   // The name of an image.
+	ImageDesc			string   // The description of an image.
+}
+
+// GetImageMetadata
+//
+// Gets an image's EXIF data, and returns it in an ImageMeta object.
+// Note that it is up to the user of the function to fill in the blank fields!
+func GetImageMetadata(file string) (*ImageMeta, error) {
+	verbose("Getting image metadata from " + file)
+	image, err := bimg.Read(file)
+	if err != nil {
+		return nil, err
+	}
+
+	m, err := bimg.Metadata(image)
+	if err != nil {
+		return nil, err
+	}
+
+	exif := m.EXIF
+
+	meta := new(ImageMeta)
+	meta.ImageEXIF = exif
+
+	return meta, nil
+}
+
+// WriteImageMeta
+//
+// Takes two arguments: a folder destination, and a name.
+// The name is automatically combined to create a [name].json file,
+// in order to ensure compatibility with fotoDen.
+// Writes the json file into the given folder.
+func (meta *ImageMeta) WriteImageMeta(folder string, name string) error {
+	err := WriteJSON(path.Join(folder, name + ".json"), "multi", meta)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

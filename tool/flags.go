@@ -33,6 +33,7 @@ var RecursFlagShort = flag.Bool("r", false, "Recursively goes through fotoDen fo
 var SourceFlag = flag.String("source", "", "The source used for fotoDen images. This is multi-context - calling this during -generate full will take images from the source directory as its base, and calling this during -init root will use this as the fotoDen image storage provider.")
 var StaticFlag = flag.Bool("static", false, "Generates either a static or dynamic webpage. If you call this during folder/album generation, the folder will always be static - otherwise, it will generate a more static webpage in the given folder/album.")
 var CopyFlag = flag.Bool("copy", false, "Copies files over to GeneratorConfig.ImageSrcDirectory. Useful if you're copying over to a remote directory.")
+var MetaFlag = flag.Bool("meta", true, "Copies all metadata into [image name].json. Metadata such as image description and name must be edited by hand.")
 var ThumbSrc = flag.String("folthumb", "", "The name of the thumbnail in the source directory. This will be selected as the thumbnail of the folder, and is copied over to the root of the folder.")
 var GenSizeFlag = flag.Bool("gensizes", true, "Tells the generator to generate all sizes in the config. This is automatically set to true.")
 var ConfigSrc = flag.String("config", "", "The name of the config file to use. If this isn't set, the one is $CONFIG/fotoDen is used - otherwise, an error is returned. Call 'fotoDen -generate config' to create a config in either $CONFIG/fotoden, or in a relative folder if defined.")
@@ -153,6 +154,7 @@ func ParseCmd() error {
 		source: *SourceFlag,
 		copy: *CopyFlag,
 		gensizes: *GenSizeFlag,
+		meta: *MetaFlag,
 		static: *StaticFlag,
 	}
 

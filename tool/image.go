@@ -74,6 +74,15 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 			}
 		}
 
+		if options.meta == true {
+			waitgroup.Add(1)
+			go func(wg *sync.WaitGroup) {
+				defer wg.Done()
+				verbose("Generating metadata to: " + path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageMetaDirectory))
+				err = generator.BatchImageMeta(items.ItemsInFolder, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageMetaDirectory))
+			}(&waitgroup)
+		}
+
 		err = items.WriteItemsInfo(path.Join(fpath, "itemsInfo.json"))
 		if checkError(err) {
 			return 0, err
@@ -251,6 +260,14 @@ func InsertImage(folder string, file string, mode string, options GeneratorOptio
 				err = generator.BatchImageConversion([]string{file}, sizeName, path.Join(folder, sizeName), sizeOpts)
 			}(&waitgroup)
 		}
+	}
+
+	if options.meta == true {
+		waitgroup.Add(1)
+		go func(wg *sync.WaitGroup) {
+			verbose("Generating metadata to: " + generator.CurrentConfig.ImageMetaDirectory)
+			err = generator.BatchImageMeta(items.ItemsInFolder, generator.CurrentConfig.ImageMetaDirectory)
+		}(&waitgroup)
 	}
 
 	waitgroup.Wait()

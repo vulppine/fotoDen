@@ -52,10 +52,17 @@
     </div>
 
     <div class="container-lg fd-folder fd-viewer fd-root d-none">
-      <div class="d-flex h-25 overflow-hidden">
+      <div class="d-flex h-25 overflow-hidden rounded fd-banner">
+        <div class="d-flex justify-content-center">
+          <div class="spinner-border fd-bannerload text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
         <img class="d-block align-self-center w-100">
       </div>
-      <h1 class="fd-folderName"></h1><h5 class="text-muted">in <a href="#" class="text-white fd-superFolder"></a></h3>
+      <div class="container-lg my-3">
+        <h1 class="fd-folderName"></h1><h5 class="text-muted">in <a href="#" class="text-white fd-superFolder"></a></h3>
+      </div>
       <hr>
       <div class="d-flex justify-content-center">
         <div class="spinner-border fd-loading text-light" role="status">

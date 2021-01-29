@@ -37,6 +37,7 @@ type GeneratorOptions struct {
 	gensizes bool
 	imagegen bool
 	sort     bool
+	meta     bool
 	static   bool
 }
 

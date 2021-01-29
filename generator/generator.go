@@ -39,13 +39,6 @@ type Items struct {
 	ItemsInFolder       []string // All the items in a folder, by name, in an array.
 }
 
-// TODO: Implement this!
-
-type ImageMeta struct {
-	ImageName			string   // The name of an image.
-	ImageDesc			string   // The description of an image.
-}
-
 type GeneratorConfig struct {
 	ImageRootDirectory  string // where all images are stored (default: img)
 	ImageSrcDirectory   string // where all source images are stored (default: ImageRootDirectory/src)

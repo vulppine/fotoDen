@@ -53,10 +53,18 @@
 
     <div class="container-lg fd-album fd-viewer fd-root d-none">
       <div class="container-lg">
-        <div class="d-flex h-25 overflow-hidden">
-          <img class="d-block align-self-center w-100 fd-banner">
+        <div class="d-flex h-25 overflow-hidden rounded fd-banner">
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border fd-bannerload text-light" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <img class="d-block align-self-center w-100" style="object-fit: cover">
         </div>
-        <h1 class="fd-folderName"></h1><h5 class="text-muted">in <a href="#" class="text-white fd-superFolder"></a></h3>
+        <div class="container-lg my-3">
+          <h1><span class="fd-folderName"></span></h1>
+          <h5 class="text-muted">in <a href="#" class="text-white fd-superFolder"></a></h5>
+        </div>
         <hr>
       </div>
       <div class="container-lg fd-folder fd-viewer">
