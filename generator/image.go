@@ -112,30 +112,6 @@ type ImageMeta struct {
 	ImageDesc			string   // The description of an image.
 }
 
-// GetImageMetadata
-//
-// Gets an image's EXIF data, and returns it in an ImageMeta object.
-// Note that it is up to the user of the function to fill in the blank fields!
-func GetImageMetadata(file string) (*ImageMeta, error) {
-	verbose("Getting image metadata from " + file)
-	image, err := bimg.Read(file)
-	if err != nil {
-		return nil, err
-	}
-
-	m, err := bimg.Metadata(image)
-	if err != nil {
-		return nil, err
-	}
-
-	exif := m.EXIF
-
-	meta := new(ImageMeta)
-	meta.ImageEXIF = exif
-
-	return meta, nil
-}
-
 // WriteImageMeta
 //
 // Takes two arguments: a folder destination, and a name.

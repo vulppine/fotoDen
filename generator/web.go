@@ -13,7 +13,6 @@ import (
 // The structure of the JSON config file that fotoDen uses.
 type WebConfig struct {
 	WebsiteTitle     string
-	WorkingDirectory string
 	PhotoURLBase     string
 	ImageRootDir     string
 	ThumbnailFrom    string

@@ -24,7 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-const BaseURL = 'http://localhost:80'
+const BaseURL = document.getElementById('fd-script').dataset.fdBaseurl
+const version = '0.1.0-DEVEL'
 
 // global variables
 
@@ -276,11 +277,8 @@ function makePhotoURL (photoName, dir, localBool) {
 
 function PhotoObject () {
   this.name = ''
-  this.album = '' // we get this from folderInfo.json
-  this.index = getPageInfo(new URL(document.URL)).index
-  this.canvas = null
-  this.blobURL = null
-  this.cloudURL = null
+  this.desc = ''
+  this.index = parseInt(getPageInfo(new URL(document.URL)).index)
 }
 
 // Viewer
@@ -306,6 +304,7 @@ class Viewer {
 
     // SPANS/LINKS/TEXT //
     this.name = container.querySelector('.fd-name')
+    this.desc = container.querySelector('.fd-desc')
     this.folderName = container.querySelector('.fd-folderName')
     this.superFolder = container.querySelector('.fd-superFolder')
 
@@ -370,7 +369,24 @@ class PhotoViewer extends Viewer {
 
     getJSON('itemsInfo.json')
       .then(json => {
-        photo.name = json.ItemsInFolder[photo.index]
+        if (json.Metadata === true) {
+          getJSON(imageRootDir + '/meta/' + json.ItemsInFolder[photo.index] + '.json')
+            .then(meta => {
+              if (meta.ImageName === '') {
+                photo.name = json.ItemsInFolder[photo.index]
+              } else {
+                photo.name = meta.ImageName
+              }
+
+              photo.desc = json.ImageDesc
+              setText(this.name, photo.name)
+              setText(this.desc, photo.desc)
+            })
+        } else {
+          photo.name = json.ItemsInFolder[photo.index]
+          setText(this.name, photo.name)
+        }
+
         photo.album = this.info.FolderName
 
         if (parseInt(photo.index) === json.ItemsInFolder.length - 1) {
@@ -384,12 +400,10 @@ class PhotoViewer extends Viewer {
           theme.setButton(this.navNext, setCurrentURLParam('index', (parseInt(photo.index) + 1)))
         }
 
-        setText(this.name, photo.name)
-
         setText(this.folderName, photo.album)
         setLink(this.folderName, getAlbumURL().toString())
         setTitle([photo.name, photo.album])
-        this.setPhoto(photo.name)
+        this.setPhoto(json.ItemsInFolder[photo.index])
       })
   }
 
@@ -459,6 +473,9 @@ class AlbumViewer extends Viewer {
     };
 
     setTitle([info.FolderName])
+    if (info.FolderDesc !== '') {
+      setText(this.desc, info.FolderDesc)
+    }
 
     getJSON(getAlbumURL() + 'itemsInfo.json')
       .then((json) => {
@@ -489,7 +506,10 @@ class AlbumViewer extends Viewer {
   }
 
   setNavPageLinks () {
-    if (this.currentPage === 0) {
+    if (this.currentPage === Math.ceil(this.maxPhotos / this.imagesPerPage) - 1) {
+      theme.setButton(this.navPrev)
+      theme.setButton(this.navNext)
+    } else if (this.currentPage === 0) {
       theme.setButton(this.navPrev)
       theme.setButton(this.navNext, setCurrentURLParam('page', (this.currentPage + 1)))
     } else if (this.currentPage === this.pageAmount) {
@@ -526,7 +546,7 @@ class AlbumViewer extends Viewer {
     this.thumbnailContainer.addEventListener('fd-imgLoad', () => {
       totalLoaded++
 
-      if (totalLoaded === this.imagesPerPage) {
+      if (totalLoaded === this.imagesPerPage || totalLoaded === this.info.ItemAmount) {
         this.thumbnailContainer.dispatchEvent(contentLoad)
       }
     })
@@ -575,6 +595,9 @@ class FolderViewer extends Viewer {
 
     if (this.info.FolderType !== 'album') {
       setTitle([info.FolderName])
+      if (info.FolderDesc !== '') {
+        setText(this.desc, info.FolderDesc)
+      }
     }
 
     if (this.info.SubfolderShortNames.length > 0) {
@@ -610,7 +633,7 @@ function setConfig () {
     .then(async function (json) {
       readConfig(json)
       if (json.Theme !== '') {
-        theme = await import(BaseURL + '/theme/theme.js')
+        theme = await import(BaseURL + '/theme/js/theme.js')
         theme.init()
       }
       return Promise.resolve()
@@ -624,10 +647,24 @@ function setConfig () {
 
 function readConfig (info) {
   websiteTitle = info.WebsiteTitle
-  workingDirectory = info.WorkingDirectory
   storageURLBase = info.PhotoURLBase
   thumbnailFrom = info.ThumbnailFrom
   imageRootDir = info.ImageRootDir
+
+  const p = new URL(BaseURL).pathname
+  if (p === '' || p === '/') {
+    workingDirectory = ''
+    console.log(workingDirectory)
+  } else {
+    const pa = p.split('/')
+    console.log(pa)
+    if (pa[pa.length] === '') {
+      pa.pop()
+      workingDirectory = pa[pa.length]
+    } else {
+      workingDirectory = pa[pa.length]
+    }
+  }
 
   displayImageFrom = {
     size: info.DisplayImageFrom,
@@ -654,6 +691,11 @@ function readConfig (info) {
  */
 
 function pageInit () {
+  if (BaseURL === null) {
+    throw new Error('Error: fd-baseURL was not defined in the HTML. Aborting.')
+  }
+
+  setText(document.getElementById('fd-version'), version)
   const mobileCheck = window.matchMedia('(pointer: coarse)')
   if (mobileCheck.matches) { isMobile = true }
   setConfig()
@@ -661,19 +703,21 @@ function pageInit () {
       getJSON(getAlbumURL() + 'folderInfo.json')
         .then((info) => {
           try {
-            if (document.querySelector('.fd-photo.fd-viewer')) {
-              const photoViewer = new PhotoViewer(document.querySelector('.fd-photo.fd-viewer'), info)
-              PhotoViewers.push(photoViewer)
-            } else {
-              if (document.querySelector('.fd-folder.fd-viewer')) {
-                const folderViewer = new FolderViewer(document.querySelector('.fd-folder.fd-viewer'), info)
+            const viewers = document.querySelectorAll('.fd-viewer')
+            viewers.forEach((viewer) => {
+              if (viewer.classList.contains('fd-photo')) {
+                const photoViewer = new PhotoViewer(viewer, info)
+                PhotoViewers.push(photoViewer)
+              } else if (viewer.classList.contains('fd-folder')) {
+                const folderViewer = new FolderViewer(viewer, info)
                 FolderViewers.push(folderViewer)
-              }
-              if (document.querySelector('.fd-album.fd-viewer')) {
-                const albumViewer = new AlbumViewer(document.querySelector('.fd-album.fd-viewer'), info)
+              } else if (viewer.classList.contains('fd-album')) {
+                const albumViewer = new AlbumViewer(viewer, info)
                 AlbumViewers.push(albumViewer)
+              } else {
+                console.warn('Invalid viewer type detected.')
               }
-            };
+            })
           } catch (err) {
             console.error(err)
           }

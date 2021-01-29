@@ -81,6 +81,7 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 				verbose("Generating metadata to: " + path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageMetaDirectory))
 				err = generator.BatchImageMeta(items.ItemsInFolder, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageMetaDirectory))
 			}(&waitgroup)
+			items.Metadata = true
 		}
 
 		err = items.WriteItemsInfo(path.Join(fpath, "itemsInfo.json"))

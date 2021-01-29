@@ -34,7 +34,7 @@ function getLoadedImageRatios (container) {
 }
 
 async function justifyThumbnails (container) {
-  const layout = await import(BaseURL + '/theme/layout.js')
+  const layout = await import(BaseURL + '/theme/js/layout.js')
 
   const newImageSizes = layout.justifyImages(imageRatios, { containerWidth: container.offsetWidth })
 
@@ -160,7 +160,7 @@ export function createFolderLink (info) {
 
   folderItemCountContainer.setAttribute('class', 'row')
 
-  if (info.ItemAmount != null) {
+  if (info.ItemAmount > 0) {
     const folderItemCountPhotos = document.createElement('div')
     folderItemCountContainer.appendChild(folderItemCountPhotos)
     folderItemCountPhotos.setAttribute('class', 'col')
@@ -212,10 +212,12 @@ export function createThumbnail (index, name) {
 
 export function init () {
   document.addEventListener('fd-viewerLoad', e => {
-    if (e.target.classList.contains('fd-root')) {
+    const t = e.target
+    if (t.classList.contains('fd-root')) {
       removeLoad(document.querySelector('#fd-rootLoad'))
-      toggleView(e.target)
+      toggleView(t)
       if (e.target.classList.contains('fd-album') || e.target.classList.contains('fd-folder')) {
+        console.log('Root album/folder container detected')
         fetch('./thumb.jpg')
           .then(response => {
             if (!response.ok) {
@@ -226,12 +228,13 @@ export function init () {
           })
           .then((blob) => {
             console.log('Thumbnail detected')
-            e.target.querySelector('.fd-banner').getElementsByTagName('img')[0].src = URL.createObjectURL(blob)
-            e.target.querySelector('.fd-bannerload').remove()
+            t.querySelector('.fd-banner').getElementsByTagName('img')[0].src = URL.createObjectURL(blob)
+            t.querySelector('.fd-bannerload').remove()
           })
           .catch((err) => {
+            console.log(e.target)
             console.log(err)
-            e.target.querySelector('.fd-banner').remove()
+            t.querySelector('.fd-banner').remove()
           })
       }
     }

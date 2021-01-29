@@ -142,7 +142,6 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 		if *SourceFlag == "" {
 			fmt.Printf("You will have to configure your photo storage provider in %v.", path.Join(rootpath, "config.json"))
 		}
-		webconfig.WorkingDirectory = path.Base(rootpath)
 	}
 
 	err = webconfig.WriteWebConfig(path.Join(rootpath, "config.json"))

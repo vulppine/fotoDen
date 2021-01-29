@@ -14,6 +14,7 @@ import (
 //
 // Takes the path of the fotoDen folder.
 func UpdateFolderSubdirectories(fpath string) error {
+	verbose("Updating folder subdirectories in " + fpath)
 	folder := new(generator.Folder)
 
 	err := folder.ReadFolderInfo(path.Join(fpath, "folderInfo.json"))
@@ -88,6 +89,9 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 	}
 
 	fpath, _ = filepath.Abs(fpath)
+	verbose(path.Dir(fpath))
+	verbose(path.Join(path.Dir(fpath), "folderInfo.json"))
+	verbose(fmt.Sprint(fileCheck(path.Join(path.Dir(fpath), "folderInfo.json"))))
 
 	if fileCheck(path.Join(path.Dir(fpath), "folderInfo.json")) {
 		err = UpdateFolderSubdirectories(path.Dir(fpath))

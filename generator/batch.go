@@ -79,14 +79,11 @@ func BatchImageConversion(files []string, prefix string, directory string, Scali
 
 func BatchImageMeta(files []string, directory string) error {
 	wd, _ := os.Getwd()
-	verbose("Getting image metadata from" + wd + "and placing them in " + directory)
+	verbose("Writing image metadata templates from images in " + wd + "and placing them in " + directory)
 	batchImageMeta := func(file string, index int) error {
-		meta, err := GetImageMetadata(file)
-		if err != nil {
-			return err
-		}
+		meta := new(ImageMeta)
 
-		err = meta.WriteImageMeta(directory, file)
+		err := meta.WriteImageMeta(directory, file)
 		if err != nil {
 			return err
 		}

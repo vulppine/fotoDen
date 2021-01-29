@@ -182,7 +182,7 @@ func (folder *Folder) UpdateSubdirectories(directory string) (int, error) {
 	folder.SubfolderShortNames = RemoveItemFromStringArray(GetArrayOfFolders(fileArray), CurrentConfig.ImageRootDirectory)
 
 	// really lazy, find a better way to do this
-	folder.SubfolderShortNames = RemoveItemFromStringArray(folder.SubfolderShortNames, "css")
+	folder.SubfolderShortNames = RemoveItemFromStringArray(folder.SubfolderShortNames, "theme")
 	folder.SubfolderShortNames = RemoveItemFromStringArray(folder.SubfolderShortNames, "js")
 	return len(folder.SubfolderShortNames), nil
 }

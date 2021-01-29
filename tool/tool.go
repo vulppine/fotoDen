@@ -60,7 +60,7 @@ func verbose(print string) {
 
 func fileCheck(filename string) bool {
 	_, err := os.Stat(filename)
-	return os.IsExist(err)
+	return !os.IsNotExist(err)
 }
 
 type fvisitFunction func(string) error
