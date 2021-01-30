@@ -135,11 +135,11 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 
 	var webconfig *generator.WebConfig
 
-	if *WizardFlag == true {
-		webconfig = SetupWebConfig(*SourceFlag)
+	if *wizardFlag == true {
+		webconfig = SetupWebConfig(*sourceFlag)
 	} else {
-		webconfig = generator.GenerateWebConfig(*SourceFlag)
-		if *SourceFlag == "" {
+		webconfig = generator.GenerateWebConfig(*sourceFlag)
+		if *sourceFlag == "" {
 			fmt.Printf("You will have to configure your photo storage provider in %v.", path.Join(rootpath, "config.json"))
 		}
 	}
@@ -173,7 +173,7 @@ func InitializefotoDenConfig(u string, dest string) error {
 
 	var config generator.GeneratorConfig
 
-	if *WizardFlag == true {
+	if *wizardFlag == true {
 		config = SetupConfig()
 	} else {
 		config = generator.DefaultConfig

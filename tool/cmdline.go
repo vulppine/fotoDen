@@ -1,11 +1,11 @@
 package tool
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
 	"os"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func ReadInput(message string) string {
@@ -20,7 +20,7 @@ func ReadInput(message string) string {
 }
 
 func ReadInputAsArray(message string, sep string) []string {
-	return strings.Split(ReadInput(message + "[seperator: " + sep + "]"), sep)
+	return strings.Split(ReadInput(message+"[seperator: "+sep+"]"), sep)
 }
 
 func ReadInputAsInt(message string) (int, error) {
@@ -30,11 +30,11 @@ func ReadInputAsInt(message string) (int, error) {
 	n := ReadInput(message)
 	if n == "" {
 		return 0, nil
-	} else {
-		i, err = strconv.Atoi(n)
-		if checkError(err) {
-			return 0, err
-		}
+	}
+
+	i, err = strconv.Atoi(n)
+	if checkError(err) {
+		return 0, err
 	}
 
 	return i, nil
@@ -47,11 +47,11 @@ func ReadInputAsFloat(message string) (float32, error) {
 	n := ReadInput(message)
 	if n == "" {
 		return 0, nil
-	} else {
-		f, err = strconv.ParseFloat(n, 32)
-		if checkError(err) {
-			return 0, err
-		}
+	}
+
+	f, err = strconv.ParseFloat(n, 32)
+	if checkError(err) {
+		return 0, err
 	}
 
 	return float32(f), nil

@@ -25,22 +25,22 @@ import (
 //
 // -update updates the folder. (If the given args are null, or if there is no info file, it will return an error.)
 
-var GenFlag = flag.String("generate", "", "Generates a fotoDen structure in the current folder, or the default config in the configuration directory. Accepted modes: album, folder, config.")
-var NameFlag = flag.String("name", "", "The name of the folder (not the path). If this is blank, or not called, the current name of the folder will be used in generation.")
-var UpdFlag = flag.String("update", "folder", "Updates fotoDen resources.")
-var RecursFlag = flag.Bool("recurse", false, "Recursively goes through fotoDen folders.")
-var RecursFlagShort = flag.Bool("r", false, "Recursively goes through fotoDen folders.")
-var SourceFlag = flag.String("source", "", "The source used for fotoDen images. This is multi-context - calling this during -generate full will take images from the source directory as its base, and calling this during -init root will use this as the fotoDen image storage provider.")
-var StaticFlag = flag.Bool("static", false, "Generates either a static or dynamic webpage. If you call this during folder/album generation, the folder will always be static - otherwise, it will generate a more static webpage in the given folder/album.")
-var CopyFlag = flag.Bool("copy", false, "Copies files over to GeneratorConfig.ImageSrcDirectory. Useful if you're copying over to a remote directory.")
-var MetaFlag = flag.Bool("meta", true, "Copies all metadata into [image name].json. Metadata such as image description and name must be edited by hand.")
-var ThumbSrc = flag.String("folthumb", "", "The name of the thumbnail in the source directory. This will be selected as the thumbnail of the folder, and is copied over to the root of the folder.")
-var GenSizeFlag = flag.Bool("gensizes", true, "Tells the generator to generate all sizes in the config. This is automatically set to true.")
-var ConfigSrc = flag.String("config", "", "The name of the config file to use. If this isn't set, the one is $CONFIG/fotoDen is used - otherwise, an error is returned. Call 'fotoDen -generate config' to create a config in either $CONFIG/fotoden, or in a relative folder if defined.")
-var InitFlag = flag.String("init", "", "Initializes various aspects of fotoDen. Accepted values: config, root, templates, js. config should only be done if the config folder was removed, as it is automatically called at the first start of the program.")
-var WizardFlag = flag.Bool("interactive", true, "Enables interactive mode. Interactive mode occurs when settings need to be configured in files.")
-var VerboseFlag = flag.Bool("verbose", false, "Sets verbose mode.")
-var VerboseFlagShort = flag.Bool("v", false, "Sets verbose mode.")
+var genFlag = flag.String("generate", "", "Generates a fotoDen structure in the current folder, or the default config in the configuration directory. Accepted modes: album, folder, config.")
+var nameFlag = flag.String("name", "", "The name of the folder (not the path). If this is blank, or not called, the current name of the folder will be used in generation.")
+var updFlag = flag.String("update", "folder", "Updates fotoDen resources.")
+var recursFlag = flag.Bool("recurse", false, "Recursively goes through fotoDen folders.")
+var recursFlagShort = flag.Bool("r", false, "Recursively goes through fotoDen folders.")
+var sourceFlag = flag.String("source", "", "The source used for fotoDen images. This is multi-context - calling this during -generate full will take images from the source directory as its base, and calling this during -init root will use this as the fotoDen image storage provider.")
+var staticFlag = flag.Bool("static", false, "Generates either a static or dynamic webpage. If you call this during folder/album generation, the folder will always be static - otherwise, it will generate a more static webpage in the given folder/album.")
+var copyFlag = flag.Bool("copy", false, "Copies files over to GeneratorConfig.ImageSrcDirectory. Useful if you're copying over to a remote directory.")
+var metaFlag = flag.Bool("meta", true, "Copies all metadata into [image name].json. Metadata such as image description and name must be edited by hand.")
+var thumbSrc = flag.String("folthumb", "", "The name of the thumbnail in the source directory. This will be selected as the thumbnail of the folder, and is copied over to the root of the folder.")
+var genSizeFlag = flag.Bool("gensizes", true, "Tells the generator to generate all sizes in the config. This is automatically set to true.")
+var configSrc = flag.String("config", "", "The name of the config file to use. If this isn't set, the one is $CONFIG/fotoDen is used - otherwise, an error is returned. Call 'fotoDen -generate config' to create a config in either $CONFIG/fotoden, or in a relative folder if defined.")
+var initFlag = flag.String("init", "", "Initializes various aspects of fotoDen. Accepted values: config, root, templates, js. config should only be done if the config folder was removed, as it is automatically called at the first start of the program.")
+var wizardFlag = flag.Bool("interactive", true, "Enables interactive mode. Interactive mode occurs when settings need to be configured in files.")
+var verboseFlag = flag.Bool("verbose", false, "Sets verbose mode.")
+var verboseFlagShort = flag.Bool("v", false, "Sets verbose mode.")
 
 var genoptions GeneratorOptions
 
@@ -51,33 +51,33 @@ func parseGen(mode string, arg string, options GeneratorOptions) error {
 	case "album", "folder":
 		switch {
 		case arg == "":
-			if *NameFlag == "" {
+			if *nameFlag == "" {
 				err := GenerateFolder(path.Base(wd), path.Base(wd), options)
 				if checkError(err) {
 					return err
 				}
 			} else {
-				err := GenerateFolder(*NameFlag, path.Base(wd), options)
+				err := GenerateFolder(*nameFlag, path.Base(wd), options)
 				if checkError(err) {
 					return err
 				}
 			}
 		case arg != "":
-			if *NameFlag == "" {
+			if *nameFlag == "" {
 				name := path.Base(wd)
 				err := GenerateFolder(name, arg, options)
 				if checkError(err) {
 					return err
 				}
 			} else {
-				err := GenerateFolder(*NameFlag, arg, options)
+				err := GenerateFolder(*nameFlag, arg, options)
 				if checkError(err) {
 					return err
 				}
 			}
 		default:
 			fmt.Println("Something really wrong happened. How the hell did you do that?")
-			return fmt.Errorf("Unexplainable error occurred")
+			return fmt.Errorf("unexplainable error occurred")
 		}
 	case "config":
 		var file *os.File
@@ -94,12 +94,12 @@ func parseGen(mode string, arg string, options GeneratorOptions) error {
 		checkError(err)
 
 		if stat.Size() > 0 {
-			return fmt.Errorf("A config file already exists in the folder. Consider modifying it with a text editor.")
-		} else {
-			generator.WritefotoDenConfig(generator.DefaultConfig, path.Join(generator.FotoDenConfigDir, "config.json"))
+			return fmt.Errorf("a config file already exists in the folder")
 		}
+
+		generator.WritefotoDenConfig(generator.DefaultConfig, path.Join(generator.FotoDenConfigDir, "config.json"))
 	default:
-		return fmt.Errorf("An invalid value was passed to -generate. Aborting. mode: " + mode)
+		return fmt.Errorf("an invalid value was passed to -generate: " + mode)
 	}
 
 	return nil
@@ -108,7 +108,7 @@ func parseGen(mode string, arg string, options GeneratorOptions) error {
 func parseUpdate(value string, arg string) error {
 	var err error
 	switch {
-	case *RecursFlag, *RecursFlagShort:
+	case *recursFlag, *recursFlagShort:
 		switch value {
 		case "folder":
 			err = RecursiveVisit(arg, UpdateFolderSubdirectories)
@@ -143,7 +143,7 @@ func ParseCmd() error {
 	flag.Parse()
 	arg := flag.Arg(0) // ignore the other flags silently
 
-	if *VerboseFlag || *VerboseFlagShort {
+	if *verboseFlag || *verboseFlagShort {
 		Verbose = true
 		verbose(fmt.Sprint("Tool verbosity: ", Verbose))
 		generator.Verbose = true
@@ -151,27 +151,27 @@ func ParseCmd() error {
 	}
 
 	genoptions = GeneratorOptions{
-		source: *SourceFlag,
-		copy: *CopyFlag,
-		gensizes: *GenSizeFlag,
-		meta: *MetaFlag,
-		static: *StaticFlag,
+		source:   *sourceFlag,
+		copy:     *copyFlag,
+		gensizes: *genSizeFlag,
+		meta:     *metaFlag,
+		static:   *staticFlag,
 	}
 
-	if *GenFlag == "album" {
+	if *genFlag == "album" {
 		genoptions.imagegen = true
 	}
 	verbose("Current generator options [source/copy/thumb]: " + fmt.Sprint(genoptions))
 
 	flag.Visit(func(flag *flag.Flag) { verbose("Flag setting: " + fmt.Sprint(flag.Name, " ", flag.Value)) })
 
-	if *ConfigSrc == "" && *InitFlag != "config" {
+	if *configSrc == "" && *initFlag != "config" {
 		err := generator.OpenfotoDenConfig(path.Join(generator.FotoDenConfigDir, "config.json"))
 		if checkError(err) {
 			return err
 		}
-	} else if *InitFlag != "config" {
-		err := generator.OpenfotoDenConfig(*ConfigSrc)
+	} else if *initFlag != "config" {
+		err := generator.OpenfotoDenConfig(*configSrc)
 		if checkError(err) {
 			return err
 		}
@@ -179,14 +179,14 @@ func ParseCmd() error {
 
 	verbose("Generator config: " + fmt.Sprint(generator.CurrentConfig))
 
-	if *InitFlag != "" {
-		verbose("Checking init flag..." + fmt.Sprint(*InitFlag))
-		switch *InitFlag {
+	if *initFlag != "" {
+		verbose("Checking init flag..." + fmt.Sprint(*initFlag))
+		switch *initFlag {
 		case "config":
-			err := InitializefotoDenConfig(*SourceFlag, arg)
+			err := InitializefotoDenConfig(*sourceFlag, arg)
 			return err
 		case "root":
-			err := InitializefotoDenRoot(arg, *NameFlag)
+			err := InitializefotoDenRoot(arg, *nameFlag)
 			return err
 		case "templates":
 			err := InitializeWebTemplates(generator.CurrentConfig.WebBaseURL, arg)
@@ -195,23 +195,23 @@ func ParseCmd() error {
 			err := InitializefotoDenjs(generator.CurrentConfig.WebBaseURL, arg)
 			return err
 		default:
-			return fmt.Errorf("An invalid init flag was set. Aborting.")
+			return fmt.Errorf("invalid init flag set")
 		}
 	}
 
 	switch {
-	case *GenFlag != "":
-		err := parseGen(*GenFlag, arg, genoptions)
+	case *genFlag != "":
+		err := parseGen(*genFlag, arg, genoptions)
 		if checkError(err) {
 			return err
 		}
-	case *UpdFlag != "":
-		err := parseUpdate(*UpdFlag, arg)
+	case *updFlag != "":
+		err := parseUpdate(*updFlag, arg)
 		if checkError(err) {
 			return err
 		}
 	default:
-		return fmt.Errorf("-init, -generate or -update must be defined. Aborting.")
+		return fmt.Errorf("-init, -generate or -update must be defined")
 	}
 
 	return nil

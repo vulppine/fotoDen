@@ -6,9 +6,7 @@ import (
 	"path"
 )
 
-// GetArrayOfFilesAndFolders
-//
-// Takes an array of os.FileInfo (from os.Readdir()), and returns a string array of all non-directories.
+// GetArrayOfFilesAndFolders takes an array of os.FileInfo (usually from from os.Readdir()), and returns a string array of all non-directories.
 // Also returns a string array of directories, so we don't have to copy and paste this function.
 func GetArrayOfFilesAndFolders(directory []os.FileInfo) ([]string, []string) {
 	fileArray := make([]string, 0)
@@ -25,20 +23,19 @@ func GetArrayOfFilesAndFolders(directory []os.FileInfo) ([]string, []string) {
 	return fileArray, folderArray
 }
 
-// Wrappers for both, just in case only one of the two is needed
+// GetArrayOfFiles takes an array of os.FileInfo, and runs it through GetArrayOfFilesAndFolders, returning only the array of files.
 func GetArrayOfFiles(directory []os.FileInfo) []string {
 	fileArray, _ := GetArrayOfFilesAndFolders(directory)
 	return fileArray
 }
 
+// GetArrayOfFolders takes an array of os.FileInfo, and runs it through GetArrayOfFilesAndFolders, returning only the array of folders.
 func GetArrayOfFolders(directory []os.FileInfo) []string {
 	_, folderArray := GetArrayOfFilesAndFolders(directory)
 	return folderArray
 }
 
-// CopyFile
-//
-// Takes three arguments - the name of the file, the name of the new file, and the destination.
+// CopyFile takes three arguments - the name of the file, the name of the new file, and the destination.
 // This assumes the file we're renaming is in the current working directory, or it is reachable
 // via the current working directory.
 //

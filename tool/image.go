@@ -1,14 +1,14 @@
 package tool
 
 import (
-	"sort"
 	"fmt"
 	"github.com/vulppine/fotoDen/generator"
-	"path"
-	"sync"
-	"os"
 	"io/ioutil"
+	"os"
+	"path"
 	"path/filepath"
+	"sort"
+	"sync"
 )
 
 func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
@@ -207,7 +207,7 @@ func InsertImage(folder string, file string, mode string, options GeneratorOptio
 		return err
 	}
 
-	switch (mode) {
+	switch mode {
 	case "append":
 		items.ItemsInFolder = append(items.ItemsInFolder, file)
 	case "sort":

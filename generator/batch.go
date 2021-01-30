@@ -8,9 +8,7 @@ import (
 	"strings"
 )
 
-// BatchOperationOnFiles
-//
-// Takes two arguments, an array of file names, and a function that takes a string and an int.
+// BatchOperationOnFiles takes two arguments, an array of file names, and a function that takes a string and an int.
 //
 // The string will be the file name, while the int will be the index of the file in the array.
 //
@@ -27,9 +25,7 @@ func BatchOperationOnFiles(files []string, fn func(string, int) error) error {
 	return nil
 }
 
-// BatchCopyFileByIndex
-//
-// Copies a list of file string names to the current WorkingDirectory by index.
+// BatchCopyFile copies a list of file string names to the current WorkingDirectory by index.
 // Returns an error if one occurs, otherwise nil.
 // Also preserves the current extension of the file. (This is due to a NeoCities Free restriction)
 func BatchCopyFile(files []string, directory string) error {
@@ -52,9 +48,7 @@ func BatchCopyFile(files []string, directory string) error {
 	return nil
 }
 
-// BatchResizeImages
-//
-// Resizes a set of images to thumbnail size and puts them into the given directory, as according to CurrentConfig.
+// BatchImageConversion resizes a set of images to thumbnail size and puts them into the given directory, as according to CurrentConfig.
 // Returns an error if one occurs, otherwise nil.
 func BatchImageConversion(files []string, prefix string, directory string, ScalingOptions ImageScale) error {
 	wd, _ := os.Getwd()
@@ -77,6 +71,8 @@ func BatchImageConversion(files []string, prefix string, directory string, Scali
 	return nil
 }
 
+// BatchImageMeta takes a string array of files, and a destination directory, and generates a JSON file
+// containing non-EXIF metadata (such as names and descriptions) of image files for fotoDen to process.
 func BatchImageMeta(files []string, directory string) error {
 	wd, _ := os.Getwd()
 	verbose("Writing image metadata templates from images in " + wd + "and placing them in " + directory)

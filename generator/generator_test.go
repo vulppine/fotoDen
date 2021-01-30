@@ -1,11 +1,11 @@
 package generator
 
 import (
-	"testing"
-	"io/ioutil"
-	"path"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path"
+	"testing"
 )
 
 func TestJSONRW(t *testing.T) {
@@ -47,7 +47,7 @@ func TestFotoDenConfigRW(t *testing.T) {
 
 	err = OpenfotoDenConfig(path.Join(dir, "tmp_config.json"))
 	if err != nil {
-		t.Errorf("Error - OpenfotoDenConfig: "+ fmt.Sprint(err))
+		t.Errorf("Error - OpenfotoDenConfig: " + fmt.Sprint(err))
 	}
 	t.Log(fmt.Sprint(CurrentConfig))
 }
@@ -112,7 +112,7 @@ func TestBatchCopyConvert(t *testing.T) {
 
 	os.Chdir(dir)
 
-	err = BatchImageConversion(srcfiles, "test", dir2, ImageScale{ScalePercent:0.99})
+	err = BatchImageConversion(srcfiles, "test", dir2, ImageScale{ScalePercent: 0.99})
 	if err != nil {
 		t.Errorf("Error: BatchImageConversion: " + fmt.Sprint(err))
 	}

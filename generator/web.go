@@ -8,65 +8,55 @@ import (
 	"text/template"
 )
 
-// WebConfig
-//
-// The structure of the JSON config file that fotoDen uses.
+// WebConfig is the structure of the JSON config file that fotoDen uses.
 type WebConfig struct {
 	WebsiteTitle     string
 	PhotoURLBase     string
 	ImageRootDir     string
 	ThumbnailFrom    string
 	DisplayImageFrom string
-	Theme			 string
-	ImageSizes		 []WebImageSize
+	Theme            string
+	ImageSizes       []WebImageSize
 }
 
-// WebImageSize
-//
-// A structure for image size types that fotoDen will call on.
+// WebImageSize is a structure for image size types that fotoDen will call on.
 type WebImageSize struct {
-	SizeName string			// the semantic name of the size
-	Directory string		// the directory the size is stored in, relative to ImageRootDir
-	LocalBool bool          // whether to download it remotely or locally
+	SizeName  string // the semantic name of the size
+	Directory string // the directory the size is stored in, relative to ImageRootDir
+	LocalBool bool   // whether to download it remotely or locally
 }
 
-// WebVars
-//
-// These will dictate where fotoDen gets its JavaScript and CSS files per page.
+// WebVars dictate where fotoDen gets its JavaScript and CSS files per page.
 type WebVars struct {
-	BaseURL     string
-	JSLocation  string
-	CSSLocation string
+	BaseURL       string
+	JSLocation    string
+	CSSLocation   string
 	StaticWebVars map[string]string
 }
 
-// StaticWebVars
-//
-// These are fields that a page can take in order to allow for static page generation.
+// StaticWebVars are fields that a page can take in order to allow for static page generation.
 // If a folder is marked for dynamic generation, these will all automatically be blank.
 // Otherwise, these will have the relevant information inside. This only applies to folders.
 type StaticWebVars struct {
-	IsStatic bool
-	PageName string // the current name of the page, e.g. 'My album', or 'Photo name'
-	PageDesc string // the current description of the page
+	IsStatic   bool
+	PageName   string // the current name of the page, e.g. 'My album', or 'Photo name'
+	PageDesc   string // the current description of the page
 	PageFolder string // the folder this is contained in
 	PageAuthor string // the author of the page, i.e. the photographer
 }
 
-// GenerateWebConfig
-//
-// Creates a new WebConfig object, and returns a WebConfig object with a populated ImageSizes
+// GenerateWebConfig creates a new WebConfig object, and returns a WebConfig object with a populated ImageSizes
 // based on the current ScalingOptions map.
 func GenerateWebConfig(source string) *WebConfig {
 
 	webconfig := new(WebConfig)
 	webconfig.PhotoURLBase = source
 
-	for k, _ := range CurrentConfig.ImageSizes {
+	for k := range CurrentConfig.ImageSizes {
 		webconfig.ImageSizes = append(
 			webconfig.ImageSizes,
 			WebImageSize{
-				SizeName: k,
+				SizeName:  k,
 				Directory: k,
 				LocalBool: true,
 			},
@@ -76,7 +66,7 @@ func GenerateWebConfig(source string) *WebConfig {
 	return webconfig
 }
 
-
+// ReadWebConfig reads a JSON file containing WebConfig fields into a WebConfig struct.
 func (config *WebConfig) ReadWebConfig(fpath string) error {
 	err := ReadJSON(fpath, config)
 	if err != nil {
@@ -86,6 +76,7 @@ func (config *WebConfig) ReadWebConfig(fpath string) error {
 	return nil
 }
 
+// WriteWebConfig writes a WebConfig struct into the specified path.
 func (config *WebConfig) WriteWebConfig(fpath string) error {
 	err := WriteJSON(fpath, "multi", config)
 	if err != nil {
@@ -95,9 +86,7 @@ func (config *WebConfig) WriteWebConfig(fpath string) error {
 	return nil
 }
 
-// GenerateWebRoot
-//
-// Generates the root of a fotoDen website in fpath.
+// GenerateWebRoot generates the root of a fotoDen website in fpath.
 // Creates the folders for JS and CSS placement.
 //
 // It is up to the fotoDen tool to copy over the relevant files,
@@ -131,9 +120,7 @@ func GenerateWebRoot(fpath string) error {
 	return nil
 }
 
-// MakeAlbumDirectoryStructure
-//
-// Makes a fotoDen-suitable album structure in the given rootDirectory (string).
+// MakeAlbumDirectoryStructure makes a fotoDen-suitable album structure in the given rootDirectory (string).
 // The directory must exist beforehand.
 func MakeAlbumDirectoryStructure(rootDirectory string) error {
 
@@ -155,16 +142,14 @@ func MakeAlbumDirectoryStructure(rootDirectory string) error {
 	os.Mkdir(path.Join(CurrentConfig.ImageRootDirectory, CurrentConfig.ImageSrcDirectory), 0777)
 	os.Mkdir(path.Join(CurrentConfig.ImageRootDirectory, CurrentConfig.ImageMetaDirectory), 0777)
 
-	for k, _ := range CurrentConfig.ImageSizes {
+	for k := range CurrentConfig.ImageSizes {
 		os.Mkdir(filepath.Join(CurrentConfig.ImageRootDirectory, k), 0777)
 	}
 
 	return nil
 }
 
-// NewWebVars
-//
-// Creates a WebVars object. Takes a single URL string, and outputs
+// NewWebVars creates a WebVars object. Takes a single URL string, and outputs
 // a set of fotoDen compatible URLs.
 //
 // Generates:
@@ -199,18 +184,16 @@ func NewWebVars(u string) (*WebVars, error) {
 
 	webvars.StaticWebVars = map[string]string{
 		"isStatic": "{{.IsStatic}}",
-		"name": "{{.PageName}}",
-		"desc": "{{.PageDesc}}",
-		"auth": "{{.PageAuthor}}",
-		"sfol": "{{.PageFolder}}",
+		"name":     "{{.PageName}}",
+		"desc":     "{{.PageDesc}}",
+		"auth":     "{{.PageAuthor}}",
+		"sfol":     "{{.PageFolder}}",
 	}
 
 	return webvars, nil
 }
 
-// NewStaticWebVars
-//
-// Creates a new static web var set based on the folder given.
+// NewStaticWebVars creates a new static web var set based on the folder given.
 // Returns a filled webvar set - save for superFolder, which only occurs
 // if the folder above is a fotoDen folder or not.
 //
@@ -247,9 +230,7 @@ func NewStaticWebVars(folder string) (*StaticWebVars, error) {
 	return swebvars, nil
 }
 
-// ConfigureWebFile
-//
-// Configures the web variables in a template by putting it through Go's template system.
+// ConfigureWebFile configures the web variables in a template by putting it through Go's template system.
 // Outputs to a destination location.
 // Can be used for any fotoDen-compatible web file.
 //

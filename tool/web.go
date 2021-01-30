@@ -7,9 +7,9 @@ import (
 )
 
 type Theme struct {
-	ThemeName 	string
+	ThemeName   string
 	Stylesheets []string
-	Scripts 	[]string
+	Scripts     []string
 }
 
 func ReadThemeConfig(fpath string) (*Theme, error) {
@@ -17,7 +17,7 @@ func ReadThemeConfig(fpath string) (*Theme, error) {
 
 	err := generator.ReadJSON(fpath, t)
 	if checkError(err) {
-		return nil, fmt.Errorf("A valid theme could not be read.")
+		return nil, fmt.Errorf("valid theme could not be read")
 	}
 
 	return t, nil
@@ -44,7 +44,7 @@ func GenerateWeb(m string, dest string, f *generator.Folder, opt GeneratorOption
 	case "folder":
 		err = generator.ConfigureWebFile(path.Join(generator.CurrentConfig.WebSourceLocation, "html", "folder-template.html"), path.Join(dest, "index.html"), pageOptions)
 	default:
-		return fmt.Errorf("A mode was not passed to GenerateWeb. Aborting.")
+		return fmt.Errorf("mode was not passed to GenerateWeb")
 	}
 
 	if checkError(err) {

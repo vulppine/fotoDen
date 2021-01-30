@@ -55,8 +55,8 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 		panic(err) // can't continue!
 	}
 
-	if *ThumbSrc != "" {
-		err = generator.MakeFolderThumbnail(*ThumbSrc, fpath)
+	if *thumbSrc != "" {
+		err = generator.MakeFolderThumbnail(*thumbSrc, fpath)
 		checkError(err)
 	}
 
@@ -74,7 +74,7 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 			folder.FolderType = "album"
 			folder.ItemAmount = fileAmount
 		} else {
-			return fmt.Errorf("Error: No images detected in source! Use -generate folder or a valid source!")
+			return fmt.Errorf("no images detected in source - use -generate folder or a valid source")
 		}
 	} else {
 		verbose("Generating folder...")

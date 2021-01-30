@@ -64,7 +64,7 @@ func SetupWebConfig(source string) *generator.WebConfig {
 	config.PhotoURLBase = ReadInput("Are you going to be using a remote storage provider for your photos? If so, put in the URL to the folder containing your fotoDen-structured images here.")
 
 	fmt.Println("Here are your current image sizes, for reference:")
-	for k, _ := range generator.CurrentConfig.ImageSizes {
+	for k := range generator.CurrentConfig.ImageSizes {
 		fmt.Println(k)
 	}
 

@@ -1,11 +1,11 @@
 package tool
 
 import (
-	"testing"
-	"path"
 	"fmt"
-	"os"
 	"io/ioutil"
+	"os"
+	"path"
+	"testing"
 
 	"github.com/vulppine/fotoDen/generator"
 )
@@ -34,11 +34,11 @@ func TestGenerateFolder(t *testing.T) {
 	t.Log(string(j))
 
 	genopts = GeneratorOptions{
-		source: "../test_images",
-		copy: true,
+		source:   "../test_images",
+		copy:     true,
 		gensizes: true,
 		imagegen: true,
-		sort: true,
+		sort:     true,
 	}
 
 	err = GenerateFolder("with_images", path.Join(dir, "with_images"), genopts)
@@ -87,10 +87,10 @@ func TestImageCRUD(t *testing.T) {
 	}()
 
 	genopts := GeneratorOptions{
-		source: "../test_images",
-		copy: true,
+		source:   "../test_images",
+		copy:     true,
 		gensizes: true,
-		sort: true,
+		sort:     true,
 	}
 
 	err = UpdateImages(dir, genopts)

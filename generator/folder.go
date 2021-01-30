@@ -6,9 +6,7 @@ import (
 	"path"
 )
 
-// GenerateFolderInfo
-//
-// Generates a Folder object that can be used for folder configuration.
+// GenerateFolderInfo generates a Folder object that can be used for folder configuration.
 // If directory is an empty string, it does it in the current directory.
 // Otherwise, it attempts to reach the directory from the current working directory.
 //
@@ -42,38 +40,10 @@ func GenerateFolderInfo(directory string, name string) (*Folder, error) {
 	folder.FolderShortName = path.Base(currentDirectory)
 	folder.SubfolderShortNames = []string{}
 
-	/* Move this to tool
-	_, err := os.Stat(path.Join(path.Dir(currentDirectory), "folderInfo.json"))
-	if err != nil {
-		fmt.Println("Directory above either is not a fotoDen directory, or is missing folderInfo.json. Skipping. Folder: ", directory)
-	} else {
-		supFolder := new(Folder)
-		err = supFolder.ReadFolderInfo(path.Join(path.Dir(currentDirectory), "folderInfo.json"))
-		if err != nil {
-			fmt.Println("An error occurred during folder generation: ", err)
-		} else {
-			supFolder.SubfolderShortNames = append(supFolder.SubfolderShortNames, folder.FolderShortName)
-			supFolder.WriteFolderInfo(path.Join(path.Dir(currentDirectory), "folderInfo.json"))
-		}
-	}	*/
-
-	/* Move this to tool
-	_, err = os.Stat(path.Join(currentDirectory, "thumb"))
-	if err != nil {
-		fmt.Println("No thumbnail detected. (You can set this manually by placing a valid image into the folder named as 'thumb', and setting folderInfo.json's 'FolderThumbnail' to true.)")
-		folder.FolderThumbnail = false
-	} else {
-		folder.FolderThumbnail = true
-	}
-	*/
-
 	return folder, nil
 }
 
-
-/// ReadFolderInfo
-//
-// A method for reading folder info from a file.
+// ReadFolderInfo is a method for reading folder info from a file.
 // Returns an error if any occur.
 func (folder *Folder) ReadFolderInfo(filePath string) error {
 	verbose("Reading folder infomation from " + filePath)
@@ -85,9 +55,7 @@ func (folder *Folder) ReadFolderInfo(filePath string) error {
 	return nil
 }
 
-// WriteFolderInfo
-//
-// A method for writing folder info to a file.
+// WriteFolderInfo is a method for writing fotoDen folder info to a file.
 // Returns an error if any occur.
 func (folder *Folder) WriteFolderInfo(filePath string) error {
 	verbose("Writing folder (" + folder.FolderShortName + ") to " + filePath)
@@ -99,9 +67,7 @@ func (folder *Folder) WriteFolderInfo(filePath string) error {
 	return nil
 }
 
-// GenerateItemInfo
-//
-// Generates an Items object based on the contents of the directory.
+// GenerateItemInfo generates an Items object based on the contents of the directory.
 // This automatically strips non-images.
 func GenerateItemInfo(directory string) (*Items, error) {
 	items := new(Items)
@@ -126,9 +92,7 @@ func GenerateItemInfo(directory string) (*Items, error) {
 	return items, nil
 }
 
-// ReadItemsInfo
-//
-// A method for reading items info from a file.
+// ReadItemsInfo is a method for reading items info from a file.
 // Returns an error if any occur.
 func (items *Items) ReadItemsInfo(filePath string) error {
 	verbose("Reading items infomation from " + filePath)
@@ -140,9 +104,7 @@ func (items *Items) ReadItemsInfo(filePath string) error {
 	return nil
 }
 
-// WriteItemsInfo
-//
-// A method for writing items info to a file.
+// WriteItemsInfo is a method for writing items info to a file.
 // Returns an error if any occur.
 func (items *Items) WriteItemsInfo(filePath string) error {
 	verbose("Writing items to " + filePath)
@@ -157,9 +119,7 @@ func (items *Items) WriteItemsInfo(filePath string) error {
 // perhaps this should be moved to tool?
 // no - it's useful here
 
-// UpdateSubdirectories
-//
-// Updates a Folder object's subdirectories according to the given directory.
+// UpdateSubdirectories updates a Folder object's subdirectories according to the given directory.
 // If directory is an empty string, will attempt to update the Folder from the current working directory.
 // Returns an error, if any occurs, otherwise the number of directories and a nil error.
 func (folder *Folder) UpdateSubdirectories(directory string) (int, error) {

@@ -2,8 +2,8 @@ package tool
 
 import (
 	"fmt"
-	"os"
 	"io/ioutil"
+	"os"
 
 	"github.com/vulppine/fotoDen/generator"
 )

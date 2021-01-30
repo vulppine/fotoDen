@@ -221,6 +221,9 @@ function getFolderURL (level) {
   let rootDirectoryLoc
 
   if (workingDirectory === '') {
+    if (folderURL.pathname === '/' && level > 0) {
+      return null
+    }
     rootDirectoryLoc = 0
   } else {
     rootDirectoryLoc = folderPath.indexOf(workingDirectory)
@@ -229,13 +232,15 @@ function getFolderURL (level) {
   folderURL.search = ''
 
   if (rootDirectoryLoc !== 0 && folderPath.length - level < folderPath.length - rootDirectoryLoc) {
-    throw new Error('Error: attempted to go deeper than workingDirectory, aborting!')
+    console.warn('Attempted to go deeper than baseURL, ignoring.')
+    return null
   } else if (level <= folderPath.length) {
     folderURL.pathname = folderPath.slice(0, folderPath.length - level).concat(['']).join('/') // folders should really have a default page file name
     folderURL.href = folderURL.origin + folderURL.pathname + folderURL.search // had an issue with this, so i'm forcing it
     return folderURL
   } else {
-    throw new Error('Attempted to go deeper than possible - ignoring.')
+    console.warn('Attempted to go deeper than baseURL, ignoring.')
+    return null
   }
 }
 
@@ -324,16 +329,18 @@ class Viewer {
   }
 
   setSuperFolder () {
-    getJSON(getFolderURL(1).toString() + 'folderInfo.json')
-      .then((info) => {
-        setText(this.superFolder, info.FolderName)
-        this.superFolder.href = getFolderURL(1).toString()
-      })
-      .catch(() => {
-        if (this.folderSubtitle === null) { return }
-
+    const f = getFolderURL(1)
+    if (f === null) {
+      if (this.folderSubtitle !== null) {
         this.folderSubtitle.setAttribute('style', 'display: none')
-      })
+      }
+    } else {
+      getJSON(f.toString() + 'folderInfo.json')
+        .then((info) => {
+          setText(this.superFolder, info.FolderName)
+          setLink(this.superFolder, f.toString())
+        })
+    }
   }
 
   getNavContentMinMax (total, current) {

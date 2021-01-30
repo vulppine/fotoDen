@@ -7,9 +7,7 @@ import (
 	"strconv"
 )
 
-// IsolateImages
-//
-// Isolates images in an array.
+// IsolateImages isolates images in an array.
 //
 // Checks all image files at O(n), if a file is not an image, removes it from the current slice.
 func IsolateImages(files []string) []string {
@@ -29,15 +27,15 @@ func IsolateImages(files []string) []string {
 	return files
 }
 
+// ImageScale represents scaling options to be used by ResizeImage.
+// See ResizeImage for more information.
 type ImageScale struct {
 	MaxHeight    int
 	MaxWidth     int
 	ScalePercent float32
 }
 
-// ResizeImage
-//
-// Resizes a single image.
+// ResizeImage resizes a single image.
 //
 // You'll have to pass it a ImageScale object,
 // which contains values for either a scale percentage, or a max height/width.
@@ -58,7 +56,7 @@ func ResizeImage(file string, imageName string, scale ImageScale, dest string, i
 
 	imageType := bimg.DetermineImageType(image)
 	if imageType == bimg.UNKNOWN {
-		return fmt.Errorf("ResizeImage: Unknown file type. Skipping. Image: ", imageName )
+		return fmt.Errorf("ResizeImage: Unknown file type. Skipping. Image: ", imageName)
 	}
 
 	newImage, err := bimg.NewImage(image).Convert(imageFormat)
@@ -101,25 +99,21 @@ func ResizeImage(file string, imageName string, scale ImageScale, dest string, i
 	return nil
 }
 
-// ImageMeta
-//
-// Provides information on an image. Includes the entirety of the image's EXIF data (which can be modified post-generation).
-// ImageEXIF is included in case that an image does not already include EXIF data (e.g., film photography), so that the
-// data can be manually input on a per-image basis, if the user does not want to use an external editor.
-// This is subject to change!
+// ImageMeta provides metadata such as name and description for an image file.
+// This is used by fotoDen on the web frontend to display custom per-image information.
 type ImageMeta struct {
-	ImageName			string   // The name of an image.
-	ImageDesc			string   // The description of an image.
+	ImageName string // The name of an image.
+	ImageDesc string // The description of an image.
 }
 
-// WriteImageMeta
+// WriteImageMeta writes an ImageMeta struct to a file.
 //
 // Takes two arguments: a folder destination, and a name.
 // The name is automatically combined to create a [name].json file,
 // in order to ensure compatibility with fotoDen.
 // Writes the json file into the given folder.
 func (meta *ImageMeta) WriteImageMeta(folder string, name string) error {
-	err := WriteJSON(path.Join(folder, name + ".json"), "multi", meta)
+	err := WriteJSON(path.Join(folder, name+".json"), "multi", meta)
 	if err != nil {
 		return err
 	}
@@ -127,8 +121,7 @@ func (meta *ImageMeta) WriteImageMeta(folder string, name string) error {
 	return nil
 }
 
-// MakeThumbnail
-//
+// MakeFolderThumbnail creates a thumbnail from a file into a destination directory.
 // This is only here to make fotoDen's command line tool look cleaner in code, and avoid importing more than needed.
 func MakeFolderThumbnail(file string, directory string) error {
 	err := ResizeImage(file, "thumb.jpg", CurrentConfig.ImageSizes["thumb"], directory, bimg.JPEG)
