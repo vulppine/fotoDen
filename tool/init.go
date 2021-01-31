@@ -135,7 +135,7 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 
 	var webconfig *generator.WebConfig
 
-	if *wizardFlag == true {
+	if WizardFlag == true {
 		webconfig = SetupWebConfig(*sourceFlag)
 	} else {
 		webconfig = generator.GenerateWebConfig(*sourceFlag)
@@ -155,7 +155,7 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 	err = folder.WriteFolderInfo(path.Join(rootpath, "folderInfo.json"))
 	checkError(err)
 
-	err = GenerateWeb("folder", rootpath, folder, genoptions)
+	err = GenerateWeb("folder", rootpath, folder, Genoptions)
 	checkError(err)
 
 	return nil
@@ -173,7 +173,7 @@ func InitializefotoDenConfig(u string, dest string) error {
 
 	var config generator.GeneratorConfig
 
-	if *wizardFlag == true {
+	if WizardFlag == true {
 		config = SetupConfig()
 	} else {
 		config = generator.DefaultConfig

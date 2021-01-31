@@ -16,11 +16,11 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 	verbose("Generating item information to " + fpath)
 	var waitgroup sync.WaitGroup
 
-	items, err := generator.GenerateItemInfo(options.source)
+	items, err := generator.GenerateItemInfo(options.Source)
 	verbose("Current images in folder: " + fmt.Sprint(items.ItemsInFolder))
 
 	if len(items.ItemsInFolder) > 0 {
-		if options.sort == true {
+		if options.Sort == true {
 			sort.Strings(items.ItemsInFolder)
 		}
 		err = generator.MakeAlbumDirectoryStructure(fpath)
@@ -28,13 +28,13 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 			panic(err)
 		}
 
-		if options.source != "" {
-			verbose("Changing to directory: " + options.source)
+		if options.Source != "" {
+			verbose("Changing to directory: " + options.Source)
 			wd, err := os.Getwd()
 			checkError(err)
 			fpath, err = filepath.Abs(fpath)
 			checkError(err)
-			source, err := filepath.Abs(options.source)
+			source, err := filepath.Abs(options.Source)
 			checkError(err)
 
 			defer os.Chdir(wd)
@@ -51,7 +51,7 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 			panic(err)
 		}
 
-		if options.copy == true {
+		if options.Copy == true {
 			waitgroup.Add(1)
 			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
@@ -60,7 +60,7 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 			}(&waitgroup)
 		}
 
-		if options.gensizes == true {
+		if options.Gensizes == true {
 			verbose("Attempting to generate from sizes: " + fmt.Sprint(generator.CurrentConfig.ImageSizes))
 			for k, v := range generator.CurrentConfig.ImageSizes {
 				sizeName := k
@@ -74,7 +74,7 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 			}
 		}
 
-		if options.meta == true {
+		if options.Meta == true {
 			waitgroup.Add(1)
 			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
@@ -116,18 +116,18 @@ func UpdateImages(folder string, options GeneratorOptions) error {
 		return err
 	}
 
-	dir, err := ioutil.ReadDir(options.source)
+	dir, err := ioutil.ReadDir(options.Source)
 	if checkError(err) {
 		return err
 	}
 
-	if options.source != "" {
-		verbose("Changing to directory: " + options.source)
+	if options.Source != "" {
+		verbose("Changing to directory: " + options.Source)
 		wd, err := os.Getwd()
 		checkError(err)
 		folder, err = filepath.Abs(folder)
 		checkError(err)
-		source, err := filepath.Abs(options.source)
+		source, err := filepath.Abs(options.Source)
 		checkError(err)
 
 		defer os.Chdir(wd)
@@ -139,7 +139,7 @@ func UpdateImages(folder string, options GeneratorOptions) error {
 	}
 
 	items.ItemsInFolder = generator.IsolateImages(generator.GetArrayOfFiles(dir))
-	if options.sort {
+	if options.Sort {
 		sort.Strings(items.ItemsInFolder)
 	}
 
@@ -218,13 +218,13 @@ func InsertImage(folder string, file string, mode string, options GeneratorOptio
 
 	var waitgroup sync.WaitGroup
 
-	if options.source != "" {
-		verbose("Changing to directory: " + options.source)
+	if options.Source != "" {
+		verbose("Changing to directory: " + options.Source)
 		wd, err := os.Getwd()
 		checkError(err)
 		folder, err = filepath.Abs(folder)
 		checkError(err)
-		source, err := filepath.Abs(options.source)
+		source, err := filepath.Abs(options.Source)
 		checkError(err)
 
 		defer os.Chdir(wd)
@@ -241,7 +241,7 @@ func InsertImage(folder string, file string, mode string, options GeneratorOptio
 		panic(err)
 	}
 
-	if options.copy {
+	if options.Copy {
 		waitgroup.Add(1)
 		go func(wg *sync.WaitGroup) {
 			defer wg.Done()
@@ -250,7 +250,7 @@ func InsertImage(folder string, file string, mode string, options GeneratorOptio
 		}(&waitgroup)
 	}
 
-	if options.gensizes {
+	if options.Gensizes {
 		for k, v := range generator.CurrentConfig.ImageSizes {
 			sizeName := k
 			sizeOpts := v
@@ -263,7 +263,7 @@ func InsertImage(folder string, file string, mode string, options GeneratorOptio
 		}
 	}
 
-	if options.meta == true {
+	if options.Meta == true {
 		waitgroup.Add(1)
 		go func(wg *sync.WaitGroup) {
 			verbose("Generating metadata to: " + generator.CurrentConfig.ImageMetaDirectory)

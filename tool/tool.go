@@ -21,6 +21,8 @@ import (
 //
 // for another example, this allows for the insertion/deletion of images
 
+var WizardFlag bool
+
 // GenerationOptions
 //
 // Some options for the generator.
@@ -32,14 +34,16 @@ import (
 //
 // from the flags.
 type GeneratorOptions struct {
-	source   string
-	copy     bool
-	gensizes bool
+	Source   string
+	Copy     bool
+	Gensizes bool
 	imagegen bool
-	sort     bool
-	meta     bool
-	static   bool
+	Sort     bool
+	Meta     bool
+	Static   bool
 }
+
+var Genoptions GeneratorOptions
 
 func checkError(err error) bool {
 	if err != nil {

@@ -42,22 +42,26 @@ var wizardFlag = flag.Bool("interactive", true, "Enables interactive mode. Inter
 var verboseFlag = flag.Bool("verbose", false, "Sets verbose mode.")
 var verboseFlagShort = flag.Bool("v", false, "Sets verbose mode.")
 
-var genoptions GeneratorOptions
+var NameFlag string
+var Recurse bool
 
-func parseGen(mode string, arg string, options GeneratorOptions) error {
+func ParseGen(mode string, arg string, options GeneratorOptions) error {
 	wd, _ := os.Getwd()
 	verbose("Starting from " + wd)
+	if mode == "album" {
+		Genoptions.imagegen = true
+	}
 	switch mode {
 	case "album", "folder":
 		switch {
 		case arg == "":
 			if *nameFlag == "" {
-				err := GenerateFolder(path.Base(wd), path.Base(wd), options)
+				err := GenerateFolder(path.Base(wd), path.Base(wd), Genoptions)
 				if checkError(err) {
 					return err
 				}
 			} else {
-				err := GenerateFolder(*nameFlag, path.Base(wd), options)
+				err := GenerateFolder(NameFlag, path.Base(wd), Genoptions)
 				if checkError(err) {
 					return err
 				}
@@ -65,12 +69,12 @@ func parseGen(mode string, arg string, options GeneratorOptions) error {
 		case arg != "":
 			if *nameFlag == "" {
 				name := path.Base(wd)
-				err := GenerateFolder(name, arg, options)
+				err := GenerateFolder(name, arg, Genoptions)
 				if checkError(err) {
 					return err
 				}
 			} else {
-				err := GenerateFolder(*nameFlag, arg, options)
+				err := GenerateFolder(NameFlag, arg, Genoptions)
 				if checkError(err) {
 					return err
 				}
@@ -105,10 +109,10 @@ func parseGen(mode string, arg string, options GeneratorOptions) error {
 	return nil
 }
 
-func parseUpdate(value string, arg string) error {
+func ParseUpdate(value string, arg string) error {
 	var err error
 	switch {
-	case *recursFlag, *recursFlagShort:
+	case Recurse:
 		switch value {
 		case "folder":
 			err = RecursiveVisit(arg, UpdateFolderSubdirectories)
@@ -139,6 +143,7 @@ func parseUpdate(value string, arg string) error {
 	return nil
 }
 
+/*
 func ParseCmd() error {
 	flag.Parse()
 	arg := flag.Arg(0) // ignore the other flags silently
@@ -150,12 +155,12 @@ func ParseCmd() error {
 		verbose(fmt.Sprint("Generator verbosity: ", generator.Verbose))
 	}
 
-	genoptions = GeneratorOptions{
-		source:   *sourceFlag,
-		copy:     *copyFlag,
-		gensizes: *genSizeFlag,
-		meta:     *metaFlag,
-		static:   *staticFlag,
+	genoptions := GeneratorOptions{
+		Source:   *sourceFlag,
+		Copy:     *copyFlag,
+		Gensizes: *genSizeFlag,
+		Meta:     *metaFlag,
+		Static:   *staticFlag,
 	}
 
 	if *genFlag == "album" {
@@ -201,7 +206,7 @@ func ParseCmd() error {
 
 	switch {
 	case *genFlag != "":
-		err := parseGen(*genFlag, arg, genoptions)
+		err := ParseGen(*genFlag, arg, genoptions)
 		if checkError(err) {
 			return err
 		}
@@ -216,3 +221,4 @@ func ParseCmd() error {
 
 	return nil
 }
+*/
