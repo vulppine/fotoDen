@@ -14,7 +14,7 @@ func isBlank(input string) bool {
 	return false
 }
 
-func SetupConfig() generator.GeneratorConfig {
+func setupConfig() generator.GeneratorConfig {
 	config := generator.GeneratorConfig{}
 
 	fmt.Println("Wizard: Setup fotoDen config")
@@ -56,7 +56,7 @@ func SetupConfig() generator.GeneratorConfig {
 	return config
 }
 
-func SetupWebConfig(source string) *generator.WebConfig {
+func setupWebConfig(source string) *generator.WebConfig {
 	config := generator.GenerateWebConfig(source)
 
 	fmt.Println("Wizard: Setup website config")
@@ -70,6 +70,31 @@ func SetupWebConfig(source string) *generator.WebConfig {
 
 	config.ThumbnailFrom = ReadInput("What size do you want your thumbnails to be?")
 	config.DisplayImageFrom = ReadInput("What size do you want to display your images as in a fotoDen photo viewer?")
+	config.DownloadSizes = ReadInputAsArray("What sizes do you want downlodable?", ",")
 
 	return config
+}
+
+func generateFolderWizard(directory string) (*generator.Folder, error) {
+	folder, err := generator.GenerateFolderInfo(directory, "")
+	if checkError(err) {
+		return nil, err
+	}
+
+	fmt.Println("Wizard: Generate folder")
+	folder.FolderName = ReadInput("What is the name of this folder/album?")
+	folder.FolderDesc = ReadInput("What is the description of this folder/album?")
+	folder.IsStatic = ReadInputAsBool("Will the folder/album webpages have some dynamic elements static?", "y")
+	t := ReadInputAsBool("Will the folder have a thumbnail?", "y")
+	if t {
+		thumb := ReadInput("Where is the thumbnail located? (direct path or relative to current working directory)")
+		if thumb == "" {
+			fmt.Println("No file detected - ignoring.")
+		} else {
+			folder.FolderThumbnail = true
+			generator.MakeFolderThumbnail(thumb, directory)
+		}
+	}
+
+	return folder, nil
 }

@@ -11,6 +11,10 @@ import (
 	"sync"
 )
 
+// GenerateItems generates the album part of a fotoDen folder in fpath.
+//
+// It takes an options struct (which is just a set of options condensed into one struct)
+// and generates an image folder based on the options given (e.g., source, etc.)
 func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 	verbose("GenerateItems: Current generator options: " + fmt.Sprint(options))
 	verbose("Generating item information to " + fpath)
@@ -101,13 +105,7 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 	return len(items.ItemsInFolder), nil
 }
 
-// UpdateFolderImages
-//
-// Takes a folder path.
-//
-// The folder will be updated with all the images in the current folder.
-//
-// This should, in fact, make a difference between the arrays and copy over any new files...
+// UpdateImages updates all the images in a fotoDen folder.
 func UpdateImages(folder string, options GeneratorOptions) error {
 	items := new(generator.Items)
 
@@ -151,9 +149,7 @@ func UpdateImages(folder string, options GeneratorOptions) error {
 	return nil
 }
 
-// DeleteImage
-//
-// Deletes an n amount of images from the folder.
+// DeleteImage deletes an image from the folder.
 //
 // DeleteImage goes through the ItemsInFolder array of folderInfo.json,
 // and deletes the name of the image from the array,
@@ -192,13 +188,7 @@ func DeleteImage(folder string, file string) error {
 	return nil
 }
 
-// InsertImage
-//
-// Inserts an n amount of images into the folder, at the very end.
-//
-// Accepts a n amount of file names.
-// Generates thumbnails for the given filenames, and copies them over,
-// and updates items.json accordingly.
+// InsertImage inserts an image into a fotoDen folder.
 func InsertImage(folder string, file string, mode string, options GeneratorOptions) error {
 	items := new(generator.Items)
 

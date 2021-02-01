@@ -20,7 +20,16 @@ func ReadInput(message string) string {
 }
 
 func ReadInputAsArray(message string, sep string) []string {
-	return strings.Split(ReadInput(message+"[seperator: "+sep+"]"), sep)
+	return strings.Split(ReadInput(message+"[seperator: "+sep+"] "), sep)
+}
+
+func ReadInputAsBool(message string, cond string) bool {
+	res := ReadInput(message + "[" + cond + "] ")
+	if res == cond {
+		return true
+	}
+
+	return false
 }
 
 func ReadInputAsInt(message string) (int, error) {

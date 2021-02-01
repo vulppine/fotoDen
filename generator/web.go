@@ -15,7 +15,8 @@ type WebConfig struct {
 	ImageRootDir     string
 	ThumbnailFrom    string
 	DisplayImageFrom string
-	Theme            string
+	Theme            bool
+	DownloadSizes	 []string
 	ImageSizes       []WebImageSize
 }
 
@@ -117,6 +118,11 @@ func GenerateWebRoot(fpath string) error {
 		return err
 	}
 
+	err = os.Mkdir(filepath.Join(fpath, "theme", "etc"), 0755)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -201,9 +207,9 @@ func NewWebVars(u string) (*WebVars, error) {
 func NewStaticWebVars(folder string) (*StaticWebVars, error) {
 	swebvars := new(StaticWebVars)
 	f := new(Folder)
-	folder, _ = filepath.Abs(folder)
+	fpath, _ := filepath.Abs(folder)
 
-	err := f.ReadFolderInfo(filepath.Join(folder, "folderInfo.json"))
+	err := f.ReadFolderInfo(filepath.Join(fpath, "folderInfo.json"))
 	if err != nil {
 		return swebvars, err
 	}
@@ -214,12 +220,13 @@ func NewStaticWebVars(folder string) (*StaticWebVars, error) {
 	swebvars.PageAuthor = f.FolderAuthor
 
 	superFolder := func() bool {
-		_, err := os.Stat(filepath.Join(filepath.Dir(folder), "folderInfo.json"))
-		return os.IsExist(err)
+		_, err := os.Stat(filepath.Join(filepath.Dir(fpath), "folderInfo.json"))
+		return os.IsNotExist(err)
 	}()
 
-	if superFolder {
-		err = f.ReadFolderInfo(filepath.Join(filepath.Dir(folder), "folderInfo.json"))
+	if !superFolder {
+		verbose("Folder above is a fotoDen folder, using that...")
+		err = f.ReadFolderInfo(filepath.Join(filepath.Dir(fpath), "folderInfo.json"))
 		if err != nil {
 			return swebvars, err
 		}

@@ -8,15 +8,9 @@ import (
 	"path/filepath"
 )
 
-// Initialization
-//
-// This is where the fotoDen website initialization occurs.
-
-// InitializeWebTemplates
-//
-// Sets up web templates according to a given URL, and path containing templates.
+// InitializeWebTheme sets up web templates according to a given URL, and path containing templates.
 // All templates should be labelled with [photo, album, folder]-template.html.
-func InitializeWebTemplates(u string, srcpath string) error {
+func InitializeWebTheme(u string, srcpath string) error {
 	wd, _ := os.Getwd()
 
 	t, err := ReadThemeConfig(path.Join(srcpath, "theme.json"))
@@ -64,9 +58,7 @@ func InitializeWebTemplates(u string, srcpath string) error {
 	return nil
 }
 
-// Initialize fotoDen.js
-//
-// Sets a single variable as needed in fotoDen.js, from a path where it is located.
+// InitializefotoDenjs sets a single variable as needed in fotoDen.js, from a path where it is located.
 // Copies it over to generator.CurrentConfig.WebSourceLocation afterwards.
 func InitializefotoDenjs(u string, fpath string) error {
 
@@ -82,9 +74,7 @@ func InitializefotoDenjs(u string, fpath string) error {
 	return nil
 }
 
-// Initialize fotoDen root
-//
-// Sets up the root directory for fotoDen, including a folderInfo.json file.
+// InitializefotoDenRoot sets up the root directory for fotoDen, including a folderInfo.json file.
 // Creates the folder structure,
 // copies over the folder page as well as the theme.css file,
 // and copies over fotoDen.js,
@@ -129,6 +119,15 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 		if checkError(err) {
 			return err
 		}
+		os.Chdir(generator.CurrentConfig.WebSourceLocation)
+	}
+
+	if len(t.Other) != 0 {
+		os.Chdir("etc")
+		err = generator.BatchCopyFile(t.Stylesheets, path.Join(rootpath, "theme", "etc"))
+		if checkError(err) {
+			return err
+		}
 	}
 
 	os.Chdir(wd)
@@ -136,10 +135,19 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 	var webconfig *generator.WebConfig
 
 	if WizardFlag == true {
-		webconfig = SetupWebConfig(*sourceFlag)
+		webconfig = setupWebConfig(URLFlag)
 	} else {
-		webconfig = generator.GenerateWebConfig(*sourceFlag)
-		if *sourceFlag == "" {
+		webconfig = generator.GenerateWebConfig(URLFlag)
+		webconfig.Theme = true // we're generating this from fotoDen tool, so we're using a theme obviously
+		webconfig.WebsiteTitle = name
+		webconfig.ImageRootDir = generator.CurrentConfig.ImageRootDirectory
+		webconfig.ThumbnailFrom = webconfig.ImageSizes[0].SizeName
+		webconfig.DisplayImageFrom = webconfig.ImageSizes[len(webconfig.ImageSizes) - 1].SizeName
+		for _, v := range webconfig.ImageSizes {
+			webconfig.DownloadSizes = append(webconfig.DownloadSizes, v.SizeName)
+		}
+
+		if URLFlag == "" {
 			fmt.Printf("You will have to configure your photo storage provider in %v.", path.Join(rootpath, "config.json"))
 		}
 	}
@@ -161,9 +169,7 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 	return nil
 }
 
-// Initialize fotoDen config folder
-//
-// Initializes the fotoDen config folder.
+// InitializefotoDenConfig initializes a fotoDen config folder.
 //
 // This should only be done once.
 //
@@ -174,7 +180,7 @@ func InitializefotoDenConfig(u string, dest string) error {
 	var config generator.GeneratorConfig
 
 	if WizardFlag == true {
-		config = SetupConfig()
+		config = setupConfig()
 	} else {
 		config = generator.DefaultConfig
 		generator.CurrentConfig.WebBaseURL = u

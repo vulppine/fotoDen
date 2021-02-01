@@ -11,16 +11,14 @@ import (
 func init() {
 	rootCmd.AddCommand(initCmd)
 
-	initCmd.Flags().StringVar(&url, "url", "", "what URL to initialize fotoDen with")
-	initCmd.Flags().StringVar(&name, "name", "", "what name a folder should have")
+	initCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
+	initCmd.Flags().StringVar(&name, "name", "", "what name a site should have (with init site)")
 }
 
-
 var (
-	url string
-	name string
+	name    string
 	initCmd = &cobra.Command{
-		Use: "init type destination",
+		Use:   "init { config | site | theme } destination",
 		Short: "Initializes various fotoDen resources",
 		Long: `Initializes fotoDen resources. Takes two args: What to initialize, and where to put it, in that order.
 config creates a configuration directory in the given location.
@@ -38,22 +36,22 @@ js is deprecated, and will be removed or replaced.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			switch args[0] {
 			case "config":
-				err := tool.InitializefotoDenConfig(url, args[1])
+				err := tool.InitializefotoDenConfig(tool.URLFlag, args[1])
 				return err
-			case "root":
+			case "site":
 				err := tool.InitializefotoDenRoot(args[1], name)
 				return err
-			case "templates":
-				if url != "" {
-					err := tool.InitializeWebTemplates(url, args[1])
+			case "theme":
+				if tool.URLFlag != "" {
+					err := tool.InitializeWebTheme(tool.URLFlag, args[1])
 					return err
 				}
 
-				err := tool.InitializeWebTemplates(generator.CurrentConfig.WebBaseURL, args[1])
+				err := tool.InitializeWebTheme(generator.CurrentConfig.WebBaseURL, args[1])
 				return err
 			case "js":
-				if url != "" {
-					err := tool.InitializefotoDenjs(url, args[1])
+				if tool.URLFlag != "" {
+					err := tool.InitializefotoDenjs(tool.URLFlag, args[1])
 					return err
 				}
 
@@ -64,5 +62,4 @@ js is deprecated, and will be removed or replaced.`,
 			}
 		},
 	}
-
 )

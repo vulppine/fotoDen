@@ -8,9 +8,7 @@ import (
 	"path/filepath"
 )
 
-// UpdateFolderSubdirectories
-//
-// A function to easily update a folder's subdirectories.
+// UpdateFolderSubdirectories is a function to easily update a folder's subdirectories.
 //
 // Takes the path of the fotoDen folder.
 func UpdateFolderSubdirectories(fpath string) error {
@@ -32,20 +30,14 @@ func UpdateFolderSubdirectories(fpath string) error {
 	return nil
 }
 
-// GenerateFolder
-//
-// Generates an entire fotoDen-compatible folder from
+// ThumbSrc represents the source of a thumbnail for a fotoDen folder.
+// This is meant to be used with the command line tool.
+var ThumbSrc string
+
+// GenerateFolder generates an entire fotoDen-compatible folder from
 // any images within the current directory,
 // including thumbnails, as well as copying over the
 // images to a new source folder based on generator.CurrentConfig.
-//
-// TODO: Change this to accept a mode
-// that allows either direct upload of named files by an array,
-// to some storage provider,
-// or a direct copy to a source folder in the folder structure.
-//
-// If yes: This will allow fotoDen to become a more 'central' tool
-// If no: This allows fotoDen to be a part of a toolset
 //
 // Takes the folder's name, as well as its path.
 // Returns an error if any occur.
@@ -55,14 +47,23 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 		panic(err) // can't continue!
 	}
 
-	if *thumbSrc != "" {
-		err = generator.MakeFolderThumbnail(*thumbSrc, fpath)
-		checkError(err)
-	}
+	var folder *generator.Folder
 
-	folder, err := generator.GenerateFolderInfo(fpath, name)
-	if checkError(err) {
-		return err
+	if WizardFlag {
+		folder, err = generateFolderWizard(fpath)
+		if checkError(err) {
+			return err
+		}
+	} else {
+		if ThumbSrc != "" {
+			err = generator.MakeFolderThumbnail(ThumbSrc, fpath)
+			checkError(err)
+		}
+
+		folder, err = generator.GenerateFolderInfo(fpath, name)
+		if checkError(err) {
+			return err
+		}
 	}
 
 	if options.imagegen == true {
@@ -89,9 +90,6 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 	}
 
 	fpath, _ = filepath.Abs(fpath)
-	verbose(path.Dir(fpath))
-	verbose(path.Join(path.Dir(fpath), "folderInfo.json"))
-	verbose(fmt.Sprint(fileCheck(path.Join(path.Dir(fpath), "folderInfo.json"))))
 
 	if fileCheck(path.Join(path.Dir(fpath), "folderInfo.json")) {
 		err = UpdateFolderSubdirectories(path.Dir(fpath))

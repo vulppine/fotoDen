@@ -39,6 +39,7 @@ let storageURLBase
 let imageRootDir
 let thumbnailFrom
 let displayImageFrom
+let downloadSizes
 const imageSizes = new Map()
 
 // theme
@@ -411,29 +412,35 @@ class PhotoViewer extends Viewer {
         setLink(this.folderName, getAlbumURL().toString())
         setTitle([photo.name, photo.album])
         this.setPhoto(json.ItemsInFolder[photo.index])
+
+        if (this.infoButtons !== null) {
+          this.setDownloads(json.ItemsInFolder[photo.index])
+        }
       })
   }
 
   setPhoto (image) {
     setText(name, image)
-    this.container.querySelector('.fd-photo').src = makePhotoURL(displayImageFrom.prefix + image, imageSizes.get(displayImageFrom.size).directory, imageSizes.get(displayImageFrom.size).localBool)
+    this.container.querySelector('.fd-photo').src = makePhotoURL(
+      displayImageFrom.prefix + image,
+      imageSizes.get(displayImageFrom.size).directory,
+      imageSizes.get(displayImageFrom.size).localBool
+    )
     this.container.querySelector('.fd-photo').addEventListener('load', e => {
       this.container.querySelector('.fd-photo').dispatchEvent(contentLoad)
     })
   }
 
   setDownloads (image) {
-    imageSizes.forEach((value, key) => {
-      const newButton = document.createElement('a')
-      newButton.setAttribute('class', 'downloadButton button')
-
-      if (key === 'src') {
-        newButton.innerHTML = 'src'
-        newButton.href = makePhotoURL(image, value.directory, value.localBool)
-      } else {
-        newButton.innerHTML = key
-        newButton.href = makePhotoURL(key + '_' + image, value.directory, value.localBool)
-      }
+    downloadSizes.forEach((value) => {
+      const newButton = theme.createButton(
+        value,
+        makePhotoURL(
+          imageSizes.get(value).prefix + image,
+          imageSizes.get(value).directory,
+          imageSizes.get(value).localBool)
+      )
+      this.infoButtons.appendChild(newButton)
     })
   }
 }
@@ -639,7 +646,7 @@ function setConfig () {
   return getJSON(BaseURL + '/config.json')
     .then(async function (json) {
       readConfig(json)
-      if (json.Theme !== '') {
+      if (json.Theme === true) {
         theme = await import(BaseURL + '/theme/js/theme.js')
         theme.init()
       }
@@ -657,6 +664,7 @@ function readConfig (info) {
   storageURLBase = info.PhotoURLBase
   thumbnailFrom = info.ThumbnailFrom
   imageRootDir = info.ImageRootDir
+  downloadSizes = info.DownloadSizes
 
   const p = new URL(BaseURL).pathname
   if (p === '' || p === '/') {

@@ -56,7 +56,7 @@ func ResizeImage(file string, imageName string, scale ImageScale, dest string, i
 
 	imageType := bimg.DetermineImageType(image)
 	if imageType == bimg.UNKNOWN {
-		return fmt.Errorf("ResizeImage: Unknown file type. Skipping. Image: ", imageName)
+		return fmt.Errorf("ResizeImage: Unknown file type. Skipping. Image: %s", imageName)
 	}
 
 	newImage, err := bimg.NewImage(image).Convert(imageFormat)

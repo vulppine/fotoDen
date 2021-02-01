@@ -2,8 +2,8 @@ package generator
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 )
@@ -62,8 +62,9 @@ var DefaultConfig GeneratorConfig = GeneratorConfig{
 	ImageRootDirectory: "img",
 	ImageMetaDirectory: "meta",
 	ImageSizes: map[string]ImageScale{
-		"thumb": ImageScale{MaxHeight: 800},
-		"large": ImageScale{ScalePercent: 0.5},
+		"small": ImageScale{ScalePercent: 0.25},
+		"medium": ImageScale{ScalePercent: 0.5},
+		"large": ImageScale{ScalePercent: 0.75},
 	},
 	ImageSrcDirectory: "src",
 	WebSourceLocation: path.Join(FotoDenConfigDir, "web"), // remember when $HOME webpage folders were a thing?
@@ -82,7 +83,7 @@ var Verbose bool // if this is set, everything important is printed
 
 func verbose(print string) {
 	if Verbose {
-		fmt.Println(print)
+		log.Println(print)
 	}
 }
 

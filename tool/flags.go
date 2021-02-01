@@ -1,50 +1,25 @@
 package tool
 
 import (
-	"flag"
 	"fmt"
 	"github.com/vulppine/fotoDen/generator"
 	"os"
 	"path"
 )
 
-// Flags
-//
-// The command line flags.
-//
-// fotoDen tool requires -generate or -update passed to it, otherwise it won't do anything.
-// A single arg is required, and that should be a the name of the folder being processed.
-// If this isn't detected when -generate is passed, it will use the name of the current folder.
-// Equally, -generate can also take a 'name' flag - if this isn't detected, the name of
-// the current folder will be used.
-//
-// -generate is currently a bool, but should be a string later for getting photos from a source
-// -update is a bool, for now
-//
-// -generate will generate a fotoDen folder in the current folder with a given shortname.
-//
-// -update updates the folder. (If the given args are null, or if there is no info file, it will return an error.)
-
-var genFlag = flag.String("generate", "", "Generates a fotoDen structure in the current folder, or the default config in the configuration directory. Accepted modes: album, folder, config.")
-var nameFlag = flag.String("name", "", "The name of the folder (not the path). If this is blank, or not called, the current name of the folder will be used in generation.")
-var updFlag = flag.String("update", "folder", "Updates fotoDen resources.")
-var recursFlag = flag.Bool("recurse", false, "Recursively goes through fotoDen folders.")
-var recursFlagShort = flag.Bool("r", false, "Recursively goes through fotoDen folders.")
-var sourceFlag = flag.String("source", "", "The source used for fotoDen images. This is multi-context - calling this during -generate full will take images from the source directory as its base, and calling this during -init root will use this as the fotoDen image storage provider.")
-var staticFlag = flag.Bool("static", false, "Generates either a static or dynamic webpage. If you call this during folder/album generation, the folder will always be static - otherwise, it will generate a more static webpage in the given folder/album.")
-var copyFlag = flag.Bool("copy", false, "Copies files over to GeneratorConfig.ImageSrcDirectory. Useful if you're copying over to a remote directory.")
-var metaFlag = flag.Bool("meta", true, "Copies all metadata into [image name].json. Metadata such as image description and name must be edited by hand.")
-var thumbSrc = flag.String("folthumb", "", "The name of the thumbnail in the source directory. This will be selected as the thumbnail of the folder, and is copied over to the root of the folder.")
-var genSizeFlag = flag.Bool("gensizes", true, "Tells the generator to generate all sizes in the config. This is automatically set to true.")
-var configSrc = flag.String("config", "", "The name of the config file to use. If this isn't set, the one is $CONFIG/fotoDen is used - otherwise, an error is returned. Call 'fotoDen -generate config' to create a config in either $CONFIG/fotoden, or in a relative folder if defined.")
-var initFlag = flag.String("init", "", "Initializes various aspects of fotoDen. Accepted values: config, root, templates, js. config should only be done if the config folder was removed, as it is automatically called at the first start of the program.")
-var wizardFlag = flag.Bool("interactive", true, "Enables interactive mode. Interactive mode occurs when settings need to be configured in files.")
-var verboseFlag = flag.Bool("verbose", false, "Sets verbose mode.")
-var verboseFlagShort = flag.Bool("v", false, "Sets verbose mode.")
-
+// NameFlag sets the name for a folder/album. If this is not set, fotoDen will automatically use the folder's name.
 var NameFlag string
+
+// Recurse toggles recursive functions on directories. This is primarily used for the update command.
 var Recurse bool
 
+// URLFlag sets the URL for functions that require a URL. This is mostly used in initialization.
+var URLFlag string
+
+// ParseGen parses a mode, arguments, and generator options given to it, and redirects
+// commands according to the given mode with its arg.
+//
+// Accepts two modes officially: album, and folder. Config should be deferred to initialization.
 func ParseGen(mode string, arg string, options GeneratorOptions) error {
 	wd, _ := os.Getwd()
 	verbose("Starting from " + wd)
@@ -55,7 +30,7 @@ func ParseGen(mode string, arg string, options GeneratorOptions) error {
 	case "album", "folder":
 		switch {
 		case arg == "":
-			if *nameFlag == "" {
+			if NameFlag == "" {
 				err := GenerateFolder(path.Base(wd), path.Base(wd), Genoptions)
 				if checkError(err) {
 					return err
@@ -67,7 +42,7 @@ func ParseGen(mode string, arg string, options GeneratorOptions) error {
 				}
 			}
 		case arg != "":
-			if *nameFlag == "" {
+			if NameFlag == "" {
 				name := path.Base(wd)
 				err := GenerateFolder(name, arg, Genoptions)
 				if checkError(err) {
@@ -109,6 +84,8 @@ func ParseGen(mode string, arg string, options GeneratorOptions) error {
 	return nil
 }
 
+// ParseUpdate parses a value and an arg, and directs continued execution depending on what value was given.
+// This is a command line function - value is the equivalent to the second argument given (fotoDen update { value })
 func ParseUpdate(value string, arg string) error {
 	var err error
 	switch {
@@ -143,7 +120,7 @@ func ParseUpdate(value string, arg string) error {
 	return nil
 }
 
-/*
+/* This is here for reference
 func ParseCmd() error {
 	flag.Parse()
 	arg := flag.Arg(0) // ignore the other flags silently

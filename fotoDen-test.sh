@@ -19,15 +19,15 @@ fi
 if [ "$1" == "mk-testdir" ] || [ "$1" == "mkall" ]; then
     mkdir fotoDen_test
 
-    $PWD/fotoDen -init config -source "http://localhost/" -interactive=false fotoDen_test/
+    $PWD/fotoDen init config --url "http://localhost/" --interactive=false fotoDen_test/
 
-    fotoDen=$PWD'/fotoDen -config fotoDen_test/config.json -interactive=false'
+    fotoDen=$PWD'/fotoDen --config fotoDen_test/ --interactive=false'
 
-    $fotoDen -init js js/fotoDen.js
-    $fotoDen -init templates theme/default/
-    $fotoDen -init root -name "Test Root" -source "http://localhost/" fotoDen_test/test_root
-    $fotoDen -generate folder -name "Test Folder" -v fotoDen_test/test_root/test_folder
-    $fotoDen -generate album -name "Test Album" -source test_images -v fotoDen_test/test_root/test_folder/test_album
+    $fotoDen init js js/fotoDen.js
+    $fotoDen init theme theme/default/
+    $fotoDen init site --name "Test Site" --url "http://localhost/" fotoDen_test/test_root
+    $fotoDen generate folder --name "Test Folder" -v fotoDen_test/test_root/test_folder
+    $fotoDen generate album  --name "Test Album" --source test_images -v fotoDen_test/test_root/test_folder/test_album
 
     echo "---------------------------------------------------"
     echo "Your test environment is available at fotoDen_root."

@@ -10,6 +10,7 @@ func init() {
 
 	genCmd.Flags().StringVar(&tool.Genoptions.Source, "source", "", "source for fotoDen images")
 	genCmd.Flags().StringVar(&tool.NameFlag, "name", "", "name for fotoDen folders/albums")
+	genCmd.Flags().StringVar(&tool.ThumbSrc, "thumb", "", "location of the thumbnail for the folder/album")
 	genCmd.Flags().BoolVar(&tool.Genoptions.Copy, "copy", false, "toggle copying of images from source to fotoDen albums")
 	genCmd.Flags().BoolVar(&tool.Genoptions.Gensizes, "gensizes", true, "toggle generation of all image sizes from source to fotoDen albums")
 	genCmd.Flags().BoolVar(&tool.Genoptions.Sort, "sort", true, "toggle sorting of all images in fotoDen albums by name")
@@ -19,10 +20,10 @@ func init() {
 
 var (
 	genCmd = &cobra.Command{
-		Use: "generate",
+		Use:   "generate { album | folder } destination",
 		Short: "Generates fotoDen folders/albums",
-		Args: cobra.ExactArgs(2),
-		RunE: func (cmd *cobra.Command, args []string) error {
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			err := tool.ParseGen(args[0], args[1], tool.Genoptions)
 			if err != nil {
 				return err

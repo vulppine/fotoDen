@@ -8,14 +8,15 @@ import (
 func init() {
 	rootCmd.AddCommand(updCmd)
 
-	updCmd.Flags().BoolP(&tool.Recurse, "recurse", "r", true, "toggles recursing through folders")
+	updCmd.Flags().BoolVarP(&tool.Recurse, "recurse", "r", true, "toggles recursing through folders")
 }
 
 var (
 	updCmd = &cobra.Command{
-		Use: "update type",
+		Use:   "update { folder | web } folder",
+		Args:  cobra.ExactArgs(2),
 		Short: "Updates various fotoDen resources",
-		RunE: func (cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			err := tool.ParseUpdate(args[0], args[1])
 			if err != nil {
 				return err

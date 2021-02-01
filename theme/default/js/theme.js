@@ -1,4 +1,4 @@
-/* global bootstrap, BaseURL, getPageInfo, getAlbumURL, makePhotoURL, imageSizes, thumbnailFrom */
+/* global bootstrap, BaseURL, getPageInfo, getAlbumURL, makePhotoURL, imageSizes, thumbnailFrom, websiteTitle */
 /* eslint-env browser */
 // fotoDen DEFAULT THEME FUNCTIONS //
 
@@ -92,6 +92,18 @@ export function setButton (button, URL) {
   }
 }
 
+export function createButton (name, URL) {
+  const anchor = document.createElement('a')
+  anchor.href = URL
+  const button = document.createElement('button')
+  anchor.appendChild(button)
+
+  button.setAttribute('class', 'btn btn-secondary mx-1')
+  button.innerHTML = name
+
+  return anchor
+}
+
 export function createNavPageLink (page, container) {
   const newPage = document.createElement('li')
   const newAnchor = document.createElement('a')
@@ -155,7 +167,7 @@ export function createFolderLink (info) {
   if (info.FolderThumbnail === true) {
     folderThumb.src = info.FolderShortName + '/thumb.jpg'
   } else {
-    folderThumb.src = BaseURL + '/thumb.png'
+    folderThumb.classList.add('bg-secondary')
   }
 
   folderItemCountContainer.setAttribute('class', 'row')
@@ -252,4 +264,12 @@ export function init () {
     removeLoad(e.target.parentNode)
     toggleView(e.target)
   })
+
+  if (document.querySelector('.navbar-brand') !== null) {
+    if (websiteTitle === null || websiteTitle === undefined || websiteTitle === '') {
+      document.querySelector('.navbar-brand').innerText = 'fotoDen'
+    } else {
+      document.querySelector('.navbar-brand').innerText = websiteTitle
+    }
+  }
 }

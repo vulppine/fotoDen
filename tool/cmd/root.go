@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"github.com/vulppine/fotoDen/tool"
 	"github.com/vulppine/fotoDen/generator"
+	"github.com/vulppine/fotoDen/tool"
 )
 
 func Execute() error {
@@ -27,12 +27,12 @@ func debug(input interface{}) {
 }
 
 var (
-	d = rootCmd.PersistentFlags().Bool("debug", false, "Prints debug information to console.")
-	v = rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Prints verbose information made by fotoDen")
-	config string
+	d         = rootCmd.PersistentFlags().Bool("debug", false, "Prints debug information to console.")
+	v         = rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Prints verbose information made by fotoDen")
+	config    string
 	configSrc generator.GeneratorConfig
-	rootCmd = &cobra.Command{
-		Use: "fotoDen",
+	rootCmd   = &cobra.Command{
+		Use:   "fotoDen { init | generate | update } args [--config string] [--verbose | -v] [--interactive | -i]",
 		Short: "A static photo gallery generator",
 	}
 )
@@ -61,6 +61,6 @@ func setRootFlags() {
 
 func init() {
 	cobra.OnInitialize(setRootFlags)
-	rootCmd.PersistentFlags().BoolVarP(&tool.WizardFlag, "interactive", "i", true, "Allows fotoDen to display interactive prompts")
+	rootCmd.PersistentFlags().BoolVarP(&tool.WizardFlag, "interactive", "i", false, "Allows fotoDen to display interactive prompts")
 	rootCmd.PersistentFlags().StringVar(&config, "config", "", "The config directory to use for fotoDen")
 }
