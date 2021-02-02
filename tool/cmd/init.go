@@ -36,14 +36,13 @@ templates creates a set of templates into the current config folder (defined by 
 If the url flag is not set, it will use the current configuration's base URL.
 
 js is deprecated, and will be removed or replaced.`,
-		Args: cobra.ExactArgs(2),
 	}
 	initConfigCmd = &cobra.Command{
 		Use: "config [--url url] directory",
 		Short: "Initializes a fotoDen configuration directory with the given name",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := tool.InitializefotoDenConfig(tool.URLFlag, args[1])
+			err := tool.InitializefotoDenConfig(tool.URLFlag, args[0])
 			return err
 		},
 	}
@@ -52,7 +51,7 @@ js is deprecated, and will be removed or replaced.`,
 		Short: "Initializes a fotoDen website in the given directory",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := tool.InitializefotoDenRoot(args[1], name)
+			err := tool.InitializefotoDenRoot(args[0], name)
 			return err
 		},
 	}
@@ -62,11 +61,11 @@ js is deprecated, and will be removed or replaced.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if tool.URLFlag != "" {
-				err := tool.InitializeWebTheme(tool.URLFlag, args[1])
+				err := tool.InitializeWebTheme(tool.URLFlag, args[0])
 				return err
 			}
 
-			err := tool.InitializeWebTheme(generator.CurrentConfig.WebBaseURL, args[1])
+			err := tool.InitializeWebTheme(generator.CurrentConfig.WebBaseURL, args[0])
 			return err
 		},
 	}

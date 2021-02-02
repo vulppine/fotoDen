@@ -208,7 +208,7 @@ func InitializefotoDenConfig(u string, dest string) error {
 		config = setupConfig()
 	} else {
 		config = generator.DefaultConfig
-		generator.CurrentConfig.WebBaseURL = u
+		config.WebBaseURL = u
 	}
 
 	if dest == "" {

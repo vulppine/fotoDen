@@ -387,11 +387,12 @@ class PhotoViewer extends Viewer {
             .then(meta => {
               if (meta.ImageName === '') {
                 photo.name = json.ItemsInFolder[photo.index]
+                photo.desc = 'No description provided...'
               } else {
                 photo.name = meta.ImageName
+                photo.desc = json.ImageDesc
               }
 
-              photo.desc = json.ImageDesc
               setText(this.name, photo.name)
               setText(this.desc, photo.desc)
             })

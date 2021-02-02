@@ -35,6 +35,7 @@
           </div>
         </div>
         <img class="fd-photo w-100 h-100 d-none" style="object-fit: contain">
+        <script src="http://localhost:80/theme/js/exif.js"></script>
       </div>
 
       <div class="container-lg my-3">
@@ -45,6 +46,29 @@
           </div>
           <div class="col-lg-auto">
             <div class="fd-infoButtons d-flex align-items-center my-3">Download: </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col border-right mb-3">
+            <hr>
+            <span class="fd-desc"></span>
+          </div>
+          <div class="col-lg-4">
+            <hr>
+            <div class="p-0 container-lg">
+              <div class="row">
+                <div class="col"><p class="h2"><i class="bi bi-camera"></i> <span id="exif-make"></span> <span id="exif-model"></span></p></div>
+              </div>
+              <div class="row py-1">
+                <div class="col"><p class="h5"><i class="bi bi-bullseye"></i> <span id="exif-focal"></span></p></div>
+                <div class="col"><p class="h5"><i class="bi bi-circle"></i> <span id="exif-aperture"></span></p></div>
+              </div>
+              <div class="row py-1">
+                <div class="col"><i class="bi bi-lightbulb"></i> ISO <span id="exif-iso-speed"></span></div>
+                <div class="col"><i class="bi bi-lightning"></i> <span id="exif-flash"></span></div>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>

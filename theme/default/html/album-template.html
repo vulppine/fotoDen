@@ -51,8 +51,8 @@
         <img class="d-block align-self-center w-100" style="object-fit: cover">
       </div>
       <div class="container-lg my-3">
-        <h1><span class="fd-folderName"></span></h1>
-        <h5 class="text-muted fd-folderSubtitle">in <a href="#" class="text-white fd-superFolder"></a></h5>
+        <h1><span class="fd-folderName">{{.StaticWebVars.name}}</span></h1>
+        <h5 class="text-muted fd-folderSubtitle">in <a href="#" class="text-white fd-superFolder">{{.StaticWebVars.sfol}}</a></h5>
       </div>
       <hr>
       <div class="container-lg fd-folder fd-viewer">
@@ -87,6 +87,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="http://localhost:80/js/fotoDen.js" id="fd-script" data-fd-baseURL="http://localhost:80"></script>
+    <script src="{{.BaseURL}}/js/fotoDen.js" id="fd-script" data-fd-baseURL="{{.BaseURL}}"></script>
   </body>
 </html>

@@ -13,19 +13,20 @@ if [ "$1" == "" ]; then
 fi
 
 if [ "$1" == "build" ] || [ "$1" == "mkall" ]; then
-    go build
+    make all
 fi
 
 if [ "$1" == "mk-testdir" ] || [ "$1" == "mkall" ]; then
     mkdir fotoDen_test
 
-    $PWD/fotoDen init config --url "http://localhost/" --interactive=false fotoDen_test/
+    $PWD/build/fotoDen init config --url "http://localhost/" fotoDen_test/
 
-    fotoDen=$PWD'/fotoDen --config fotoDen_test/ --interactive=false'
+    fotoDen=$PWD'/build/fotoDen --config fotoDen_test/'
 
-    $fotoDen init js js/fotoDen.js
-    $fotoDen init theme theme/default/
-    $fotoDen init site --name "Test Site" --url "http://localhost/" fotoDen_test/test_root
+    $fotoDen init js build/fotoDen.min.js
+    unzip build/default_theme.zip -d build/theme/
+    $fotoDen init theme build/theme/
+    $fotoDen init site --name "Test Site" --url "http://localhost" fotoDen_test/test_root
     $fotoDen generate folder --name "Test Folder" -v fotoDen_test/test_root/test_folder
     $fotoDen generate album  --name "Test Album" --source test_images -v fotoDen_test/test_root/test_folder/test_album
 

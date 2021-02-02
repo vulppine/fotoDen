@@ -1,4 +1,4 @@
-/* global bootstrap, BaseURL, getPageInfo, getAlbumURL, makePhotoURL, imageSizes, thumbnailFrom, websiteTitle */
+/* global bootstrap, BaseURL, EXIF, getPageInfo, getAlbumURL, makePhotoURL, imageSizes, thumbnailFrom, websiteTitle */
 /* eslint-env browser */
 
 /**
@@ -53,6 +53,22 @@ async function justifyThumbnails (container) {
   window.onresize = () => {
     justifyThumbnails(container)
   }
+}
+
+function getEXIFData (image) {
+  function setEXIFText (element, text) {
+    if (element === null) { return }
+    if (text === undefined) { element.parentNode.parentNode.remove(); return }
+    element.innerText = text
+  }
+  EXIF.getData(image, function () {
+    setEXIFText(document.querySelector('#exif-make'), EXIF.getTag(this, 'Make'))
+    setEXIFText(document.querySelector('#exif-model'), EXIF.getTag(this, 'Model'))
+    setEXIFText(document.querySelector('#exif-iso-speed'), EXIF.getTag(this, 'ISOSpeedRatings'))
+    setEXIFText(document.querySelector('#exif-flash'), EXIF.getTag(this, 'Flash'))
+    setEXIFText(document.querySelector('#exif-focal'), EXIF.getTag(this, 'FocalLength'))
+    setEXIFText(document.querySelector('#exif-aperture'), EXIF.getTag(this, 'FNumber'))
+  })
 }
 
 // exported functions //
@@ -265,6 +281,13 @@ export function init () {
     if (e.target.classList.contains('fd-albumThumbnails')) {
       getLoadedImageRatios(e.target)
       justifyThumbnails(e.target)
+    }
+
+    if (e.target.classList.contains('fd-photo')) {
+      const t = e.target
+      console.log(t)
+      console.log("Photo detected...")
+      getEXIFData(t)
     }
 
     removeLoad(e.target.parentNode)

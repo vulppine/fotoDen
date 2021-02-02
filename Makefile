@@ -6,7 +6,7 @@ JSDIR = js
 JSMIN = terser
 TOOLPKG = github.com/vulppine/fotoDen/tool
 JSSUM = md5sum $(JSDIR)/$(JSNAME).js | cut -d " " -f 1
-JSMINSUM = md5sum $(JSDIR)/$(JSNAME).min.js | cut -d " " -f 1
+JSMINSUM = md5sum $(BUILDDIR)/$(JSNAME).min.js | cut -d " " -f 1
 .PHONY: all minjs tool theme
 
 $(shell mkdir $(BUILDDIR))

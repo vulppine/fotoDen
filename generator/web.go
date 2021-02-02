@@ -170,6 +170,9 @@ func NewWebVars(u string) (*WebVars, error) {
 	}
 
 	webvars.BaseURL = url.String()
+	if len(webvars.BaseURL) > 0 && webvars.BaseURL[len(webvars.BaseURL) - 1] == '/' {
+		webvars.BaseURL = webvars.BaseURL[0:len(webvars.BaseURL) - 1]
+	}
 
 	jsurl.Path = path.Join(jsurl.Path, "js", "fotoDen.js")
 	webvars.JSLocation = jsurl.String()
@@ -217,7 +220,6 @@ func NewStaticWebVars(folder string) (*StaticWebVars, error) {
 	swebvars.IsStatic = true
 	swebvars.PageName = f.FolderName
 	swebvars.PageDesc = f.FolderDesc
-	swebvars.PageAuthor = f.FolderAuthor
 
 	superFolder := func() bool {
 		_, err := os.Stat(filepath.Join(filepath.Dir(fpath), "folderInfo.json"))
