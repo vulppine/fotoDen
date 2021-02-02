@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/vulppine/fotoDen/generator"
 	"github.com/vulppine/fotoDen/tool"
@@ -11,8 +9,14 @@ import (
 func init() {
 	rootCmd.AddCommand(initCmd)
 
-	initCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
-	initCmd.Flags().StringVar(&name, "name", "", "what name a site should have (with init site)")
+	initCmd.AddCommand(initConfigCmd)
+	initConfigCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
+	initCmd.AddCommand(initSiteCmd)
+	initSiteCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
+	initSiteCmd.Flags().StringVar(&name, "name", "", "what name a site should have (with init site)")
+	initCmd.AddCommand(initThemeCmd)
+	initThemeCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
+	initCmd.AddCommand(initJSCmd)
 }
 
 var (
@@ -33,33 +37,50 @@ If the url flag is not set, it will use the current configuration's base URL.
 
 js is deprecated, and will be removed or replaced.`,
 		Args: cobra.ExactArgs(2),
+	}
+	initConfigCmd = &cobra.Command{
+		Use: "config [--url url] directory",
+		Short: "Initializes a fotoDen configuration directory with the given name",
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			switch args[0] {
-			case "config":
-				err := tool.InitializefotoDenConfig(tool.URLFlag, args[1])
+			err := tool.InitializefotoDenConfig(tool.URLFlag, args[1])
+			return err
+		},
+	}
+	initSiteCmd = &cobra.Command{
+		Use: "site [--name] destination",
+		Short: "Initializes a fotoDen website in the given directory",
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			err := tool.InitializefotoDenRoot(args[1], name)
+			return err
+		},
+	}
+	initThemeCmd = &cobra.Command{
+		Use: "theme source",
+		Short: "Initalizes a fotoDen theme into the configuration directory",
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if tool.URLFlag != "" {
+				err := tool.InitializeWebTheme(tool.URLFlag, args[1])
 				return err
-			case "site":
-				err := tool.InitializefotoDenRoot(args[1], name)
-				return err
-			case "theme":
-				if tool.URLFlag != "" {
-					err := tool.InitializeWebTheme(tool.URLFlag, args[1])
-					return err
-				}
-
-				err := tool.InitializeWebTheme(generator.CurrentConfig.WebBaseURL, args[1])
-				return err
-			case "js":
-				if tool.URLFlag != "" {
-					err := tool.InitializefotoDenjs(tool.URLFlag, args[1])
-					return err
-				}
-
-				err := tool.InitializefotoDenjs(generator.CurrentConfig.WebBaseURL, args[1])
-				return err
-			default:
-				return fmt.Errorf("invalid init flag set")
 			}
+
+			err := tool.InitializeWebTheme(generator.CurrentConfig.WebBaseURL, args[1])
+			return err
+		},
+	}
+	initJSCmd = &cobra.Command{
+		Use: "js source",
+		Short: "Checks and copies over a fotoDen.js file into the configuration directory",
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			err := tool.InitializefotoDenjs(args[0])
+			if err != nil {
+				return err
+			}
+
+			return nil
 		},
 	}
 )

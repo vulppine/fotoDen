@@ -1,11 +1,15 @@
 package tool
 
 import (
+	"crypto/md5"
 	"fmt"
-	"github.com/vulppine/fotoDen/generator"
+	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/vulppine/fotoDen/generator"
 )
 
 // InitializeWebTheme sets up web templates according to a given URL, and path containing templates.
@@ -58,15 +62,36 @@ func InitializeWebTheme(u string, srcpath string) error {
 	return nil
 }
 
-// InitializefotoDenjs sets a single variable as needed in fotoDen.js, from a path where it is located.
-// Copies it over to generator.CurrentConfig.WebSourceLocation afterwards.
-func InitializefotoDenjs(u string, fpath string) error {
+var (
+	// The MD5 checksum of fotoDen.js. Must be defined during build.
+	JSSum string
+	// The MD5 checksum of fotoDen.min.js. Must be defined during build.
+	JSMinSum string
+)
 
-	webvars, err := generator.NewWebVars(u)
+// InitializefotoDenjs copies over a valid fotoDen.js into the configuration's web directory.
+// The JS must be validated during build, otherwise it will warn the user that the script cannot be validated.
+func InitializefotoDenjs(fpath string) error {
+	if JSSum != "" || JSMinSum != "" {
+		f, err := ioutil.ReadFile(fpath)
+		if checkError(err) {
+			return err
+		}
+		s := fmt.Sprintf("%x", md5.Sum(f))
+		if s != JSSum && s != JSMinSum {
+			verbose("checksum: " + s)
+			verbose("valid checksums:")
+			verbose("fotoDen.js: " + JSSum)
+			verbose("fotoDen.min.js: " + JSMinSum)
+			if !ReadInputAsBool("Warning: the selected JS file may have been modified, or is not fotoDen.js. Continue?", "y") {
+				return fmt.Errorf("js not valid")
+			}
+		}
+	} else {
+		log.Println("Warning: fotoDen tool was not compiled with valid JS checksums. Ensure that your scripts are safe, or are valid for fotoDen websites.")
+	}
 
-	checkError(err)
-
-	err = generator.ConfigureWebFile(path.Join(fpath), path.Join(generator.CurrentConfig.WebSourceLocation, "fotoDen.js"), webvars)
+	err := generator.CopyFile(path.Join(fpath), "fotoDen.js", path.Join(generator.CurrentConfig.WebSourceLocation))
 	if checkError(err) {
 		return err
 	}

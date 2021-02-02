@@ -25,6 +25,15 @@ import (
 // WizardFlag specifies if fotoDen tool functions should have interactive input or not.
 var WizardFlag bool
 
+// NameFlag sets the name for a folder/album. If this is not set, fotoDen will automatically use the folder's name.
+var NameFlag string
+
+// Recurse toggles recursive functions on directories. This is primarily used for the update command.
+var Recurse bool
+
+// URLFlag sets the URL for functions that require a URL. This is mostly used in initialization.
+var URLFlag string
+
 // GeneratorOptions is a set of options for the generator.
 //
 // Includes:
@@ -38,7 +47,7 @@ type GeneratorOptions struct {
 	Source   string
 	Copy     bool
 	Gensizes bool
-	imagegen bool
+	ImageGen bool
 	Sort     bool
 	Meta     bool
 	Static   bool

@@ -6,6 +6,20 @@ import (
 	"path"
 )
 
+// Folder represents a folderInfo.json file used by fotoDen.
+// It has all the needed values for fotoDen.js to operate correctly.
+// fotoDen/generator does not provide functions to manage this - only to read and create these.
+type Folder struct {
+	FolderName          string // The name of the folder.
+	FolderDesc          string // The description of a folder.
+	FolderShortName     string // The shortname of the folder (can be taken from the filesystem folder name)
+	FolderType          string // The type of folder (currently supports only album or folder)
+	FolderThumbnail     bool   // If a thumbnail exists or not. This is dictated by the generation of thumb.jpg.
+	ItemAmount          int
+	SubfolderShortNames []string // Any folders that are within the folder (updated whenever the generator is called in the folder)
+	IsStatic            bool     // If the folder was generated statically, or has information inserted dynamically.
+}
+
 // GenerateFolderInfo generates a Folder object that can be used for folder configuration.
 // If directory is an empty string, it does it in the current directory.
 // Otherwise, it attempts to reach the directory from the current working directory.
@@ -67,6 +81,15 @@ func (folder *Folder) WriteFolderInfo(filePath string) error {
 	return nil
 }
 
+// Items represents an itemsInfo.json file used by fotoDen.
+// It is used mainly in album-type folders, and contains a bool indicating whether
+// metadata is being used, and a string array (potentially large) of file names.
+type Items struct {
+	Metadata bool // Dictates whether or not each image has its own ImageMeta object.
+	// If this is false, then no metadata will be read.
+	ItemsInFolder []string // All the items in a folder, by name, in an array.
+}
+
 // GenerateItemInfo generates an Items object based on the contents of the directory.
 // This automatically strips non-images.
 func GenerateItemInfo(directory string) (*Items, error) {
@@ -84,7 +107,6 @@ func GenerateItemInfo(directory string) (*Items, error) {
 	if err != nil {
 		return items, err
 	}
-
 	defer os.Chdir(WorkingDirectory)
 	os.Chdir(directory)
 	items.ItemsInFolder = IsolateImages(GetArrayOfFiles(dirContents))

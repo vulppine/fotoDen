@@ -1,4 +1,5 @@
-/*
+/**
+ * @license MIT
  * The MIT License (MIT)
  * Copyright 2019 SmugMug, Inc.
  *

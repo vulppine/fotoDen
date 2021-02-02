@@ -66,7 +66,7 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 		}
 	}
 
-	if options.imagegen == true {
+	if options.ImageGen == true {
 		verbose("Generating album...")
 		fileAmount, err := GenerateItems(fpath, options)
 		if fileAmount > 0 {

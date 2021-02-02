@@ -124,7 +124,7 @@ func (meta *ImageMeta) WriteImageMeta(folder string, name string) error {
 // MakeFolderThumbnail creates a thumbnail from a file into a destination directory.
 // This is only here to make fotoDen's command line tool look cleaner in code, and avoid importing more than needed.
 func MakeFolderThumbnail(file string, directory string) error {
-	err := ResizeImage(file, "thumb.jpg", CurrentConfig.ImageSizes["thumb"], directory, bimg.JPEG)
+	err := ResizeImage(file, "thumb.jpg", ImageScale{MaxHeight: 500}, directory, bimg.JPEG)
 	if err != nil {
 		return err
 	}

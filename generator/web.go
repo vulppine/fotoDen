@@ -27,25 +27,6 @@ type WebImageSize struct {
 	LocalBool bool   // whether to download it remotely or locally
 }
 
-// WebVars dictate where fotoDen gets its JavaScript and CSS files per page.
-type WebVars struct {
-	BaseURL       string
-	JSLocation    string
-	CSSLocation   string
-	StaticWebVars map[string]string
-}
-
-// StaticWebVars are fields that a page can take in order to allow for static page generation.
-// If a folder is marked for dynamic generation, these will all automatically be blank.
-// Otherwise, these will have the relevant information inside. This only applies to folders.
-type StaticWebVars struct {
-	IsStatic   bool
-	PageName   string // the current name of the page, e.g. 'My album', or 'Photo name'
-	PageDesc   string // the current description of the page
-	PageFolder string // the folder this is contained in
-	PageAuthor string // the author of the page, i.e. the photographer
-}
-
 // GenerateWebConfig creates a new WebConfig object, and returns a WebConfig object with a populated ImageSizes
 // based on the current ScalingOptions map.
 func GenerateWebConfig(source string) *WebConfig {
@@ -155,6 +136,14 @@ func MakeAlbumDirectoryStructure(rootDirectory string) error {
 	return nil
 }
 
+// WebVars dictate where fotoDen gets its JavaScript and CSS files per page.
+type WebVars struct {
+	BaseURL       string
+	JSLocation    string
+	CSSLocation   string
+	StaticWebVars map[string]string
+}
+
 // NewWebVars creates a WebVars object. Takes a single URL string, and outputs
 // a set of fotoDen compatible URLs.
 //
@@ -197,6 +186,17 @@ func NewWebVars(u string) (*WebVars, error) {
 	}
 
 	return webvars, nil
+}
+
+// StaticWebVars are fields that a page can take in order to allow for static page generation.
+// If a folder is marked for dynamic generation, these will all automatically be blank.
+// Otherwise, these will have the relevant information inside. This only applies to folders.
+type StaticWebVars struct {
+	IsStatic   bool
+	PageName   string // the current name of the page, e.g. 'My album', or 'Photo name'
+	PageDesc   string // the current description of the page
+	PageFolder string // the folder this is contained in
+	PageAuthor string // the author of the page, i.e. the photographer
 }
 
 // NewStaticWebVars creates a new static web var set based on the folder given.

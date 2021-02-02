@@ -1,5 +1,11 @@
 /* global bootstrap, BaseURL, getPageInfo, getAlbumURL, makePhotoURL, imageSizes, thumbnailFrom, websiteTitle */
 /* eslint-env browser */
+
+/**
+ * @license MIT
+ * Copyright (c) 2021 Flipp Syder
+ */
+
 // fotoDen DEFAULT THEME FUNCTIONS //
 
 // internal functions //

@@ -12,30 +12,6 @@ import (
 //
 // Structs for usage with fotoDen JSON files.
 
-// Folder represents a folderInfo.json file used by fotoDen.
-// It has all the needed values for fotoDen.js to operate correctly.
-// fotoDen/generator does not provide functions to manage this - only to read and create these.
-type Folder struct {
-	FolderName          string // The name of the folder.
-	FolderDesc          string // The description of a folder.
-	FolderAuthor        string // The author of a folder.
-	FolderShortName     string // The shortname of the folder (can be taken from the filesystem folder name)
-	FolderType          string // The type of folder (currently supports only album or folder)
-	FolderThumbnail     bool   // If a thumbnail exists or not. This is dictated by the generation of thumb.jpg.
-	ItemAmount          int
-	SubfolderShortNames []string // Any folders that are within the folder (updated whenever the generator is called in the folder)
-	IsStatic            bool     // If the folder was generated statically, or has information inserted dynamically.
-}
-
-// Items represents an itemsInfo.json file used by fotoDen.
-// It is used mainly in album-type folders, and contains a bool indicating whether
-// metadata is being used, and a string array (potentially large) of file names.
-type Items struct {
-	Metadata bool // Dictates whether or not each image has its own ImageMeta object.
-	// If this is false, then no metadata will be read.
-	ItemsInFolder []string // All the items in a folder, by name, in an array.
-}
-
 // GeneratorConfig represents the configuration for fotoDen's generator, and where
 // images will go, as well as what sizes will be generated.
 // ImageSizes is a map with string keys containing ImageScale structs, which dictate

@@ -3,7 +3,7 @@ package generator
 import (
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 // GetArrayOfFilesAndFolders takes an array of os.FileInfo (usually from from os.Readdir()), and returns a string array of all non-directories.
@@ -41,13 +41,13 @@ func GetArrayOfFolders(directory []os.FileInfo) []string {
 //
 // Returns an error if one occurs - otherwise returns nil.
 func CopyFile(file string, name string, dest string) error {
-	verbose("Copying " + file + " to " + path.Join(dest, name))
+	verbose("Copying " + file + " to " + filepath.Join(dest, name))
 	fileReader, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
 	}
 
-	toWrite, err := os.Create(path.Join(dest, name))
+	toWrite, err := os.Create(filepath.Join(dest, name))
 	defer toWrite.Close()
 	if err != nil {
 		return err
