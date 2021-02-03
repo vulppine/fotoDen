@@ -2,10 +2,11 @@ package tool
 
 import (
 	"fmt"
-	"github.com/vulppine/fotoDen/generator"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/vulppine/fotoDen/generator"
 )
 
 // UpdateFolderSubdirectories is a function to easily update a folder's subdirectories.

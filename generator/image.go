@@ -2,9 +2,10 @@ package generator
 
 import (
 	"fmt"
-	"github.com/h2non/bimg"
 	"path"
 	"strconv"
+
+	"github.com/h2non/bimg"
 )
 
 // IsolateImages isolates images in an array.

@@ -2,14 +2,18 @@ package tool
 
 import (
 	"fmt"
-	"github.com/vulppine/fotoDen/generator"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
 	"sync"
+
+	"github.com/h2non/bimg"
+	"github.com/vulppine/fotoDen/generator"
 )
+
 
 // GenerateItems generates the album part of a fotoDen folder in fpath.
 //
@@ -47,12 +51,6 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 				dir, _ := os.Getwd()
 				return dir
 			}())
-		}
-
-		dir, err := os.Open("./")
-		defer dir.Close()
-		if checkError(err) {
-			panic(err)
 		}
 
 		if options.Copy == true {
@@ -157,7 +155,7 @@ func UpdateImages(folder string, options GeneratorOptions) error {
 //
 // If the items in the folder are sorted, it uses sort.SearchStrings to find it in O(log n) time.
 // Otherwise, it will go through it in O(n) time.
-func DeleteImage(folder string, file string) error {
+func DeleteImage(folder string, files ...string) error {
 	items := new(generator.Items)
 
 	err := items.ReadItemsInfo(path.Join(folder, "itemsInfo.json"))
@@ -165,19 +163,21 @@ func DeleteImage(folder string, file string) error {
 		return err
 	}
 
-	if sort.StringsAreSorted(items.ItemsInFolder) {
-		result := sort.SearchStrings(items.ItemsInFolder, file)
-		if result == len(items.ItemsInFolder) {
-			copy(items.ItemsInFolder[0:result-1], items.ItemsInFolder)
-		} else if result == 0 {
-			copy(items.ItemsInFolder[1:len(items.ItemsInFolder)], items.ItemsInFolder)
-		} else if result != len(items.ItemsInFolder) && items.ItemsInFolder[result] == file {
-			items.ItemsInFolder = append(items.ItemsInFolder[0:result-1], items.ItemsInFolder[result+1:len(items.ItemsInFolder)]...)
+	for _, file := range files {
+		if sort.StringsAreSorted(items.ItemsInFolder) {
+			result := sort.SearchStrings(items.ItemsInFolder, file)
+			if result == len(items.ItemsInFolder) {
+				copy(items.ItemsInFolder[0:result-1], items.ItemsInFolder)
+			} else if result == 0 {
+				copy(items.ItemsInFolder[1:len(items.ItemsInFolder)], items.ItemsInFolder)
+			} else if result != len(items.ItemsInFolder) && items.ItemsInFolder[result] == file {
+				items.ItemsInFolder = append(items.ItemsInFolder[0:result], items.ItemsInFolder[result+1:len(items.ItemsInFolder)]...)
+			} else {
+				log.Printf("File %s not found in items.", file)
+			}
 		} else {
-			fmt.Printf("File %s not found in items.", file)
+			items.ItemsInFolder = generator.RemoveItemFromStringArray(items.ItemsInFolder, file)
 		}
-	} else {
-		items.ItemsInFolder = generator.RemoveItemFromStringArray(items.ItemsInFolder, file)
 	}
 
 	err = items.WriteItemsInfo(path.Join(folder, "itemsInfo.json"))
@@ -189,7 +189,7 @@ func DeleteImage(folder string, file string) error {
 }
 
 // InsertImage inserts an image into a fotoDen folder.
-func InsertImage(folder string, file string, mode string, options GeneratorOptions) error {
+func InsertImage(folder string, mode string, options GeneratorOptions, files ...string) error {
 	items := new(generator.Items)
 
 	err := items.ReadItemsInfo(path.Join(folder, "itemsInfo.json"))
@@ -197,68 +197,101 @@ func InsertImage(folder string, file string, mode string, options GeneratorOptio
 		return err
 	}
 
-	switch mode {
-	case "append":
-		items.ItemsInFolder = append(items.ItemsInFolder, file)
-	case "sort":
-		items.ItemsInFolder = append(items.ItemsInFolder, file)
-
-		sort.Strings(items.ItemsInFolder)
-	}
-
 	var waitgroup sync.WaitGroup
 
-	if options.Source != "" {
-		verbose("Changing to directory: " + options.Source)
-		wd, err := os.Getwd()
-		checkError(err)
-		folder, err = filepath.Abs(folder)
-		checkError(err)
-		source, err := filepath.Abs(options.Source)
-		checkError(err)
+	folder, err = filepath.Abs(folder)
+	checkError(err)
+	wd, err := os.Getwd()
+	checkError(err)
 
-		defer os.Chdir(wd)
-		os.Chdir(source)
+	for _, fv := range files {
+		fi, err := filepath.Abs(fv)
+		if checkError(err) {
+			return err
+		}
+
+		if filepath.Dir(fi) != wd {
+			verbose("Changing to directory: " + filepath.Dir(fi))
+			err := os.Chdir(filepath.Dir(fi))
+			if checkError(err) {
+				return err
+			}
+		}
+
+		f := filepath.Base(fv)
+		verbose("Current file: " + f)
+		switch mode {
+		case "append":
+			items.ItemsInFolder = append(items.ItemsInFolder, f)
+		case "sort":
+			items.ItemsInFolder = append(items.ItemsInFolder, f)
+
+			sort.Strings(items.ItemsInFolder)
+		}
+
 		verbose("Current directory: " + func() string {
 			dir, _ := os.Getwd()
 			return dir
 		}())
-	}
 
-	dir, err := os.Open("./")
-	defer dir.Close()
-	if checkError(err) {
-		panic(err)
-	}
-
-	if options.Copy {
-		waitgroup.Add(1)
-		go func(wg *sync.WaitGroup) {
-			defer wg.Done()
-			fmt.Println("Copying file...")
-			err = generator.BatchCopyFile([]string{file}, path.Join(folder, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageSrcDirectory))
-		}(&waitgroup)
-	}
-
-	if options.Gensizes {
-		for k, v := range generator.CurrentConfig.ImageSizes {
-			sizeName := k
-			sizeOpts := v
+		if options.Copy {
 			waitgroup.Add(1)
 			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
-				fmt.Printf("Generating size %s...\n", sizeName)
-				err = generator.BatchImageConversion([]string{file}, sizeName, path.Join(folder, sizeName), sizeOpts)
+				fmt.Println("Copying file...")
+				err = generator.CopyFile(
+					f, f,
+					path.Join(
+						folder,
+						generator.CurrentConfig.ImageRootDirectory,
+						generator.CurrentConfig.ImageSrcDirectory,
+					),
+				)
 			}(&waitgroup)
 		}
-	}
 
-	if options.Meta == true {
-		waitgroup.Add(1)
-		go func(wg *sync.WaitGroup) {
-			verbose("Generating metadata to: " + generator.CurrentConfig.ImageMetaDirectory)
-			err = generator.BatchImageMeta(items.ItemsInFolder, generator.CurrentConfig.ImageMetaDirectory)
-		}(&waitgroup)
+		if options.Gensizes {
+			for k, v := range generator.CurrentConfig.ImageSizes {
+				sizeName := k
+				sizeOpts := v
+				waitgroup.Add(1)
+				go func(wg *sync.WaitGroup) {
+					defer wg.Done()
+					fmt.Printf("Generating size %s...\n", sizeName)
+					err = generator.ResizeImage(
+						f, sizeName + "_" + f, sizeOpts,
+						path.Join(
+							folder,
+							generator.CurrentConfig.ImageRootDirectory,
+							sizeName,
+						),
+						bimg.JPEG,
+					)
+				}(&waitgroup)
+			}
+		}
+
+		if options.Meta == true {
+			waitgroup.Add(1)
+			go func(wg *sync.WaitGroup) {
+				defer wg.Done()
+				verbose("Generating metadata to: " + generator.CurrentConfig.ImageMetaDirectory)
+				m := new(generator.ImageMeta)
+				err = m.WriteImageMeta(
+					filepath.Join(
+						folder,
+						generator.CurrentConfig.ImageRootDirectory,
+						generator.CurrentConfig.ImageMetaDirectory,
+					),
+					f,
+				)
+			}(&waitgroup)
+		}
+
+		os.Chdir(wd)
+		if checkError(err) {
+			return err
+		}
 	}
 
 	waitgroup.Wait()

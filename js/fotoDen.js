@@ -395,10 +395,12 @@ class PhotoViewer extends Viewer {
 
               setText(this.name, photo.name)
               setText(this.desc, photo.desc)
+              setTitle([photo.name, photo.album])
             })
         } else {
           photo.name = json.ItemsInFolder[photo.index]
           setText(this.name, photo.name)
+          setTitle([photo.name, photo.album])
         }
 
         photo.album = this.info.FolderName
@@ -416,7 +418,6 @@ class PhotoViewer extends Viewer {
 
         setText(this.folderName, photo.album)
         setLink(this.folderName, getAlbumURL().toString())
-        setTitle([photo.name, photo.album])
         this.setPhoto(json.ItemsInFolder[photo.index])
 
         if (this.infoButtons !== null) {

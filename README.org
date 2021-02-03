@@ -10,8 +10,8 @@ fotoDen is designed so that it can be used independent of any separate tool, but
 Download the latest version of fotoDen, and get started by initializing a configuration file, and copying over fotoDen.js (a minified version is included in release versions):
 
 #+BEGIN_SRC sh
-~fotoDen init config~
-~fotoDen init js fotoDen.min.js~
+fotoDen init config
+fotoDen init js fotoDen.min.js
 #+END_SRC
     
 You will be taken to a wizard that will help you setup fotoDen.
@@ -19,20 +19,20 @@ You will be taken to a wizard that will help you setup fotoDen.
 Afterwards, initialize a theme (default_theme.zip is available, and should be unzipped to its own folder)
 
 #+BEGIN_SRC sh
-~fotoDen init theme default_theme/~
+fotoDen init theme default_theme/
 #+END_SRC
     
 Afterwards, initialize your first site:
 
 #+BEGIN_SRC sh
-~fotoDen init site --name "[ /your website name here/ ]" my_website/~
+fotoDen init site --name "[ your website name here ]" my_website/
 #+END_SRC
 
 From there, you can start generating folders and albums as you wish:
 
 #+BEGIN_SRC sh
-~fotoDen generate folder --name "[ /your folder name here/ ]" my_website/my_folder/~
-~fotoDen generate album --name "[ /your album name here/ ]" --source [ /image location/ ] my_website/my_folder/my_album~
+fotoDen generate folder --name "[ your folder name here ]" my_website/my_folder/
+fotoDen generate album --name "[ your album name here ]" --source my/images/are/here my_website/my_folder/my_album
 #+END_SRC
 
 Run the fotoDen command for more options. (More detailed information and commands will be added soon!)
@@ -55,15 +55,20 @@ You will require the latest version of [[https://github.com/libvips/libvips][lib
 2. Run ~make all~ in the resulting folder
 3. fotoDen will be located in the *build/* folder in the same directory.
 
+** Contributing
+
+If you want to contribute, I encourage you to fork and help develop fotoDen! Note that fotoDen uses [[https://github.com/standard/standard][Standard JS]] for its JavaScript style.
+
 ** Dependencies
 
 fotoDen relies on a few important dependencies (both front and back), so here are links to the dependencies that fotoDen uses! License information for included source code can be found in their respective locations.
 
-| Dependency       | Author         | License |
-|------------------+----------------+---------|
-| [[https://github.com/h2non/bimg][bimg]]             | Tomas Aparicio | MIT     |
-| [[https://github.com/flickr/justified-layout][justified-layout]] | Flickr/SmugMug | MIT     |
-| [[https://github.com/exif-js/exif-js][exif-js]]          | Jacob Seidelin | MIT     |
+| Dependency       | Author                 | License |
+|------------------+------------------------+---------|
+| [[https://github.com/h2non/bimg][bimg]]             | Tomas Aparicio         | MIT     |
+| [[https://github.com/twbs/bootstrap][Bootstrap]]        | Twitter/Bootstrap Team | MIT     |
+| [[https://github.com/flickr/justified-layout][justified-layout]] | Flickr/SmugMug         | MIT     |
+| [[https://github.com/exif-js/exif-js][exif-js]]          | Jacob Seidelin         | MIT     |
 
 ** Copyright
 
