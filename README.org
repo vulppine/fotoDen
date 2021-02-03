@@ -73,3 +73,5 @@ fotoDen relies on a few important dependencies (both front and back), so here ar
 ** Copyright
 
 fotoDen is copyright 2021 Flipp Syder under the MIT License (see LICENSE for more information)
+
+All test images licensed are under the [[https://creativecommons.org/licenses/by-nc-sa/4.0/][CC-BY-NC-SA]]
