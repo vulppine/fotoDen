@@ -1,0 +1,54 @@
+* fotoDen
+/A statically structured, front-end dynamic photo gallery/
+
+Version 0.1.0
+
+** Using
+
+fotoDen is designed so that it can be used independent of any separate tool, but it works well if you have the fotoDen tool in order to create folders and albums that are directly accessable by fotoDen's front end.
+Download the latest version of fotoDen, and get started by initializing a configuration file, and copying over fotoDen.js (a minified version is included in release versions):
+    ~fotoDen init config~
+    ~fotoDen init js fotoDen.min.js~
+You will be taken to a wizard that will help you setup fotoDen.
+Afterwards, initialize a theme (default_theme.zip is available, and should be unzipped to its own folder)
+    ~fotoDen init theme default_theme/~
+Afterwards, initialize your first site:
+    ~fotoDen init site --name "[ /your website name here/ ]" my_website/~
+
+From there, you can start generating folders and albums as you wish:
+    ~fotoDen generate folder --name "[ /your folder name here/ ]" my_website/my_folder/~
+    ~fotoDen generate album --name "[ /your album name here/ ]" --source [ /image location/ ] my_website/my_folder/my_album~
+
+Run the fotoDen command for more options. (More detailed information and commands will be added soon!)
+
+*** Warning
+
+fotoDen is still in its *very early* stages, at v0 - everything and anything is subject to change. While I'll attempt to keep its base structure stable, commands and folder metadata are *subject to change in drastic ways*. Upgrade paths will be offered for fotoDen version transitions that up the minor version number (v0 . *y* . 0), so that version transitions with new changes are more easier.
+
+** Installing
+
+You will require the latest version of [[https://github.com/libvips/libvips][libvips]] in order to use fotoDen.
+
+You can either install from an existing build (which includes fotoDen.js md5 checksums for both the minified version, and the JS file that came with its release), or you can install the tool alone by running ~go install github.com/vulppine/fotoDen~.
+
+** Building
+
+You will require the latest version of [[https://github.com/libvips/libvips][libvips]], [[https://terser.org][terser]], and [[https://golang.org][Go]] in order to build fotoDen from source.
+
+1. Clone the git repository into a directory of your choice
+2. Run ~make all~ in the resulting folder
+3. fotoDen will be located in the *build/* folder in the same directory.
+
+** Dependencies
+
+fotoDen relies on a few important dependencies (both front and back), so here are links to the dependencies that fotoDen uses! License information for included source code can be found in their respective locations.
+
+| Dependency       | Author         | License |
+|------------------+----------------+---------|
+| [[https://github.com/h2non/bimg][bimg]]             | Tomas Aparicio | MIT     |
+| [[https://github.com/flickr/justified-layout][justified-layout]] | Flickr/SmugMug | MIT     |
+| [[https://github.com/exif-js/exif-js][exif-js]]          | Jacob Seidelin | MIT     |
+
+** Copyright
+
+fotoDen is copyright 2021 Flipp Syder under the MIT License (see LICENSE for more information)
