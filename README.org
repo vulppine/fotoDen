@@ -59,16 +59,19 @@ You will require the latest version of [[https://github.com/libvips/libvips][lib
 
 If you want to contribute, I encourage you to fork and help develop fotoDen! Note that fotoDen uses [[https://github.com/standard/standard][Standard JS]] for its JavaScript style.
 
+A testing script is included in the root of the repository - run it in your local environment to generate a test website. Generating the container will require Docker.
+
 ** Dependencies
 
 fotoDen relies on a few important dependencies (both front and back), so here are links to the dependencies that fotoDen uses! License information for included source code can be found in their respective locations.
 
-| Dependency       | Author                 | License |
-|------------------+------------------------+---------|
-| [[https://github.com/h2non/bimg][bimg]]             | Tomas Aparicio         | MIT     |
-| [[https://github.com/twbs/bootstrap][Bootstrap]]        | Twitter/Bootstrap Team | MIT     |
-| [[https://github.com/flickr/justified-layout][justified-layout]] | Flickr/SmugMug         | MIT     |
-| [[https://github.com/exif-js/exif-js][exif-js]]          | Jacob Seidelin         | MIT     |
+| Dependency       | Author                 | License    |
+|------------------+------------------------+------------|
+| [[https://github.com/h2non/bimg][bimg]]             | Tomas Aparicio         | MIT        |
+| [[https://github.com/spf13/cobra][Cobra]]            | spf13                  | Apache 2.0 |
+| [[https://github.com/twbs/bootstrap][Bootstrap]]        | Twitter/Bootstrap Team | MIT        |
+| [[https://github.com/flickr/justified-layout][justified-layout]] | Flickr/SmugMug         | MIT        |
+| [[https://github.com/exif-js/exif-js][exif-js]]          | Jacob Seidelin         | MIT        |
 
 ** Copyright
 

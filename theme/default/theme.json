@@ -1,0 +1,6 @@
+{
+    "ThemeName": "Default",
+    "Stylesheets": [],
+    "Scripts": ["layout.js", "theme.js", "exif.js"],
+    "Other": ["thumb.png"]
+}
