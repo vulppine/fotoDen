@@ -68,6 +68,8 @@ func setupWebConfig(source string) *generator.WebConfig {
 		fmt.Println(k)
 	}
 
+	config.Theme = true // TODO: Make selectable themes
+	config.ImageRootDir = generator.CurrentConfig.ImageSrcDirectory
 	config.ThumbnailFrom = ReadInput("What size do you want your thumbnails to be?")
 	config.DisplayImageFrom = ReadInput("What size do you want to display your images as in a fotoDen photo viewer?")
 	config.DownloadSizes = ReadInputAsArray("What sizes do you want downlodable?", ",")

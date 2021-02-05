@@ -70,9 +70,11 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 	if options.ImageGen == true {
 		verbose("Generating album...")
 		fileAmount, err := GenerateItems(fpath, options)
+		if checkError(err) {
+			return err
+		}
+
 		if fileAmount > 0 {
-			err = GenerateWeb("album", fpath, folder, options)
-			checkError(err)
 			folder.FolderType = "album"
 			folder.ItemAmount = fileAmount
 		} else {
@@ -81,14 +83,15 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 	} else {
 		verbose("Generating folder...")
 		folder.FolderType = "folder"
-		err = GenerateWeb("folder", fpath, folder, options)
-		checkError(err)
 	}
 
 	err = folder.WriteFolderInfo(path.Join(fpath, "folderInfo.json"))
 	if checkError(err) {
 		return err
 	}
+
+	err = GenerateWeb(folder.FolderType, fpath, folder, options)
+	checkError(err)
 
 	fpath, _ = filepath.Abs(fpath)
 

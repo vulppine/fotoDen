@@ -286,7 +286,7 @@ export function init () {
     if (e.target.classList.contains('fd-photo')) {
       const t = e.target
       console.log(t)
-      console.log("Photo detected...")
+      console.log('Photo detected...')
       getEXIFData(t)
     }
 

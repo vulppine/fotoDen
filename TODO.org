@@ -1,6 +1,12 @@
-* TODO
+* The big todo list
 
 - [ ] GUI mode (Qt?)
 - [ ] Separate website configurations for multi-site configs
-- [ ] Multi-Viewer mode (allow more than one viewer on the same page, and for viewers to communicate to each other)
+- [ ] Multi-Viewer mode (allow more than one root viewer on the same page, and for viewers to communicate to each other - multiple viewers are technically allowed, but all links currently redirect to a URL)
 - [ ] Move some fotoDen functions to Go 1.16's new libraries
+- [ ] Document fotoDen.js using JSDoc
+- [ ] Split fotoDen.js into several files and change the makefile to combine all the separate JS files (maybe?)
+- [ ] Implement some kind of extension system using ES6 import/export (it's nice to have exif data and justified layout in the default theme, but maybe these should be extended to standard functionality without filling the main fotoDen library up with what is essentially a copy and paste of the code)
+- [ ] Properly implement image updating
+  - Possibly merge the functionality of adding images with updating images, doing a preliminary search through the current available items before deciding whether to add the image, or update the image based on name
+- [ ] Selectable themes

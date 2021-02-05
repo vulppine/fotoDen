@@ -67,8 +67,17 @@ let theme = {
   },
 
   setError: (errText) => {
-    document.getElementsByClassName('errorBox')[0].setAttribute('style', 'display: block')
-    document.getElementsByClassName('error')[0].innerHTML = errText
+    document.getElementsByClassName('fd-errorBox')[0].setAttribute('style', 'display: block')
+    document.getElementsByClassName('fd-error')[0].innerHTML = errText
+  },
+
+  createButton: (name, url) => {
+    const button = document.createElement('a')
+    button.classList.Add('button')
+    button.href = url
+    button.innerText = name
+
+    return button
   },
 
   createThumbnail: (photoIndex, photoName) => {
@@ -103,11 +112,11 @@ let theme = {
     const folderAnchor = document.createElement('a')
     const folderThumbnail = new Image()
 
-    folderAnchor.setAttribute('class', 'folderLink')
-    folderLinkContainer.setAttribute('class', 'folderLinkContainer')
-    folderInfoContainer.setAttribute('class', 'folderInfoContainer')
-    folderItemCount.setAttribute('class', 'folderItemCount')
-    folderThumbnail.setAttribute('class', 'folderThumbnail')
+    folderAnchor.setAttribute('class', 'fd-folderLink')
+    folderLinkContainer.setAttribute('class', 'fd-folderLinkContainer')
+    folderInfoContainer.setAttribute('class', 'fd-folderInfoContainer')
+    folderItemCount.setAttribute('class', 'fd-folderItemCount')
+    folderThumbnail.setAttribute('class', 'fd-folderThumbnail')
 
     folderAnchor.appendChild(folderLinkContainer)
     folderLinkContainer.appendChild(folderThumbnail)
@@ -115,16 +124,16 @@ let theme = {
     folderInfoContainer.appendChild(folderItemCount)
 
     if (info.FolderThumbnail === true) {
-      folderThumbnail.src = info.FolderShortName + '/' + info.FolderThumbnail
+      folderThumbnail.src = info.FolderShortName + '/' + 'thumb.jpg'
     } else {
-      folderThumbnail.src = getAlbumURL() + info.FolderShortName + '/thumb.png'
-    };
+      folderThumbnail.src = BaseURL + '/thumb.png'
+    }
 
     if (info.ItemAmount != null) {
       const newDiv = document.createElement('div')
       newDiv.innerHTML = 'Photos: ' + info.ItemAmount // remember, this is still photo oriented...
       folderItemCount.appendChild(newDiv)
-    };
+    }
 
     if (info.SubfolderShortNames.length > 0) {
       const newDiv = document.createElement('div')
@@ -147,11 +156,11 @@ let theme = {
     newAnchor.innerHTML = (page + 1)
 
     if (page === this.currentPage) {
-      newAnchor.setAttribute('class', 'navLink active')
+      newAnchor.setAttribute('class', 'fd-navLink active')
     } else {
       newURL.search = '?page=' + page
       newAnchor.href = newURL.toString()
-      newAnchor.setAttribute('class', 'navLink')
+      newAnchor.setAttribute('class', 'fd-navLink')
     }
 
     container.appendChild(newAnchor)
@@ -237,7 +246,7 @@ function getFolderURL (level) {
 
   folderURL.search = ''
 
-  if (rootDirectoryLoc !== 0 && folderPath.length - level < folderPath.length - rootDirectoryLoc) {
+  if (rootDirectoryLoc !== 0 && folderPath.length - 1 - level < rootDirectoryLoc) {
     console.warn('Attempted to go deeper than baseURL, ignoring.')
     return null
   } else if (level <= folderPath.length) {
@@ -680,11 +689,11 @@ function readConfig (info) {
   } else {
     const pa = p.split('/')
     console.log(pa)
-    if (pa[pa.length] === '') {
+    if (pa[pa.length - 1] === '') {
       pa.pop()
-      workingDirectory = pa[pa.length]
+      workingDirectory = pa[pa.length - 1]
     } else {
-      workingDirectory = pa[pa.length]
+      workingDirectory = pa[pa.length - 1]
     }
   }
 

@@ -182,7 +182,7 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 		return err
 	}
 
-	folder, err := generator.GenerateFolderInfo(rootpath, name) // do it in rootpath since we're not trying to scan for images in the current folder
+	folder, err := generator.GenerateFolderInfo(rootpath, webconfig.WebsiteTitle) // do it in rootpath since we're not trying to scan for images in the current folder
 	folder.FolderType = "folder"
 	checkError(err)
 	err = folder.WriteFolderInfo(path.Join(rootpath, "folderInfo.json"))
