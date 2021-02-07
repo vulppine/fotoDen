@@ -527,6 +527,10 @@ class AlbumViewer extends Viewer {
       }) // you can't throw out of a constructor, sadly, so we'll just make it visible to the user
 
     if (isMobile) {
+      if (this.navContents !== null) {
+        this.navContents.remove()
+      }
+        
       this.thumbnailContainer.addEventListener('scroll', () => {
         const currentScroll = this.thumbnailContainer.scrollTop
         const maxHeight = this.thumbnailContainer.scrollHeight
