@@ -5,7 +5,7 @@
 // The front-end for a photo gallery.
 
 /**
- * @version v0.1.0
+ * @version v0.1.1
  * @license MIT
  *
  * Copyright (c) 2021 Flipp Syder
@@ -30,7 +30,7 @@
  */
 
 const BaseURL = document.getElementById('fd-script').dataset.fdBaseurl
-const version = '0.1.0'
+const version = '0.1.1'
 
 // global variables
 
