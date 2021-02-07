@@ -169,6 +169,12 @@ let theme = {
 
 // generic functions
 
+function debug (func) {
+  if (document.getElementById('fd-script').dataset.fdDebug === 'true') {
+    return func()
+  }
+}
+
 function setCurrentURLParam (param, value) {
   const newURL = new URL(document.URL)
   const newURLParams = new URLSearchParams(newURL.search)
@@ -247,14 +253,14 @@ function getFolderURL (level) {
   folderURL.search = ''
 
   if (rootDirectoryLoc !== 0 && folderPath.length - 1 - level < rootDirectoryLoc) {
-    console.warn('Attempted to go deeper than baseURL, ignoring.')
+    debug(console.warn('Attempted to go deeper than baseURL, ignoring.'))
     return null
   } else if (level <= folderPath.length) {
     folderURL.pathname = folderPath.slice(0, folderPath.length - level).concat(['']).join('/') // folders should really have a default page file name
     folderURL.href = folderURL.origin + folderURL.pathname + folderURL.search // had an issue with this, so i'm forcing it
     return folderURL
   } else {
-    console.warn('Attempted to go deeper than baseURL, ignoring.')
+    debug(console.warn('Attempted to go deeper than baseURL, ignoring.'))
     return null
   }
 }
@@ -553,7 +559,7 @@ class AlbumViewer extends Viewer {
     const range = this.getNavContentMinMax(Math.ceil(this.maxPhotos / this.imagesPerPage), this.currentPage)
 
     for (let i = range[0]; i < range[1]; i++) {
-      console.log(this.navContents)
+      debug(console.log(this.navContents))
       theme.createNavPageLink(i, this.navContents)
     }
   }
