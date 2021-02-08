@@ -30,7 +30,7 @@ var (
 	}
 	albumAddCmd = &cobra.Command{
 		Use:   "add album_name [options] images",
-		Short: "Adds images to albums.",
+		Short: "Adds images to albums. Otherwise, updates the image if it exists.",
 		Args:  cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if sortf {

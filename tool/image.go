@@ -188,7 +188,7 @@ func DeleteImage(folder string, files ...string) error {
 	return nil
 }
 
-// InsertImage inserts an image into a fotoDen folder.
+// InsertImage inserts an image into a fotoDen folder. Otherwise, it updates an already existing image.
 func InsertImage(folder string, mode string, options GeneratorOptions, files ...string) error {
 	items := new(generator.Items)
 
@@ -196,6 +196,8 @@ func InsertImage(folder string, mode string, options GeneratorOptions, files ...
 	if checkError(err) {
 		return err
 	}
+
+	sorted := sort.StringsAreSorted(items.ItemsInFolder)
 
 	var waitgroup sync.WaitGroup
 
@@ -220,13 +222,34 @@ func InsertImage(folder string, mode string, options GeneratorOptions, files ...
 
 		f := filepath.Base(fv)
 		verbose("Current file: " + f)
-		switch mode {
-		case "append":
-			items.ItemsInFolder = append(items.ItemsInFolder, f)
-		case "sort":
-			items.ItemsInFolder = append(items.ItemsInFolder, f)
 
-			sort.Strings(items.ItemsInFolder)
+		imageExists := false
+
+		if sorted {
+			i := sort.SearchStrings(items.ItemsInFolder, f)
+			if items.ItemsInFolder[i] == f {
+				verbose("Image found, updating...")
+				imageExists = true
+			}
+		} else {
+			for _, n := range items.ItemsInFolder {
+				if n == f {
+					imageExists = true
+					break
+				}
+			}
+		}
+
+		if !imageExists {
+			verbose("Adding image to album...")
+			switch mode {
+			case "append":
+				items.ItemsInFolder = append(items.ItemsInFolder, f)
+			case "sort":
+				items.ItemsInFolder = append(items.ItemsInFolder, f)
+
+				sort.Strings(items.ItemsInFolder)
+			}
 		}
 
 		verbose("Current directory: " + func() string {
