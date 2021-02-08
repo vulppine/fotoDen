@@ -12,7 +12,7 @@ type Theme struct {
 	ThemeName   string
 	Stylesheets []string
 	Scripts     []string
-	Other		[]string
+	Other       []string
 }
 
 // ReadThemeConfig reads a theme.json file, and returns a Theme struct.

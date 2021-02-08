@@ -167,7 +167,7 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 		webconfig.WebsiteTitle = name
 		webconfig.ImageRootDir = generator.CurrentConfig.ImageRootDirectory
 		webconfig.ThumbnailFrom = webconfig.ImageSizes[0].SizeName
-		webconfig.DisplayImageFrom = webconfig.ImageSizes[len(webconfig.ImageSizes) - 1].SizeName
+		webconfig.DisplayImageFrom = webconfig.ImageSizes[len(webconfig.ImageSizes)-1].SizeName
 		for _, v := range webconfig.ImageSizes {
 			webconfig.DownloadSizes = append(webconfig.DownloadSizes, v.SizeName)
 		}

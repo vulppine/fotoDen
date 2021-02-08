@@ -14,7 +14,6 @@ import (
 	"github.com/vulppine/fotoDen/generator"
 )
 
-
 // GenerateItems generates the album part of a fotoDen folder in fpath.
 //
 // It takes an options struct (which is just a set of options condensed into one struct)
@@ -282,7 +281,7 @@ func InsertImage(folder string, mode string, options GeneratorOptions, files ...
 					defer wg.Done()
 					fmt.Printf("Generating size %s...\n", sizeName)
 					err = generator.ResizeImage(
-						f, sizeName + "_" + f, sizeOpts,
+						f, sizeName+"_"+f, sizeOpts,
 						path.Join(
 							folder,
 							generator.CurrentConfig.ImageRootDirectory,
