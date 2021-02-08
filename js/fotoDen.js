@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 // fotoDen v0.1.0
 //
 // The front-end for a photo gallery.
@@ -164,113 +162,6 @@ let theme = {
     }
 
     container.appendChild(newAnchor)
-  }
-}
-
-// generic functions
-
-function debug (func) {
-  if (document.getElementById('fd-script').dataset.fdDebug === 'true') {
-    return func()
-  }
-}
-
-function setCurrentURLParam (param, value) {
-  const newURL = new URL(document.URL)
-  const newURLParams = new URLSearchParams(newURL.search)
-
-  newURLParams.set(param, value)
-  newURL.search = newURLParams.toString()
-
-  return newURL
-}
-
-function getJSON (url) {
-  if (!isMobile) {
-    return fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(response.status)
-        }
-        return Promise.resolve(response.json())
-      })
-  } else {
-    const request = new XMLHttpRequest()
-
-    return new Promise((resolve, reject) => {
-      request.onreadystatechange = () => {
-        if (request.readyState === 4) {
-          if (request.status === 200) {
-            resolve(JSON.parse(request.response))
-          } else {
-            reject(request.status)
-          }
-        }
-      }
-      request.open('GET', url)
-      request.send()
-    })
-  }
-}
-
-// setTitle
-//
-// Takes an array of strings, separates them via a separator string and adds
-// the website title at the end.
-
-function setTitle (items) {
-  items.push(websiteTitle)
-  document.title = items.join(' - ')
-}
-
-function setText (element, text) {
-  if (element === null) { return }
-
-  element.innerText = text
-}
-
-function setLink (element, link) {
-  if (element === null) { return }
-
-  element.href = link
-}
-
-function getFolderURL (level) {
-  const folderURL = new URL(document.URL)
-  const folderPath = folderURL.pathname.split('/').slice(0, folderURL.pathname.split('/').length - 1) // knock off any index.htmls or nulls right off the bat;
-
-  let rootDirectoryLoc
-
-  if (workingDirectory === '') {
-    if (folderURL.pathname === '/' && level > 0) {
-      return null
-    }
-    rootDirectoryLoc = 0
-  } else {
-    rootDirectoryLoc = folderPath.indexOf(workingDirectory)
-  }
-
-  folderURL.search = ''
-
-  if (rootDirectoryLoc !== 0 && folderPath.length - 1 - level < rootDirectoryLoc) {
-    debug(console.warn('Attempted to go deeper than baseURL, ignoring.'))
-    return null
-  } else if (level <= folderPath.length) {
-    folderURL.pathname = folderPath.slice(0, folderPath.length - level).concat(['']).join('/') // folders should really have a default page file name
-    folderURL.href = folderURL.origin + folderURL.pathname + folderURL.search // had an issue with this, so i'm forcing it
-    return folderURL
-  } else {
-    debug(console.warn('Attempted to go deeper than baseURL, ignoring.'))
-    return null
-  }
-}
-
-function getPageInfo (url) {
-  const search = new URLSearchParams(url.search)
-
-  return {
-    index: search.get('index'),
-    page: search.get('page')
   }
 }
 
@@ -530,7 +421,7 @@ class AlbumViewer extends Viewer {
       if (this.navContents !== null) {
         this.navContents.remove()
       }
-        
+
       this.thumbnailContainer.addEventListener('scroll', () => {
         const currentScroll = this.thumbnailContainer.scrollTop
         const maxHeight = this.thumbnailContainer.scrollHeight
@@ -686,38 +577,38 @@ function setConfig () {
 }
 
 function readConfig (info) {
-  websiteTitle = info.WebsiteTitle
-  storageURLBase = info.PhotoURLBase
-  thumbnailFrom = info.ThumbnailFrom
-  imageRootDir = info.ImageRootDir
-  downloadSizes = info.DownloadSizes
+  config.websiteTitle = info.WebsiteTitle
+  config.storageURLBase = info.PhotoURLBase
+  config.thumbnailFrom = info.ThumbnailFrom
+  config.imageRootDir = info.ImageRootDir
+  config.downloadSizes = info.DownloadSizes
 
   const p = new URL(BaseURL).pathname
   if (p === '' || p === '/') {
-    workingDirectory = ''
+    config.workingDirectory = ''
     console.log(workingDirectory)
   } else {
     const pa = p.split('/')
     console.log(pa)
     if (pa[pa.length - 1] === '') {
       pa.pop()
-      workingDirectory = pa[pa.length - 1]
+      config.workingDirectory = pa[pa.length - 1]
     } else {
-      workingDirectory = pa[pa.length - 1]
+      config.workingDirectory = pa[pa.length - 1]
     }
   }
 
-  displayImageFrom = {
+  config.displayImageFrom = {
     size: info.DisplayImageFrom,
     prefix: info.DisplayImageFrom + '_'
   }
 
   if (info.DisplayImageFrom === 'src') {
-    displayImageFrom.prefix = ''
+    config.displayImageFrom.prefix = ''
   }
 
   info.ImageSizes.forEach((i) => {
-    imageSizes.set(i.SizeName, {
+    config.imageSizes.set(i.SizeName, {
       directory: [imageRootDir, i.Directory].join('/'),
       prefix: i.SizeName + '_',
       localBool: i.LocalBool

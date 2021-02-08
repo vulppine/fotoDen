@@ -1,5 +1,4 @@
-/* global bootstrap, BaseURL, EXIF, getPageInfo, getAlbumURL, makePhotoURL, imageSizes, thumbnailFrom, websiteTitle */
-/* eslint-env browser */
+/* global bootstrap, fotoDen, EXIF */
 
 /**
  * @license MIT
@@ -40,7 +39,7 @@ function getLoadedImageRatios (container) {
 }
 
 async function justifyThumbnails (container) {
-  const layout = await import(BaseURL + '/theme/js/layout.js')
+  const layout = await import(fotoDen.BaseURL + '/theme/js/layout.js')
 
   const newImageSizes = layout.justifyImages(imageRatios, { containerWidth: container.offsetWidth })
 
@@ -132,9 +131,9 @@ export function createNavPageLink (page, container) {
   newPage.appendChild(newAnchor)
   newPage.classList.add('page-item')
   newAnchor.classList.add('page-link', 'border-white')
-  const newURL = getAlbumURL()
+  const newURL = fotoDen.getAlbumURL()
 
-  let currentPage = parseInt(getPageInfo(new URL(document.URL)).page)
+  let currentPage = parseInt(fotoDen.getPageInfo(new URL(document.URL)).page)
   if (isNaN(currentPage)) { currentPage = 0 }
 
   newAnchor.innerHTML = (page + 1)
@@ -230,11 +229,11 @@ export function createThumbnail (index, name) {
   const thumbnailLinkParams = new URLSearchParams(thumbnailLink)
 
   thumbnailLinkParams.set('index', index)
-  thumbnailLink.pathname = getAlbumURL().pathname.split('/').slice(0, getAlbumURL().pathname.split('/').length - 1).concat(['photo.html']).join('/')
+  thumbnailLink.pathname = fotoDen.getAlbumURL().pathname.split('/').slice(0, fotoDen.getAlbumURL().pathname.split('/').length - 1).concat(['photo.html']).join('/')
   thumbnailLink.search = thumbnailLinkParams.toString()
 
   thumbnail.setAttribute('class', 'fd-albumThumbnailImage')
-  thumbnail.setAttribute('src', makePhotoURL(imageSizes.get(thumbnailFrom).prefix + name, imageSizes.get(thumbnailFrom).directory, imageSizes.get(thumbnailFrom).localBool))
+  thumbnail.setAttribute('src', fotoDen.makePhotoURL(fotoDen.config.imageSizes.get(fotoDen.config.thumbnailFrom).prefix + name, fotoDen.config.imageSizes.get(fotoDen.config.thumbnailFrom).directory, fotoDen.config.imageSizes.get(fotoDen.config.thumbnailFrom).localBool))
 
   thumbnailAnchor.appendChild(thumbnail)
   thumbnailAnchor.href = thumbnailLink.toString()
@@ -294,11 +293,14 @@ export function init () {
     toggleView(e.target)
   })
 
-  if (document.querySelector('.navbar-brand') !== null) {
-    if (websiteTitle === null || websiteTitle === undefined || websiteTitle === '') {
-      document.querySelector('.navbar-brand').innerText = 'fotoDen'
-    } else {
-      document.querySelector('.navbar-brand').innerText = websiteTitle
+  document.addEventListener('fd-configLoad', () => {
+    console.log('Config loaded, loading theme...')
+    if (document.querySelector('.navbar-brand') !== null) {
+      if (config.websiteTitle === null || config.websiteTitle === undefined || config.websiteTitle === '') {
+        document.querySelector('.navbar-brand').innerText = 'fotoDen'
+      } else {
+        document.querySelector('.navbar-brand').innerText = config.websiteTitle
+      }
     }
-  }
+  })
 }
