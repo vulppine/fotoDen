@@ -38,27 +38,27 @@ If the url flag is not set, it will use the current configuration's base URL.
 js is deprecated, and will be removed or replaced.`,
 	}
 	initConfigCmd = &cobra.Command{
-		Use: "config [--url url] directory",
+		Use:   "config [--url url] directory",
 		Short: "Initializes a fotoDen configuration directory with the given name",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := tool.InitializefotoDenConfig(tool.URLFlag, args[0])
 			return err
 		},
 	}
 	initSiteCmd = &cobra.Command{
-		Use: "site [--name] destination",
+		Use:   "site [--name] destination",
 		Short: "Initializes a fotoDen website in the given directory",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := tool.InitializefotoDenRoot(args[0], name)
 			return err
 		},
 	}
 	initThemeCmd = &cobra.Command{
-		Use: "theme source",
+		Use:   "theme source",
 		Short: "Initalizes a fotoDen theme into the configuration directory",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if tool.URLFlag != "" {
 				err := tool.InitializeWebTheme(tool.URLFlag, args[0])
@@ -70,9 +70,9 @@ js is deprecated, and will be removed or replaced.`,
 		},
 	}
 	initJSCmd = &cobra.Command{
-		Use: "js source",
+		Use:   "js source",
 		Short: "Checks and copies over a fotoDen.js file into the configuration directory",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := tool.InitializefotoDenjs(args[0])
 			if err != nil {

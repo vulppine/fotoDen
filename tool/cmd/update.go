@@ -20,10 +20,10 @@ var (
 		Short: "Updates various fotoDen resources",
 	}
 	updFolderCmd = &cobra.Command{
-		Use: "folder [-r] folder_name",
-		Args: cobra.ExactArgs(1),
+		Use:   "folder [-r] folder_name",
+		Args:  cobra.ExactArgs(1),
 		Short: "Updates fotoDen folder subdirectories",
-		RunE: func (cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if tool.Recurse {
 				err := tool.RecursiveVisit(args[0], tool.UpdateFolderSubdirectories)
 				if err != nil {
@@ -40,10 +40,10 @@ var (
 		},
 	}
 	updWebCmd = &cobra.Command{
-		Use: "web [-r] folder_name",
-		Args: cobra.ExactArgs(1),
+		Use:   "web [-r] folder_name",
+		Args:  cobra.ExactArgs(1),
 		Short: "Updates fotoDen folder webpages",
-		RunE: func (cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if tool.Recurse {
 				err := tool.RecursiveVisit(args[0], tool.UpdateWeb)
 				if err != nil {

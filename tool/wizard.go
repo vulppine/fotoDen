@@ -100,3 +100,10 @@ func generateFolderWizard(directory string) (*generator.Folder, error) {
 
 	return folder, nil
 }
+
+func updateFolderWizard(fol *generator.Folder) *generator.Folder {
+	fol.FolderName = ReadInput("What is the new name of this folder/album?")
+	fol.FolderDesc = ReadInput("What is the new description of this folder/album?")
+
+	return fol
+}

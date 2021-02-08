@@ -102,3 +102,59 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 
 	return nil
 }
+
+func UpdateFolder(folder string, name string, desc string) error {
+	fol := new(generator.Folder)
+
+	fpath := filepath.Join(folder, "folderInfo.json")
+	if !fileCheck(fpath) {
+		return fmt.Errorf("folder is not a fotoDen folder, ignoring")
+	}
+
+	err := fol.ReadFolderInfo(fpath)
+	if checkError(err) {
+		return err
+	}
+
+	if WizardFlag {
+		fol = updateFolderWizard(fol)
+	} else {
+		fol.FolderName = name
+		fol.FolderDesc = desc
+	}
+
+	err = fol.WriteFolderInfo(fpath)
+	if checkError(err) {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateFolderThumbnail(folder string, file string) error {
+	fol := new(generator.Folder)
+
+	fpath := filepath.Join(folder, "folderInfo.json")
+	if !fileCheck(fpath) {
+		return fmt.Errorf("folder is not a fotoDen folder, ignoring")
+	}
+
+	err := fol.ReadFolderInfo(fpath)
+	if checkError(err) {
+		return err
+	}
+
+	err = generator.MakeFolderThumbnail(file, folder)
+	if checkError(err) {
+		return err
+	}
+
+	fol.FolderThumbnail = true
+
+	err = fol.WriteFolderInfo(fpath)
+	if checkError(err) {
+		return err
+	}
+
+	return err
+}

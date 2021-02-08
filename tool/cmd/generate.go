@@ -28,15 +28,15 @@ func init() {
 }
 
 var (
-	wd, _ = os.Getwd()
+	wd, _  = os.Getwd()
 	genCmd = &cobra.Command{
 		Use:   "generate { album | folder } destination",
 		Short: "Generates fotoDen folders/albums",
 	}
 	genFolderCmd = &cobra.Command{
-		Use: "folder [--name string] [--thumb image] [--static] destination",
+		Use:   "folder [--name string] [--thumb image] [--static] destination",
 		Short: "Generates a fotoDen folder",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if tool.NameFlag == "" {
 				name := path.Base(wd)
@@ -55,9 +55,9 @@ var (
 		},
 	}
 	genAlbumCmd = &cobra.Command{
-		Use: "album [--name string] [--source folder] [--copy] [--sort] [--gensizes] [--meta] [--thumb image] [--static] destination",
+		Use:   "album [--name string] [--source folder] [--copy] [--sort] [--gensizes] [--meta] [--thumb image] [--static] destination",
 		Short: "Generates a fotoDen album",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			tool.Genoptions.ImageGen = true
 			if tool.NameFlag == "" {
