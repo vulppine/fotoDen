@@ -10,14 +10,14 @@ import (
 // It has all the needed values for fotoDen.js to operate correctly.
 // fotoDen/generator does not provide functions to manage this - only to read and create these.
 type Folder struct {
-	FolderName          string // The name of the folder.
-	FolderDesc          string // The description of a folder.
-	FolderShortName     string // The shortname of the folder (can be taken from the filesystem folder name)
-	FolderType          string // The type of folder (currently supports only album or folder)
-	FolderThumbnail     bool   // If a thumbnail exists or not. This is dictated by the generation of thumb.jpg.
-	ItemAmount          int
-	SubfolderShortNames []string // Any folders that are within the folder (updated whenever the generator is called in the folder)
-	IsStatic            bool     // If the folder was generated statically, or has information inserted dynamically.
+	Name       string   `json:name`      // The name of the folder.
+	Desc       string   `json:desc`      // The description of a folder.
+	ShortName  string   `json:shortName` // The shortname of the folder (can be taken from the filesystem folder name)
+	Type       string   `json:type`      // The type of folder (currently supports only album or folder)
+	Thumbnail  bool     `json:thumbnail` // If a thumbnail exists or not. This is dictated by the generation of thumb.jpg.
+	ItemAmount int      `json:itemAmount`
+	Subfolders []string `json:subfolders` // Any folders that are within the folder (updated whenever the generator is called in the folder)
+	Static     bool     `json:static`     // If the folder was generated statically, or has information inserted dynamically.
 }
 
 // GenerateFolderInfo generates a Folder object that can be used for folder configuration.
@@ -46,13 +46,13 @@ func GenerateFolderInfo(directory string, name string) (*Folder, error) {
 	verbose("Generating folder info from: " + currentDirectory)
 
 	if name == "" {
-		folder.FolderName = path.Base(currentDirectory)
+		folder.Name = path.Base(currentDirectory)
 	} else {
-		folder.FolderName = name
+		folder.Name = name
 	}
 
-	folder.FolderShortName = path.Base(currentDirectory)
-	folder.SubfolderShortNames = []string{}
+	folder.ShortName = path.Base(currentDirectory)
+	folder.Subfolders = []string{}
 
 	return folder, nil
 }
@@ -72,7 +72,7 @@ func (folder *Folder) ReadFolderInfo(filePath string) error {
 // WriteFolderInfo is a method for writing fotoDen folder info to a file.
 // Returns an error if any occur.
 func (folder *Folder) WriteFolderInfo(filePath string) error {
-	verbose("Writing folder (" + folder.FolderShortName + ") to " + filePath)
+	verbose("Writing folder (" + folder.ShortName + ") to " + filePath)
 	err := WriteJSON(filePath, "multi", folder)
 	if err != nil {
 		return err
@@ -85,9 +85,9 @@ func (folder *Folder) WriteFolderInfo(filePath string) error {
 // It is used mainly in album-type folders, and contains a bool indicating whether
 // metadata is being used, and a string array (potentially large) of file names.
 type Items struct {
-	Metadata bool // Dictates whether or not each image has its own ImageMeta object.
+	Metadata bool `json:metadata` // Dictates whether or not each image has its own ImageMeta object.
 	// If this is false, then no metadata will be read.
-	ItemsInFolder []string // All the items in a folder, by name, in an array.
+	ItemsInFolder []string `json:items` // All the items in a folder, by name, in an array.
 }
 
 // GenerateItemInfo generates an Items object based on the contents of the directory.
@@ -161,10 +161,10 @@ func (folder *Folder) UpdateSubdirectories(directory string) (int, error) {
 	}
 
 	// special cases for the root css/js directories, and the album image location
-	folder.SubfolderShortNames = RemoveItemFromStringArray(GetArrayOfFolders(fileArray), CurrentConfig.ImageRootDirectory)
+	folder.Subfolders = RemoveItemFromStringArray(GetArrayOfFolders(fileArray), CurrentConfig.ImageRootDirectory)
 
 	// really lazy, find a better way to do this
-	folder.SubfolderShortNames = RemoveItemFromStringArray(folder.SubfolderShortNames, "theme")
-	folder.SubfolderShortNames = RemoveItemFromStringArray(folder.SubfolderShortNames, "js")
-	return len(folder.SubfolderShortNames), nil
+	folder.Subfolders = RemoveItemFromStringArray(folder.Subfolders, "theme")
+	folder.Subfolders = RemoveItemFromStringArray(folder.Subfolders, "js")
+	return len(folder.Subfolders), nil
 }

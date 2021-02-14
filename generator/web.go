@@ -10,21 +10,21 @@ import (
 
 // WebConfig is the structure of the JSON config file that fotoDen uses.
 type WebConfig struct {
-	WebsiteTitle     string
-	PhotoURLBase     string
-	ImageRootDir     string
-	ThumbnailFrom    string
-	DisplayImageFrom string
-	Theme            bool
-	DownloadSizes	 []string
-	ImageSizes       []WebImageSize
+	WebsiteTitle     string         `json:websiteTitle`
+	PhotoURLBase     string         `json:storageURL`
+	ImageRootDir     string         `json:imageRoot`
+	ThumbnailFrom    string         `json:thumbnailSize`
+	DisplayImageFrom string         `json:displayImageSize`
+	Theme            bool           `json:theme`
+	DownloadSizes    []string       `json:downloadableSizes`
+	ImageSizes       []WebImageSize `json:imageSizes`
 }
 
 // WebImageSize is a structure for image size types that fotoDen will call on.
 type WebImageSize struct {
-	SizeName  string // the semantic name of the size
-	Directory string // the directory the size is stored in, relative to ImageRootDir
-	LocalBool bool   // whether to download it remotely or locally
+	SizeName  string `json:sizeName` // the semantic name of the size
+	Directory string `json:dir`      // the directory the size is stored in, relative to ImageRootDir
+	LocalBool bool   `json:local`    // whether to download it remotely or locally
 }
 
 // GenerateWebConfig creates a new WebConfig object, and returns a WebConfig object with a populated ImageSizes
@@ -170,8 +170,8 @@ func NewWebVars(u string) (*WebVars, error) {
 	}
 
 	webvars.BaseURL = url.String()
-	if len(webvars.BaseURL) > 0 && webvars.BaseURL[len(webvars.BaseURL) - 1] == '/' {
-		webvars.BaseURL = webvars.BaseURL[0:len(webvars.BaseURL) - 1]
+	if len(webvars.BaseURL) > 0 && webvars.BaseURL[len(webvars.BaseURL)-1] == '/' {
+		webvars.BaseURL = webvars.BaseURL[0 : len(webvars.BaseURL)-1]
 	}
 
 	jsurl.Path = path.Join(jsurl.Path, "js", "fotoDen.js")
@@ -218,8 +218,8 @@ func NewStaticWebVars(folder string) (*StaticWebVars, error) {
 	}
 
 	swebvars.IsStatic = true
-	swebvars.PageName = f.FolderName
-	swebvars.PageDesc = f.FolderDesc
+	swebvars.PageName = f.Name
+	swebvars.PageDesc = f.Desc
 
 	superFolder := func() bool {
 		_, err := os.Stat(filepath.Join(filepath.Dir(fpath), "folderInfo.json"))
@@ -233,7 +233,7 @@ func NewStaticWebVars(folder string) (*StaticWebVars, error) {
 			return swebvars, err
 		}
 
-		swebvars.PageFolder = f.FolderName
+		swebvars.PageFolder = f.Name
 	}
 
 	return swebvars, nil

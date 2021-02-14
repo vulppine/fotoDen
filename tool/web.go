@@ -36,7 +36,7 @@ func GenerateWeb(m string, dest string, f *generator.Folder, opt GeneratorOption
 	var err error
 	var pageOptions *generator.StaticWebVars
 
-	if opt.Static || f.IsStatic {
+	if opt.Static || f.Static {
 		verbose("Folder/album is static, generating static web vars...")
 		pageOptions, err = generator.NewStaticWebVars(dest)
 		if checkError(err) {
@@ -77,7 +77,7 @@ func UpdateWeb(folder string) error {
 		return err
 	}
 
-	err = GenerateWeb(f.FolderType, folder, f, Genoptions)
+	err = GenerateWeb(f.Type, folder, f, Genoptions)
 	if checkError(err) {
 		return err
 	}

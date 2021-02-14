@@ -75,14 +75,14 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 		}
 
 		if fileAmount > 0 {
-			folder.FolderType = "album"
+			folder.Type = "album"
 			folder.ItemAmount = fileAmount
 		} else {
 			return fmt.Errorf("no images detected in source - use -generate folder or a valid source")
 		}
 	} else {
 		verbose("Generating folder...")
-		folder.FolderType = "folder"
+		folder.Type = "folder"
 	}
 
 	err = folder.WriteFolderInfo(path.Join(fpath, "folderInfo.json"))
@@ -90,7 +90,7 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 		return err
 	}
 
-	err = GenerateWeb(folder.FolderType, fpath, folder, options)
+	err = GenerateWeb(folder.Type, fpath, folder, options)
 	checkError(err)
 
 	fpath, _ = filepath.Abs(fpath)
@@ -119,8 +119,8 @@ func UpdateFolder(folder string, name string, desc string) error {
 	if WizardFlag {
 		fol = updateFolderWizard(fol)
 	} else {
-		fol.FolderName = name
-		fol.FolderDesc = desc
+		fol.Name = name
+		fol.Desc = desc
 	}
 
 	err = fol.WriteFolderInfo(fpath)
@@ -149,7 +149,7 @@ func UpdateFolderThumbnail(folder string, file string) error {
 		return err
 	}
 
-	fol.FolderThumbnail = true
+	fol.Thumbnail = true
 
 	err = fol.WriteFolderInfo(fpath)
 	if checkError(err) {

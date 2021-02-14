@@ -183,7 +183,7 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 	}
 
 	folder, err := generator.GenerateFolderInfo(rootpath, webconfig.WebsiteTitle) // do it in rootpath since we're not trying to scan for images in the current folder
-	folder.FolderType = "folder"
+	folder.Type = "folder"
 	checkError(err)
 	err = folder.WriteFolderInfo(path.Join(rootpath, "folderInfo.json"))
 	checkError(err)
@@ -202,7 +202,7 @@ func InitializefotoDenRoot(rootpath string, name string) error {
 func InitializefotoDenConfig(u string, dest string) error {
 	fmt.Println("Initializing fotoDen config with base URL: ", u)
 
-	var config generator.GeneratorConfig
+	var config generator.Config
 
 	if WizardFlag == true {
 		config = setupConfig()
@@ -212,7 +212,7 @@ func InitializefotoDenConfig(u string, dest string) error {
 	}
 
 	if dest == "" {
-		dest = generator.FotoDenConfigDir
+		dest = generator.RootConfigDir
 	} else {
 		dest, err := filepath.Abs(dest)
 		if checkError(err) {
@@ -226,7 +226,7 @@ func InitializefotoDenConfig(u string, dest string) error {
 		return err
 	}
 
-	err = generator.WritefotoDenConfig(config, path.Join(dest, "config.json"))
+	err = generator.WriteConfig(config, path.Join(dest, "config.json"))
 	if checkError(err) {
 		return err
 	}

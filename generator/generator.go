@@ -12,11 +12,11 @@ import (
 //
 // Structs for usage with fotoDen JSON files.
 
-// GeneratorConfig represents the configuration for fotoDen's generator, and where
+// Config represents the configuration for fotoDen's generator, and where
 // images will go, as well as what sizes will be generated.
 // ImageSizes is a map with string keys containing ImageScale structs, which dictate
 // how images will be resized.
-type GeneratorConfig struct {
+type Config struct {
 	ImageRootDirectory string // where all images are stored (default: img)
 	ImageSrcDirectory  string // where all source images are stored (default: ImageRootDirectory/src)
 	ImageMetaDirectory string // where all meta files per image are stored (default: ImageRootDirectory/meta)
@@ -29,12 +29,12 @@ type GeneratorConfig struct {
 
 var userConfigDir, _ = os.UserConfigDir()
 
-// FotoDenConfigDir is where the configuration files are stored.
-var FotoDenConfigDir = path.Join(userConfigDir, "fotoDen")
+// RootConfigDir is where the configuration files are stored.
+var RootConfigDir = path.Join(userConfigDir, "fotoDen")
 
 // DefaultConfig contains a template for fotoDen to use.
 // TODO: Move this to some kind of GeneratorConfig generator.
-var DefaultConfig GeneratorConfig = GeneratorConfig{
+var DefaultConfig Config = Config{
 	ImageRootDirectory: "img",
 	ImageMetaDirectory: "meta",
 	ImageSizes: map[string]ImageScale{
@@ -43,13 +43,12 @@ var DefaultConfig GeneratorConfig = GeneratorConfig{
 		"large": ImageScale{ScalePercent: 0.75},
 	},
 	ImageSrcDirectory: "src",
-	WebSourceLocation: path.Join(FotoDenConfigDir, "web"), // remember when $HOME webpage folders were a thing?
 	WebBaseURL:        "",                                 // this should be set during configuration generation
 }
 
 // CurrentConfig represents the current generator config, and can be used as reference
 // for any package that calls fotoDen/generator.
-var CurrentConfig GeneratorConfig
+var CurrentConfig Config
 
 // WorkingDirectory is the current working directory that fotoDen was started in.
 var WorkingDirectory, _ = os.Getwd()
@@ -113,7 +112,7 @@ func ReadJSON(filePath string, iface interface{}) error {
 }
 
 // OpenfotoDenConfig sets the current fotoDen generator configuration to this
-func OpenfotoDenConfig(configLocation string) error {
+func OpenConfig(configLocation string) error {
 	err := ReadJSON(configLocation, &CurrentConfig)
 	if err != nil {
 		return err
@@ -123,7 +122,7 @@ func OpenfotoDenConfig(configLocation string) error {
 }
 
 // WritefotoDenConfig attempts to write CurrentConfig to a new file at configLocation.
-func WritefotoDenConfig(config GeneratorConfig, configLocation string) error {
+func WriteConfig(config Config, configLocation string) error {
 	err := WriteJSON(configLocation, "multi", config)
 	if err != nil {
 		return err

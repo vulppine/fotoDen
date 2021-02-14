@@ -30,7 +30,7 @@ var (
 	d         = rootCmd.PersistentFlags().Bool("debug", false, "Prints debug information to console.")
 	v         = rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Prints verbose information made by fotoDen")
 	config    string
-	configSrc generator.GeneratorConfig
+	configSrc generator.Config
 	rootCmd   = &cobra.Command{
 		Use:   "fotoDen { init | generate | update } args [--config string] [--verbose | -v] [--interactive | -i]",
 		Short: "A static photo gallery generator",
@@ -45,13 +45,13 @@ func setRootFlags() {
 
 	if config != "" {
 		verbose(filepath.Join(config, "config.json"))
-		err := generator.OpenfotoDenConfig(filepath.Join(config, "config.json"))
+		err := generator.OpenConfig(filepath.Join(config, "config.json"))
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
 		}
 	} else {
-		err := generator.OpenfotoDenConfig(filepath.Join(generator.FotoDenConfigDir, "config.json"))
+		err := generator.OpenConfig(filepath.Join(generator.RootConfigDir, "config.json"))
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)

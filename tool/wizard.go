@@ -14,8 +14,8 @@ func isBlank(input string) bool {
 	return false
 }
 
-func setupConfig() generator.GeneratorConfig {
-	config := generator.GeneratorConfig{}
+func setupConfig() generator.Config {
+	config := generator.Config{}
 
 	fmt.Println("Wizard: Setup fotoDen config")
 	fmt.Println("Leave blank for default!")
@@ -84,16 +84,16 @@ func generateFolderWizard(directory string) (*generator.Folder, error) {
 	}
 
 	fmt.Println("Wizard: Generate folder")
-	folder.FolderName = ReadInput("What is the name of this folder/album?")
-	folder.FolderDesc = ReadInput("What is the description of this folder/album?")
-	folder.IsStatic = ReadInputAsBool("Will the folder/album webpages have some dynamic elements static?", "y")
+	folder.Name = ReadInput("What is the name of this folder/album?")
+	folder.Desc = ReadInput("What is the description of this folder/album?")
+	folder.Static = ReadInputAsBool("Will the folder/album webpages have some dynamic elements static?", "y")
 	t := ReadInputAsBool("Will the folder have a thumbnail?", "y")
 	if t {
 		thumb := ReadInput("Where is the thumbnail located? (direct path or relative to current working directory)")
 		if thumb == "" {
 			fmt.Println("No file detected - ignoring.")
 		} else {
-			folder.FolderThumbnail = true
+			folder.Thumbnail = true
 			generator.MakeFolderThumbnail(thumb, directory)
 		}
 	}
@@ -102,8 +102,8 @@ func generateFolderWizard(directory string) (*generator.Folder, error) {
 }
 
 func updateFolderWizard(fol *generator.Folder) *generator.Folder {
-	fol.FolderName = ReadInput("What is the new name of this folder/album?")
-	fol.FolderDesc = ReadInput("What is the new description of this folder/album?")
+	fol.Name = ReadInput("What is the new name of this folder/album?")
+	fol.Desc = ReadInput("What is the new description of this folder/album?")
 
 	return fol
 }

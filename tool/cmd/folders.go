@@ -44,11 +44,11 @@ var (
 		Args:  cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if sortf {
-				err := tool.InsertImage(args[0], "sort", tool.Genoptions, args[1:len(args)]...)
+				err := tool.InsertImage(args[0], "sort", tool.Genoptions, args[1:]...)
 				return err
 			}
 
-			err := tool.InsertImage(args[0], "append", tool.Genoptions, args[1:len(args)]...)
+			err := tool.InsertImage(args[0], "append", tool.Genoptions, args[1:]...)
 			return err
 		},
 	}
@@ -57,7 +57,7 @@ var (
 		Short: "Deletes images from albums.",
 		Args:  cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := tool.DeleteImage(args[0], args[1:len(args)]...)
+			err := tool.DeleteImage(args[0], args[1:]...)
 			return err
 		},
 	}

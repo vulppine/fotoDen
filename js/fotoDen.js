@@ -123,19 +123,19 @@ let theme = {
     folderLinkContainer.appendChild(folderInfoContainer)
     folderInfoContainer.appendChild(folderItemCount)
 
-    if (info.FolderThumbnail === true) {
+    if (info.thumbnail === true) {
       folderThumbnail.src = info.FolderShortName + '/' + 'thumb.jpg'
     } else {
       folderThumbnail.src = BaseURL + '/thumb.png'
     }
 
-    if (info.ItemAmount != null) {
+    if (info.itemAmount != null) {
       const newDiv = document.createElement('div')
       newDiv.innerHTML = 'Photos: ' + info.ItemAmount // remember, this is still photo oriented...
       folderItemCount.appendChild(newDiv)
     }
 
-    if (info.SubfolderShortNames.length > 0) {
+    if (info.subfolders.length > 0) {
       const newDiv = document.createElement('div')
       newDiv.innerHTML = 'Folders: ' + info.SubfolderShortNames.length
       folderItemCount.appendChild(newDiv)
@@ -343,7 +343,7 @@ class Viewer {
     this.navNext = container.querySelector('.fd-navNext')
     this.navPrev = container.querySelector('.fd-navPrev')
 
-    setText(this.folderName, info.FolderName)
+    setText(this.folderName, info.name)
     this.setSuperFolder()
 
     container.dispatchEvent(viewerLoad)
@@ -358,7 +358,7 @@ class Viewer {
     } else {
       getJSON(f.toString() + 'folderInfo.json')
         .then((info) => {
-          setText(this.superFolder, info.FolderName)
+          setText(this.superFolder, info.name)
           setLink(this.superFolder, f.toString())
         })
     }
@@ -397,11 +397,12 @@ class PhotoViewer extends Viewer {
 
     getJSON('itemsInfo.json')
       .then(json => {
-        if (json.Metadata === true) {
-          getJSON(imageRootDir + '/meta/' + json.ItemsInFolder[photo.index] + '.json')
+        photo.album = this.info.name
+        if (json.metadata === true) {
+          getJSON(imageRootDir + '/meta/' + json.items[photo.index] + '.json')
             .then(meta => {
               if (meta.ImageName === '') {
-                photo.name = json.ItemsInFolder[photo.index]
+                photo.name = json.items[photo.index]
                 photo.desc = 'No description provided...'
               } else {
                 photo.name = meta.ImageName
@@ -413,14 +414,12 @@ class PhotoViewer extends Viewer {
               setTitle([photo.name, photo.album])
             })
         } else {
-          photo.name = json.ItemsInFolder[photo.index]
+          photo.name = json.items[photo.index]
           setText(this.name, photo.name)
           setTitle([photo.name, photo.album])
         }
 
-        photo.album = this.info.FolderName
-
-        if (parseInt(photo.index) === json.ItemsInFolder.length - 1) {
+        if (parseInt(photo.index) === json.items.length - 1) {
           theme.setButton(this.navPrev, setCurrentURLParam('index', (parseInt(photo.index) - 1)))
           theme.setButton(this.navNext)
         } else if (parseInt(photo.index) === 0) {
@@ -433,10 +432,10 @@ class PhotoViewer extends Viewer {
 
         setText(this.folderName, photo.album)
         setLink(this.folderName, getAlbumURL().toString())
-        this.setPhoto(json.ItemsInFolder[photo.index])
+        this.setPhoto(json.items[photo.index])
 
         if (this.infoButtons !== null) {
-          this.setDownloads(json.ItemsInFolder[photo.index])
+          this.setDownloads(json.items[photo.index])
         }
       })
   }
@@ -508,14 +507,14 @@ class AlbumViewer extends Viewer {
       this.folderViewer = this.container.querySelector('.fd-folder.fd-viewer')
     };
 
-    setTitle([info.FolderName])
+    setTitle([info.name])
     if (info.FolderDesc !== '') {
-      setText(this.desc, info.FolderDesc)
+      setText(this.desc, info.desc)
     }
 
     getJSON(getAlbumURL() + 'itemsInfo.json')
       .then((json) => {
-        this.photos = json.ItemsInFolder
+        this.photos = json.itemsInFolder
         this.maxPhotos = this.photos.length
         this.pageAmount = Math.ceil(this.maxPhotos / this.imagesPerPage)
 
@@ -530,7 +529,7 @@ class AlbumViewer extends Viewer {
       if (this.navContents !== null) {
         this.navContents.remove()
       }
-        
+
       this.thumbnailContainer.addEventListener('scroll', () => {
         const currentScroll = this.thumbnailContainer.scrollTop
         const maxHeight = this.thumbnailContainer.scrollHeight
@@ -586,7 +585,7 @@ class AlbumViewer extends Viewer {
     this.thumbnailContainer.addEventListener('fd-imgLoad', () => {
       totalLoaded++
 
-      if (totalLoaded === this.imagesPerPage || totalLoaded === this.info.ItemAmount) {
+      if (totalLoaded === this.imagesPerPage || totalLoaded === this.info.itemAmount) {
         this.thumbnailContainer.dispatchEvent(contentLoad)
       }
     })
@@ -626,21 +625,21 @@ const FolderViewers = []
 const folderLoad = new CustomEvent('fd-folderLoad', { bubbles: true })
 
 class FolderViewer extends Viewer {
-  constructor (container, info) {
-    super(container, info)
+  constructor (container, folder) {
+    super(container, folder)
     this.folderLinks = container.querySelector('.fd-folderLinks')
     this.style = ''
 
-    this.type = info.FolderType
+    this.type = folder.type
 
-    if (this.info.FolderType !== 'album') {
-      setTitle([info.FolderName])
-      if (info.FolderDesc !== '') {
-        setText(this.desc, info.FolderDesc)
+    if (this.folder.type !== 'album') {
+      setTitle([folder.name])
+      if (folder.desc !== '') {
+        setText(this.desc, folder.desc)
       }
     }
 
-    if (this.info.SubfolderShortNames.length > 0) {
+    if (this.folder.shortnames.length > 0) {
       this.populate()
     } else {
       this.container.remove()
@@ -648,7 +647,7 @@ class FolderViewer extends Viewer {
   }
 
   populate () {
-    this.info.SubfolderShortNames.forEach(element => {
+    this.folder.shortnames.forEach(element => {
       getJSON(getFolderURL(0).toString() + element + '/folderInfo.json')
         .then(json => {
           this.folderLinks.appendChild(theme.createFolderLink(json))
@@ -661,7 +660,7 @@ class FolderViewer extends Viewer {
       totalLoaded++
       console.log(totalLoaded)
 
-      if (totalLoaded === this.info.SubfolderShortNames.length) {
+      if (totalLoaded === this.info.subfolders.length) {
         this.folderLinks.dispatchEvent(contentLoad)
       }
     })
@@ -686,11 +685,11 @@ function setConfig () {
 }
 
 function readConfig (info) {
-  websiteTitle = info.WebsiteTitle
-  storageURLBase = info.PhotoURLBase
-  thumbnailFrom = info.ThumbnailFrom
-  imageRootDir = info.ImageRootDir
-  downloadSizes = info.DownloadSizes
+  websiteTitle = info.websiteTitle
+  storageURLBase = info.storageURL
+  thumbnailFrom = info.thumbnailSize
+  imageRootDir = info.imageRoot
+  downloadSizes = info.downloadableSizes
 
   const p = new URL(BaseURL).pathname
   if (p === '' || p === '/') {
@@ -708,15 +707,15 @@ function readConfig (info) {
   }
 
   displayImageFrom = {
-    size: info.DisplayImageFrom,
-    prefix: info.DisplayImageFrom + '_'
+    size: info.displayImageSize,
+    prefix: info.displayImageSize + '_'
   }
 
-  if (info.DisplayImageFrom === 'src') {
+  if (info.displayImageSize === 'src') {
     displayImageFrom.prefix = ''
   }
 
-  info.ImageSizes.forEach((i) => {
+  info.imageSizes.forEach((i) => {
     imageSizes.set(i.SizeName, {
       directory: [imageRootDir, i.Directory].join('/'),
       prefix: i.SizeName + '_',
