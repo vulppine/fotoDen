@@ -1,14 +1,3 @@
-package tool
-
-import (
-	"io/ioutil"
-	"log"
-	"os"
-	"path/filepath"
-
-	"github.com/vulppine/fotoDen/generator"
-)
-
 // fotoDen tool:
 //
 // Compared to the generator, this contains all the functions
@@ -21,6 +10,16 @@ import (
 // you can just call tool.UpdateFolder(pathname).
 //
 // for another example, this allows for the insertion/deletion of images
+package tool
+
+import (
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
+
+	"github.com/vulppine/fotoDen/generator"
+)
 
 // WizardFlag specifies if fotoDen tool functions should have interactive input or not.
 var WizardFlag bool

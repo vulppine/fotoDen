@@ -37,7 +37,7 @@ func TestJSONRW(t *testing.T) {
 func TestFotoDenConfigRW(t *testing.T) {
 	dir := t.TempDir()
 
-	err := WritefotoDenConfig(DefaultConfig, path.Join(dir, "tmp_config.json"))
+	err := WriteConfig(DefaultConfig, path.Join(dir, "tmp_config.json"))
 	if err != nil {
 		t.Errorf("Error - WritefotoDenConfig: " + fmt.Sprint(err))
 	}
@@ -45,7 +45,7 @@ func TestFotoDenConfigRW(t *testing.T) {
 	f, _ := ioutil.ReadFile(path.Join(dir, "tmp_config.json"))
 	t.Log(string(f))
 
-	err = OpenfotoDenConfig(path.Join(dir, "tmp_config.json"))
+	err = OpenConfig(path.Join(dir, "tmp_config.json"))
 	if err != nil {
 		t.Errorf("Error - OpenfotoDenConfig: " + fmt.Sprint(err))
 	}

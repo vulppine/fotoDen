@@ -42,7 +42,13 @@ var ThumbSrc string
 //
 // Takes the folder's name, as well as its path.
 // Returns an error if any occur.
-func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
+
+type FolderMeta struct {
+	Name string
+	Desc string
+}
+
+func GenerateFolder(meta FolderMeta, fpath string, options GeneratorOptions) error {
 	err := os.Mkdir(fpath, 0755)
 	if checkError(err) {
 		panic(err) // can't continue!
@@ -61,7 +67,7 @@ func GenerateFolder(name string, fpath string, options GeneratorOptions) error {
 			checkError(err)
 		}
 
-		folder, err = generator.GenerateFolderInfo(fpath, name)
+		folder, err = generator.GenerateFolderInfo(fpath, meta.Name)
 		if checkError(err) {
 			return err
 		}

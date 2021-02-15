@@ -10,14 +10,14 @@ import (
 // It has all the needed values for fotoDen.js to operate correctly.
 // fotoDen/generator does not provide functions to manage this - only to read and create these.
 type Folder struct {
-	Name       string   `json:name`      // The name of the folder.
-	Desc       string   `json:desc`      // The description of a folder.
-	ShortName  string   `json:shortName` // The shortname of the folder (can be taken from the filesystem folder name)
-	Type       string   `json:type`      // The type of folder (currently supports only album or folder)
-	Thumbnail  bool     `json:thumbnail` // If a thumbnail exists or not. This is dictated by the generation of thumb.jpg.
-	ItemAmount int      `json:itemAmount`
-	Subfolders []string `json:subfolders` // Any folders that are within the folder (updated whenever the generator is called in the folder)
-	Static     bool     `json:static`     // If the folder was generated statically, or has information inserted dynamically.
+	Name       string   `json:"name"`      // The name of the folder.
+	Desc       string   `json:"desc"`      // The description of a folder.
+	ShortName  string   `json:"shortName"` // The shortname of the folder (can be taken from the filesystem folder name)
+	Type       string   `json:"type"`      // The type of folder (currently supports only album or folder)
+	Thumbnail  bool     `json:"thumbnail"` // If a thumbnail exists or not. This is dictated by the generation of thumb.jpg.
+	ItemAmount int      `json:"itemAmount"`
+	Subfolders []string `json:"subfolders"` // Any folders that are within the folder (updated whenever the generator is called in the folder)
+	Static     bool     `json:"static"`     // If the folder was generated statically, or has information inserted dynamically.
 }
 
 // GenerateFolderInfo generates a Folder object that can be used for folder configuration.
@@ -85,9 +85,9 @@ func (folder *Folder) WriteFolderInfo(filePath string) error {
 // It is used mainly in album-type folders, and contains a bool indicating whether
 // metadata is being used, and a string array (potentially large) of file names.
 type Items struct {
-	Metadata bool `json:metadata` // Dictates whether or not each image has its own ImageMeta object.
+	Metadata bool `json:"metadata"` // Dictates whether or not each image has its own ImageMeta object.
 	// If this is false, then no metadata will be read.
-	ItemsInFolder []string `json:items` // All the items in a folder, by name, in an array.
+	ItemsInFolder []string `json:"items"` // All the items in a folder, by name, in an array.
 }
 
 // GenerateItemInfo generates an Items object based on the contents of the directory.

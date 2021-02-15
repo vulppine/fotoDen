@@ -20,7 +20,7 @@ func TestGenerateFolder(t *testing.T) {
 
 	dir := t.TempDir()
 	genopts := GeneratorOptions{
-		imagegen: false,
+		ImageGen: false,
 	}
 
 	err := GenerateFolder("without_images", path.Join(dir, "without_images"), genopts)
@@ -34,11 +34,11 @@ func TestGenerateFolder(t *testing.T) {
 	t.Log(string(j))
 
 	genopts = GeneratorOptions{
-		source:   "../test_images",
-		copy:     true,
-		gensizes: true,
-		imagegen: true,
-		sort:     true,
+		Source:   "../test_images",
+		Copy:     true,
+		Gensizes: true,
+		ImageGen: true,
+		Sort:     true,
 	}
 
 	err = GenerateFolder("with_images", path.Join(dir, "with_images"), genopts)
@@ -87,10 +87,10 @@ func TestImageCRUD(t *testing.T) {
 	}()
 
 	genopts := GeneratorOptions{
-		source:   "../test_images",
-		copy:     true,
-		gensizes: true,
-		sort:     true,
+		Source:   "../test_images",
+		Copy:     true,
+		Gensizes: true,
+		Sort:     true,
 	}
 
 	err = UpdateImages(dir, genopts)
@@ -111,7 +111,7 @@ func TestImageCRUD(t *testing.T) {
 		return string(j)
 	}())
 
-	err = InsertImage(dir, items.ItemsInFolder[0], "sort", genopts)
+	err = InsertImage(dir, "sort", genopts, items.ItemsInFolder[0])
 	if err != nil {
 		t.Errorf("Error - InsertImage" + fmt.Sprint(err))
 	}

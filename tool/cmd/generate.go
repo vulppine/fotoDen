@@ -12,7 +12,8 @@ func init() {
 	rootCmd.AddCommand(genCmd)
 
 	genCmd.AddCommand(genFolderCmd)
-	genFolderCmd.Flags().StringVar(&tool.NameFlag, "name", "", "name for fotoDen folders/albums")
+	genFolderCmd.Flags().StringVar(&folderMeta.Name, "name", "", "name for fotoDen folders/albums")
+	genFolderCmd.Flags().StringVar(&folderMeta.Desc, "desc", "", "description for fotoDen folders/albums")
 	genFolderCmd.Flags().StringVar(&tool.ThumbSrc, "thumb", "", "location of the thumbnail for the folder/album")
 	genFolderCmd.Flags().BoolVar(&tool.Genoptions.Static, "static", false, "toggle more static generation of websites in fotoDen folders/albums")
 
@@ -28,6 +29,7 @@ func init() {
 }
 
 var (
+	folderMeta = tool.FolderMeta{}
 	wd, _  = os.Getwd()
 	genCmd = &cobra.Command{
 		Use:   "generate { album | folder } destination",
@@ -38,14 +40,14 @@ var (
 		Short: "Generates a fotoDen folder",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if tool.NameFlag == "" {
-				name := path.Base(wd)
-				err := tool.GenerateFolder(name, args[0], tool.Genoptions)
+			if folderMeta.Name == "" {
+				folderMeta.Name = path.Base(wd)
+				err := tool.GenerateFolder(folderMeta, args[0], tool.Genoptions)
 				if err != nil {
 					return err
 				}
 			} else {
-				err := tool.GenerateFolder(tool.NameFlag, args[0], tool.Genoptions)
+				err := tool.GenerateFolder(folderMeta, args[0], tool.Genoptions)
 				if err != nil {
 					return err
 				}
@@ -60,14 +62,14 @@ var (
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			tool.Genoptions.ImageGen = true
-			if tool.NameFlag == "" {
-				name := path.Base(wd)
-				err := tool.GenerateFolder(name, args[0], tool.Genoptions)
+			if folderMeta.Name == "" {
+				folderMeta.Name = path.Base(wd)
+				err := tool.GenerateFolder(folderMeta, args[0], tool.Genoptions)
 				if err != nil {
 					return err
 				}
 			} else {
-				err := tool.GenerateFolder(tool.NameFlag, args[0], tool.Genoptions)
+				err := tool.GenerateFolder(folderMeta, args[0], tool.Genoptions)
 				if err != nil {
 					return err
 				}

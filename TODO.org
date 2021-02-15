@@ -10,5 +10,5 @@
 - [X] Properly implement image updating
   - Possibly merge the functionality of adding images with updating images, doing a preliminary search through the current available items before deciding whether to add the image, or update the image based on name
 - [ ] Selectable themes
-- [ ] Ability to build folders and albums from YAML files (JSON will still be kept for front-end purposes)
+- [X] Ability to build folders and albums from YAML files (JSON will still be kept for front-end purposes)
 - [ ] More functions for website templates for static generation (e.g., the ability to create a series of links for web navigation based on another template)
