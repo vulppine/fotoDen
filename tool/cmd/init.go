@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/vulppine/fotoDen/generator"
+	// "github.com/vulppine/fotoDen/generator"
 	"github.com/vulppine/fotoDen/tool"
 )
 
@@ -12,15 +12,16 @@ func init() {
 	initCmd.AddCommand(initConfigCmd)
 	initConfigCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
 	initCmd.AddCommand(initSiteCmd)
-	initSiteCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
-	initSiteCmd.Flags().StringVar(&name, "name", "", "what name a site should have (with init site)")
+	initSiteCmd.Flags().StringVar(&tool.URLFlag, "source", "", "where fotoDen should obtain its images")
+	initSiteCmd.Flags().StringVar(&websiteInit.URL, "url", "", "what URL to initialize fotoDen with")
+	initSiteCmd.Flags().StringVar(&websiteInit.Name, "name", "", "what name a site should have (with init site)")
+	initSiteCmd.Flags().StringVar(&websiteInit.Theme, "theme", "", "what theme a site should use")
 	initCmd.AddCommand(initThemeCmd)
 	initThemeCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
 	initCmd.AddCommand(initJSCmd)
 }
 
 var (
-	name    string
 	initCmd = &cobra.Command{
 		Use:   "init { config | site | theme } destination",
 		Short: "Initializes various fotoDen resources",
@@ -46,12 +47,13 @@ js is deprecated, and will be removed or replaced.`,
 			return err
 		},
 	}
+	websiteInit tool.WebsiteConfig
 	initSiteCmd = &cobra.Command{
 		Use:   "site [--name] destination",
 		Short: "Initializes a fotoDen website in the given directory",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := tool.InitializefotoDenRoot(args[0], name)
+			err := tool.InitializefotoDenRoot(args[0], websiteInit)
 			return err
 		},
 	}
@@ -60,12 +62,7 @@ js is deprecated, and will be removed or replaced.`,
 		Short: "Initalizes a fotoDen theme into the configuration directory",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if tool.URLFlag != "" {
-				err := tool.InitializeWebTheme(tool.URLFlag, args[0])
-				return err
-			}
-
-			err := tool.InitializeWebTheme(generator.CurrentConfig.WebBaseURL, args[0])
+			err := tool.CopyThemeToConfig(args[0])
 			return err
 		},
 	}

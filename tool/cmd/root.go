@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"os"
+	"io/ioutil"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -29,8 +30,9 @@ func debug(input interface{}) {
 var (
 	d         = rootCmd.PersistentFlags().Bool("debug", false, "Prints debug information to console.")
 	v         = rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Prints verbose information made by fotoDen")
-	config    string
+	configDir    string
 	configSrc generator.Config
+	site string
 	rootCmd   = &cobra.Command{
 		Use:   "fotoDen { init | generate | update } args [--config string] [--verbose | -v] [--interactive | -i]",
 		Short: "A static photo gallery generator",
@@ -43,24 +45,50 @@ func setRootFlags() {
 		generator.Verbose = true
 	}
 
-	if config != "" {
-		verbose(filepath.Join(config, "config.json"))
-		err := generator.OpenConfig(filepath.Join(config, "config.json"))
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(1)
-		}
+	if configDir == "" {
+		configDir = generator.RootConfigDir
 	} else {
-		err := generator.OpenConfig(filepath.Join(generator.RootConfigDir, "config.json"))
+		generator.RootConfigDir, _ = filepath.Abs(configDir)
+	}
+
+	if site == "" {
+		_, err := os.Stat(filepath.Join(generator.RootConfigDir, "defaultsite"))
+		if os.IsNotExist(err) {
+			verbose("WARNING: defaultsite does not exist")
+			site = "___NOSITE"
+		} else {
+			f, err := os.Open(filepath.Join(generator.RootConfigDir, "defaultsite"))
+			if err != nil {
+				log.Fatal(err)
+				os.Exit(1)
+			}
+
+			d, err := ioutil.ReadAll(f)
+			if err != nil {
+				log.Fatal(err)
+				os.Exit(1)
+			}
+
+			site = string(d)
+		}
+	}
+
+	if site != "___NOSITE" {
+		verbose(filepath.Join(configDir, "sites", site, "config.json"))
+		s := new(tool.WebsiteConfig)
+		err := generator.ReadJSON(filepath.Join(generator.RootConfigDir, "sites", site, "config.json"), s)
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
 		}
+
+		generator.CurrentConfig = s.GeneratorConfig
 	}
 }
 
 func init() {
 	cobra.OnInitialize(setRootFlags)
 	rootCmd.PersistentFlags().BoolVarP(&tool.WizardFlag, "interactive", "i", false, "Allows fotoDen to display interactive prompts")
-	rootCmd.PersistentFlags().StringVar(&config, "config", "", "The config directory to use for fotoDen")
+	rootCmd.PersistentFlags().StringVar(&configDir, "config_dir", "", "The config directory to use for fotoDen")
+	rootCmd.PersistentFlags().StringVar(&site, "site", "", "The website that fotoDen should focus on.")
 }
