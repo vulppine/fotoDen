@@ -53,12 +53,15 @@ func (b *BuildFile) Build(folder string) error {
 		genopts := GeneratorOptions{
 			Static: b.Static,
 		}
+		if b.Dir == "" {
+			b.Dir = b.Name
+		}
 		err := GenerateFolder(
 			FolderMeta{
 				Name: b.Name,
 				Desc: b.Desc,
 			},
-			folder,
+			filepath.Join(folder, b.Dir),
 			genopts,
 		)
 		if checkError(err) {
@@ -69,13 +72,12 @@ func (b *BuildFile) Build(folder string) error {
 			if f.Dir == "" {
 				f.Dir = f.Name
 			}
-			err = f.Build(filepath.Join(folder, f.Dir))
+			b.Dir, _ = filepath.Abs(filepath.Join(folder, b.Dir))
+			err = f.Build(b.Dir)
 			if checkError(err) {
 				return err
 			}
 		}
-
-		return nil
 	case "album":
 		genopts := GeneratorOptions{
 			ImageGen: true,
@@ -85,6 +87,9 @@ func (b *BuildFile) Build(folder string) error {
 			Static:   b.Static,
 			Gensizes: b.Options.Gensizes,
 		}
+		if b.Dir == "" {
+			b.Dir = b.Name
+		}
 		if b.ImageDir != "" {
 			genopts.Source = b.ImageDir
 			err := GenerateFolder(
@@ -92,7 +97,7 @@ func (b *BuildFile) Build(folder string) error {
 					Name: b.Name,
 					Desc: b.Desc,
 				},
-				folder,
+				filepath.Join(folder, b.Dir),
 				genopts,
 			)
 			if checkError(err) {
@@ -106,7 +111,7 @@ func (b *BuildFile) Build(folder string) error {
 					Name: b.Name,
 					Desc: b.Desc,
 				},
-				folder,
+				filepath.Join(folder, b.Dir),
 				genopts,
 			)
 			if checkError(err) {
@@ -114,6 +119,17 @@ func (b *BuildFile) Build(folder string) error {
 			}
 
 			InsertImage(folder, "append", Genoptions, b.Images...)
+		}
+
+		for _, f := range b.Subfolders {
+			if f.Dir == "" {
+				f.Dir = f.Name
+			}
+			b.Dir, _ = filepath.Abs(filepath.Join(folder, b.Dir))
+			err := f.Build(b.Dir)
+			if checkError(err) {
+				return err
+			}
 		}
 	}
 
