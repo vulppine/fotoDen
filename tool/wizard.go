@@ -2,6 +2,7 @@ package tool
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/vulppine/fotoDen/generator"
 )
@@ -12,6 +13,42 @@ func isBlank(input string) bool {
 	}
 
 	return false
+}
+
+func setupWebsite(loc string) (WebsiteConfig, *generator.WebConfig) {
+	fmt.Println("Wizard: Setup fotoDen website")
+	w := WebsiteConfig{}
+	w.RootLocation = loc
+
+	w.Name = ReadInput("What is the name of your website?")
+	w.Theme = ReadInput("What theme do you want to use?")
+	w.URL = ReadInput("What is the URL of your website?")
+	w.GeneratorConfig = setupConfig()
+	w.GeneratorConfig.WebBaseURL = w.URL
+	w.GeneratorConfig.WebSourceLocation, _ = filepath.Abs(
+		filepath.Join(
+			generator.RootConfigDir,
+			"sites",
+			w.Name,
+			"theme",
+			w.Theme,
+		))
+
+	src := ReadInput("Are you going to remotely host your images? If so, type in the URL now, otherwise leave it blank to automatically use local hosting for all images")
+	s := generator.GenerateWebConfig(src)
+	s.WebsiteTitle = w.Name
+	s.Theme = true
+
+	fmt.Println("Here are your current image sizes, for reference:")
+	for k := range generator.CurrentConfig.ImageSizes {
+		fmt.Println(k)
+	}
+	s.ImageRootDir = generator.CurrentConfig.ImageSrcDirectory
+	s.ThumbnailFrom = ReadInput("What size do you want your thumbnails to be?")
+	s.DisplayImageFrom = ReadInput("What size do you want to display your images as in a fotoDen photo viewer?")
+	s.DownloadSizes = ReadInputAsArray("What sizes do you want downlodable?", ",")
+
+	return w, s
 }
 
 func setupConfig() generator.Config {
@@ -35,13 +72,21 @@ func setupConfig() generator.Config {
 		fmt.Printf("Image sizes detected: %v\n", imageSizes)
 		fmt.Println("Leave blank to set as zero. At least one value must be filled in. Priority: MaxHeight, MaxWidth, ScalePercent")
 		for _, val := range imageSizes {
-			fmt.Println("Image size " + val)
-			imageSize := generator.ImageScale{}
-			imageSize.MaxHeight, _ = ReadInputAsInt("Maximium height of image?")
-			imageSize.MaxWidth, _ = ReadInputAsInt("Maximum width of image?")
-			scalePercent, _ := ReadInputAsFloat("Image scale percent? [0 - 100%]")
-			imageSize.ScalePercent = scalePercent * 0.1
-			config.ImageSizes[val] = imageSize
+			var c bool
+			for c != true {
+				fmt.Println("Image size " + val)
+				imageSize := generator.ImageScale{}
+				imageSize.MaxHeight, _ = ReadInputAsInt("Maximium height of image?")
+				imageSize.MaxWidth, _ = ReadInputAsInt("Maximum width of image?")
+				scalePercent, _ := ReadInputAsFloat("Image scale percent? [0 - 100%]")
+				imageSize.ScalePercent = scalePercent * 0.1
+				if imageSize.MaxHeight == 0 && imageSize.MaxWidth == 0 && imageSize.ScalePercent == 0 {
+					fmt.Println("You must set one value to a non-zero value!")
+				} else {
+					c = true
+					config.ImageSizes[val] = imageSize
+				}
+			}
 		}
 	} else {
 		config.ImageSizes = generator.DefaultConfig.ImageSizes
@@ -50,8 +95,6 @@ func setupConfig() generator.Config {
 			fmt.Printf("Size name: %s, MaxHeight: %d, MaxWidth: %d, ScalePercent: %f\n", k, v.MaxHeight, v.MaxWidth, v.ScalePercent)
 		}
 	}
-
-	config.WebBaseURL = ReadInput("What is the URL of your website?")
 
 	return config
 }

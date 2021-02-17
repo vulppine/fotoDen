@@ -19,8 +19,26 @@ func ReadInput(message string) string {
 	return scanner.Text()
 }
 
+func ReadInputD(message string, d string) string {
+	m := ReadInput(message)
+	if m == "" {
+		return d
+	}
+
+	return m
+}
+
 func ReadInputAsArray(message string, sep string) []string {
-	return strings.Split(ReadInput(message+"[seperator: "+sep+"] "), sep)
+	return strings.Split(ReadInput(message+" [seperator: "+sep+"] "), sep)
+}
+
+func ReadInputAsArrayD(message string, sep string, d []string) []string {
+	m := ReadInputAsArray(message, sep)
+	if len(m) == 0 {
+		return d
+	}
+
+	return m
 }
 
 func ReadInputAsBool(message string, cond string) bool {
@@ -49,6 +67,19 @@ func ReadInputAsInt(message string) (int, error) {
 	return i, nil
 }
 
+func ReadInputAsIntD(message string, d int) (int, error) {
+	m, err := ReadInputAsInt(message)
+	if checkError(err) {
+		return 0, err
+	}
+
+	if m == 0 {
+		return d, nil
+	}
+
+	return m, nil
+}
+
 func ReadInputAsFloat(message string) (float32, error) {
 	var f float64
 	var err error
@@ -64,4 +95,17 @@ func ReadInputAsFloat(message string) (float32, error) {
 	}
 
 	return float32(f), nil
+}
+
+func ReadInputAsFloatD(message string, d float32) (float32, error) {
+	m, err := ReadInputAsFloat(message)
+	if checkError(err) {
+		return 0, err
+	}
+
+	if m == 0 {
+		return d, nil
+	}
+
+	return m, nil
 }

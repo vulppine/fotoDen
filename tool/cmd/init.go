@@ -9,8 +9,8 @@ import (
 func init() {
 	rootCmd.AddCommand(initCmd)
 
-	initCmd.AddCommand(initConfigCmd)
-	initConfigCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
+	// initCmd.AddCommand(initConfigCmd)
+	// initConfigCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
 	initCmd.AddCommand(initSiteCmd)
 	initSiteCmd.Flags().StringVar(&tool.URLFlag, "source", "", "where fotoDen should obtain its images")
 	initSiteCmd.Flags().StringVar(&websiteInit.URL, "url", "", "what URL to initialize fotoDen with")
@@ -38,6 +38,7 @@ If the url flag is not set, it will use the current configuration's base URL.
 
 js is deprecated, and will be removed or replaced.`,
 	}
+	/* Deprecated, see init.go in tool root
 	initConfigCmd = &cobra.Command{
 		Use:   "config [--url url] directory",
 		Short: "Initializes a fotoDen configuration directory with the given name",
@@ -47,6 +48,7 @@ js is deprecated, and will be removed or replaced.`,
 			return err
 		},
 	}
+	*/
 	websiteInit tool.WebsiteConfig
 	initSiteCmd = &cobra.Command{
 		Use:   "site [--name] destination",

@@ -249,12 +249,8 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 		panic(err)
 	}
 
-	// var webconfig *generator.WebConfig
-	webconfig.RootLocation = rootpath
 
 	var w *generator.WebConfig
-
-
 
 	if webconfig.Theme == "" {
 		if fileCheck(path.Join(generator.RootConfigDir, "defaulttheme")) {
@@ -271,20 +267,10 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 	}
 
 	if WizardFlag == true {
-		webconfig.GeneratorConfig = setupConfig()
-		webconfig.URL = webconfig.GeneratorConfig.WebBaseURL
-		webconfig.GeneratorConfig.WebSourceLocation, err = filepath.Abs(
-			path.Join(
-				generator.RootConfigDir,
-				"sites",
-				webconfig.Name,
-				"theme",
-				webconfig.Theme,
-			))
+		webconfig, w = setupWebsite(rootpath)
 		generator.CurrentConfig = webconfig.GeneratorConfig
-		w = setupWebConfig(URLFlag)
-		webconfig.Name = w.WebsiteTitle
 	} else {
+		webconfig.RootLocation = rootpath
 		webconfig.GeneratorConfig = generator.DefaultConfig
 		webconfig.GeneratorConfig.WebBaseURL = webconfig.URL
 		if webconfig.Name == "" {
@@ -402,6 +388,7 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 	return nil
 }
 
+/* Deprecated since fotoDen configs are now included at a per-site basis
 // InitializefotoDenConfig initializes a fotoDen config folder.
 //
 // This should only be done once.
@@ -441,3 +428,4 @@ func InitializefotoDenConfig(u string, dest string) error {
 
 	return nil
 }
+*/

@@ -89,6 +89,6 @@ func setRootFlags() {
 func init() {
 	cobra.OnInitialize(setRootFlags)
 	rootCmd.PersistentFlags().BoolVarP(&tool.WizardFlag, "interactive", "i", false, "Allows fotoDen to display interactive prompts")
-	rootCmd.PersistentFlags().StringVar(&configDir, "config_dir", "", "The config directory to use for fotoDen")
+	rootCmd.PersistentFlags().StringVar(&configDir, "config-dir", "", "The config directory to use for fotoDen")
 	rootCmd.PersistentFlags().StringVar(&site, "site", "", "The website that fotoDen should focus on.")
 }
