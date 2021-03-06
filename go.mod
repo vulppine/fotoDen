@@ -1,6 +1,6 @@
 module github.com/vulppine/fotoDen
 
-go 1.15
+go 1.16
 
 require (
 	github.com/h2non/bimg v1.1.5

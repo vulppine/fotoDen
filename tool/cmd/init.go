@@ -18,12 +18,12 @@ func init() {
 	initSiteCmd.Flags().StringVar(&websiteInit.Theme, "theme", "", "what theme a site should use")
 	initCmd.AddCommand(initThemeCmd)
 	initThemeCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
-	initCmd.AddCommand(initJSCmd)
+	// initCmd.AddCommand(initJSCmd)
 }
 
 var (
 	initCmd = &cobra.Command{
-		Use:   "init { config | site | theme } destination",
+		Use:   "init { site | theme } destination",
 		Short: "Initializes various fotoDen resources",
 		Long: `Initializes fotoDen resources. Takes two args: What to initialize, and where to put it, in that order.
 config creates a configuration directory in the given location.
@@ -68,6 +68,7 @@ js is deprecated, and will be removed or replaced.`,
 			return err
 		},
 	}
+	/*
 	initJSCmd = &cobra.Command{
 		Use:   "js source",
 		Short: "Checks and copies over a fotoDen.js file into the configuration directory",
@@ -81,4 +82,5 @@ js is deprecated, and will be removed or replaced.`,
 			return nil
 		},
 	}
+	*/
 )

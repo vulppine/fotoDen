@@ -21,15 +21,15 @@ if [ "$1" == "mk-testdir" ] || [ "$1" == "mkall" ]; then
 
     fotoDen=$PWD'/build/fotoDen --config-dir fotoDen_test/'
 
-    $fotoDen init js build/fotoDen.min.js
+    # $fotoDen init js build/fotoDen.min.js
     unzip build/default_theme.zip -d build/theme/
     $fotoDen init theme build/theme/
-    $fotoDen init site --name "Test Site" --url "http://localhost" --theme Default fotoDen_test/test_root
+    $fotoDen init site --name "Test Site" -v --url "http://localhost" --theme Default fotoDen_test/test_root
     $fotoDen generate folder --name "Test Folder" -v fotoDen_test/test_root/test_folder
     $fotoDen generate album  --name "Test Album" --source test_images -v fotoDen_test/test_root/test_folder/test_album
 
     echo "---------------------------------------------------"
-    echo "Your test environment is available at fotoDen_root."
+    echo "Your test environment is available at fotoDen_test."
     echo "---------------------------------------------------"
 fi
 

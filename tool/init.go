@@ -1,10 +1,10 @@
 package tool
 
 import (
-	"crypto/md5"
+	// "crypto/md5"
 	"fmt"
 	"io/ioutil"
-	"log"
+	// "log"
 	"os"
 	"path"
 	"path/filepath"
@@ -181,6 +181,7 @@ func InitializeWebTheme(u string, srcpath string, dest string) error {
 	return nil
 }
 
+/* Disabled, see embedjs.go for its replacement.
 var (
 	// The MD5 checksum of fotoDen.js. Must be defined during build.
 	JSSum string
@@ -217,6 +218,12 @@ func InitializefotoDenjs(fpath string) error {
 
 	return nil
 }
+*/
+
+// isEmbed says if fotoDen.js is embed or not,
+// and is automatically set if embedjs.go is
+// included from the build flag +embedjs
+var isEmbed bool
 
 // WebsiteConfig represents a struct that contains
 // everything needed for the fotoDen generator to work.
@@ -298,7 +305,7 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 		}
 
 		if URLFlag == "" {
-			fmt.Printf("You will have to configure your photo storage provider in %v.", path.Join(rootpath, "config.json"))
+			fmt.Printf("You will have to configure your photo storage provider in %v.\n", path.Join(rootpath, "config.json"))
 		}
 	}
 
@@ -327,8 +334,15 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 		return err
 	}
 
-	err = generator.CopyFile(path.Join(generator.RootConfigDir, "fotoDen.js"), "fotoDen.js", path.Join(rootpath, "js"))
-	checkError(err)
+	if isEmbed {
+		verbose("copying fotoDen.js from internal embed file")
+		err = writefotoDenJS(path.Join(rootpath, "fotoDen.js"))
+		checkError(err)
+	} else {
+		verbose("copying fotoDen.js from config dir")
+		err = generator.CopyFile(path.Join(generator.RootConfigDir, "fotoDen.js"), "fotoDen.js", path.Join(rootpath, "js"))
+		checkError(err)
+	}
 
 	tpath := path.Join(spath, "theme", webconfig.Theme)
 	t, err := ReadThemeConfig(path.Join(tpath, "theme.json"))

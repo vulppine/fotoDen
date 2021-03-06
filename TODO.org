@@ -3,7 +3,8 @@
 - [ ] GUI mode (Qt?)
 - [X] Separate website configurations for multi-site configs
 - [ ] Multi-Viewer mode (allow more than one root viewer on the same page, and for viewers to communicate to each other - multiple viewers are technically allowed, but all links currently redirect to a URL)
-- [ ] Move some fotoDen functions to Go 1.16's new libraries
+- [X] Move some fotoDen functions to Go 1.16's new libraries
+  - A minified fotoDen is now included in every build of fotoDen. If the correct build flags aren't set, however, fotoDen.js will instead copy from the configuration directory.
 - [ ] Document fotoDen.js using JSDoc
 - [ ] Split fotoDen.js into several files and change the makefile to combine all the separate JS files (maybe?)
   - This may require some fotoDen variables to be more *explicitly* global, as some variables need to be accessed by dynamically loaded modules (e.g., themes)

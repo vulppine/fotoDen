@@ -15,7 +15,7 @@ all: minjs theme tool
 
 minjs:
 	@echo "Minifying fotoDen..."
-	$(JSMIN) -c -m -o $(BUILDDIR)/$(JSNAME).min.js $(JSDIR)/$(JSNAME).js
+	$(JSMIN) -c -m -o tool/$(JSNAME).min.js $(JSDIR)/$(JSNAME).js
 
 theme:
 	@echo "Packaging theme..."
@@ -35,9 +35,8 @@ tool:
 	if [ -e $(BUILDDIR)/$(JSNAME).min.js ]; then\
 		echo "Building with minified JS...";\
 		go build -o $(BUILDDIR)/fotoDen\
-		-ldflags "-X '$(TOOLPKG).JSSum=$(shell $(JSSUM))' -X '$(TOOLPKG).JSMinSum=$(shell $(JSMINSUM))'";\
+		-tags embedjs;\
 	else\
 		echo "Building without minified JS...";\
-		go build -o $(BUILDDIR)/fotoDen\
-		-ldflags "-X '$(TOOLPKG).JSSum=$(shell $(JSSUM))'";\
+		go build -o $(BUILDDIR)/fotoDen;\
 	fi;
