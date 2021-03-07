@@ -15,7 +15,7 @@ all: minjs theme tool
 
 minjs:
 	@echo "Minifying fotoDen..."
-	$(JSMIN) -c -m -o tool/$(JSNAME).min.js $(JSDIR)/$(JSNAME).js
+	$(JSMIN) -c -m -o tool/$(BUILDDIR)/$(JSNAME).min.js $(JSDIR)/$(JSNAME).js
 
 theme:
 	@echo "Packaging theme..."
@@ -27,15 +27,16 @@ theme:
 	cp $(THEMEDIR)/theme.json $(BUILDDIR)/theme/
 	cd $(BUILDDIR)/theme;\
 	zip ../$(THEMENAME)_theme.zip -r *
+	mv $(BUILDDIR)/$(THEMENAME)_theme.zip tool/$(BUILDDIR)/
 	@echo "Cleaning up..."
 	rm -r build/theme/
 
 tool:
 	@echo "Making tool..."
 	if [ -e $(BUILDDIR)/$(JSNAME).min.js ]; then\
-		echo "Building with minified JS...";\
+		echo "Building with embed minified JS and theme...";\
 		go build -o $(BUILDDIR)/fotoDen\
-		-tags embedjs;\
+		-tags embed;\
 	else\
 		echo "Building without minified JS...";\
 		go build -o $(BUILDDIR)/fotoDen;\

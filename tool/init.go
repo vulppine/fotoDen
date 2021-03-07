@@ -3,7 +3,7 @@ package tool
 import (
 	// "crypto/md5"
 	"fmt"
-	"io/ioutil"
+	// "io/ioutil"
 	// "log"
 	"os"
 	"path"
@@ -12,6 +12,7 @@ import (
 	"github.com/vulppine/fotoDen/generator"
 )
 
+/* Disabled in favor of zipped and embed themes
 func CopyThemeToConfig(srcpath string) error {
 	wd, _ := os.Getwd()
 	srcpath, err := filepath.Abs(srcpath)
@@ -109,7 +110,7 @@ func InitializeWebTheme(u string, srcpath string, dest string) error {
 	checkError(err)
 
 	tpath, err := filepath.Abs(path.Join(dest, "theme", t.ThemeName))
-	err = os.MkdirAll(tpath, 0755)
+ err = os.MkdirAll(tpath, 0755)
 	if checkError(err) {
 		return err
 	}
@@ -180,6 +181,8 @@ func InitializeWebTheme(u string, srcpath string, dest string) error {
 
 	return nil
 }
+*/
+
 
 /* Disabled, see embedjs.go for its replacement.
 var (
@@ -221,8 +224,8 @@ func InitializefotoDenjs(fpath string) error {
 */
 
 // isEmbed says if fotoDen.js is embed or not,
-// and is automatically set if embedjs.go is
-// included from the build flag +embedjs
+// and is automatically set if embed.go is
+// included from the build flag +embed
 var isEmbed bool
 
 // WebsiteConfig represents a struct that contains
@@ -248,6 +251,9 @@ type WebsiteConfig struct {
 // it is, by default, a folder.
 //
 // TODO: Break this apart into smaller chunks, holy fuck
+// - Done, technically. Disabling several pieces and replacing them
+//   with more efficient, (hopefully?) user friendly methods of
+//   managing website resources should help with readability.
 func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 	rootpath, _ = filepath.Abs(rootpath)
 
@@ -256,9 +262,25 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 		panic(err)
 	}
 
-
 	var w *generator.WebConfig
 
+	var t *theme
+	if fileCheck(webconfig.Theme) {
+		verbose("attempting to open given theme as a zip file")
+		z, zs, err := zipFileReader(webconfig.Theme)
+		if checkError(err) { return err }
+
+		t, err = openTheme(z, zs)
+		if checkError(err) { return err }
+	} else if isEmbed {
+		verbose("no theme given, attempting to use internal default")
+		t, err = openTheme(defaultThemeZipReader(), defaultThemeZipLen)
+		if checkError(err) { return err }
+	} else {
+		return fmt.Errorf("could not find theme, aborting")
+	}
+
+	/*
 	if webconfig.Theme == "" {
 		if fileCheck(path.Join(generator.RootConfigDir, "defaulttheme")) {
 			f, err := os.Open(path.Join(generator.RootConfigDir, "defaulttheme"))
@@ -272,6 +294,7 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 			return fmt.Errorf("theme does not exist, cannot continue generation")
 		}
 	}
+	*/
 
 	if WizardFlag == true {
 		webconfig, w = setupWebsite(rootpath)
@@ -291,7 +314,7 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 				"sites",
 				webconfig.Name,
 				"theme",
-				webconfig.Theme,
+				t.s.ThemeName,
 			))
 		generator.CurrentConfig = webconfig.GeneratorConfig
 		w = generator.GenerateWebConfig(URLFlag)
@@ -323,11 +346,13 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 
 	generator.CurrentConfig = webconfig.GeneratorConfig
 
+	/*
 	err = InitializeWebTheme(
 		webconfig.URL,
 		path.Join(generator.RootConfigDir, "theme", webconfig.Theme),
 		path.Join(spath),
 	)
+	*/
 
 	err = w.WriteWebConfig(path.Join(rootpath, "config.json"))
 	if checkError(err) {
@@ -344,14 +369,23 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 		checkError(err)
 	}
 
+	t.initTheme(
+		webconfig.URL,
+		path.Join(spath, "theme", t.s.ThemeName), // change this
+		path.Join(rootpath, "theme"),
+	)
+
+	/*
 	tpath := path.Join(spath, "theme", webconfig.Theme)
 	t, err := ReadThemeConfig(path.Join(tpath, "theme.json"))
 	if checkError(err) {
 		return err
 	}
+	*/
 
-	wd, _ := os.Getwd()
+	// wd, _ := os.Getwd()
 
+	/*
 	os.Chdir(tpath)
 	if len(t.Stylesheets) != 0 {
 		os.Chdir("css")
@@ -378,8 +412,9 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 			return err
 		}
 	}
+	*/
 
-	os.Chdir(wd)
+	// os.Chdir(wd)
 
 	folder, err := generator.GenerateFolderInfo(rootpath, w.WebsiteTitle) // do it in rootpath since we're not trying to scan for images in the current folder
 	folder.Type = "folder"

@@ -16,8 +16,8 @@ func init() {
 	initSiteCmd.Flags().StringVar(&websiteInit.URL, "url", "", "what URL to initialize fotoDen with")
 	initSiteCmd.Flags().StringVar(&websiteInit.Name, "name", "", "what name a site should have (with init site)")
 	initSiteCmd.Flags().StringVar(&websiteInit.Theme, "theme", "", "what theme a site should use")
-	initCmd.AddCommand(initThemeCmd)
-	initThemeCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
+	// initCmd.AddCommand(initThemeCmd)
+	// initThemeCmd.Flags().StringVar(&tool.URLFlag, "url", "", "what URL to initialize fotoDen with")
 	// initCmd.AddCommand(initJSCmd)
 }
 
@@ -59,6 +59,7 @@ js is deprecated, and will be removed or replaced.`,
 			return err
 		},
 	}
+	/* Deprecated in favor of zipped/embed theme files
 	initThemeCmd = &cobra.Command{
 		Use:   "theme source",
 		Short: "Initalizes a fotoDen theme into the configuration directory",
@@ -68,6 +69,7 @@ js is deprecated, and will be removed or replaced.`,
 			return err
 		},
 	}
+	*/
 	/*
 	initJSCmd = &cobra.Command{
 		Use:   "js source",
