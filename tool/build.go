@@ -67,17 +67,6 @@ func (b *BuildFile) Build(folder string) error {
 		if checkError(err) {
 			return err
 		}
-
-		for _, f := range b.Subfolders {
-			if f.Dir == "" {
-				f.Dir = f.Name
-			}
-			b.Dir, _ = filepath.Abs(filepath.Join(folder, b.Dir))
-			err = f.Build(b.Dir)
-			if checkError(err) {
-				return err
-			}
-		}
 	case "album":
 		genopts := GeneratorOptions{
 			ImageGen: true,
@@ -120,16 +109,21 @@ func (b *BuildFile) Build(folder string) error {
 
 			InsertImage(folder, "append", Genoptions, b.Images...)
 		}
+	}
 
-		for _, f := range b.Subfolders {
-			if f.Dir == "" {
-				f.Dir = f.Name
-			}
+	for _, f := range b.Subfolders {
+		if f.Dir == "" {
+			f.Dir = f.Name
+		}
+
+		if !filepath.IsAbs(b.Dir) {
+			verbose("filepath not absolute, joining and locating")
 			b.Dir, _ = filepath.Abs(filepath.Join(folder, b.Dir))
-			err := f.Build(b.Dir)
-			if checkError(err) {
-				return err
-			}
+		}
+
+		err := f.Build(b.Dir)
+		if checkError(err) {
+			return err
 		}
 	}
 
