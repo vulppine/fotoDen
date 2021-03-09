@@ -183,7 +183,6 @@ func InitializeWebTheme(u string, srcpath string, dest string) error {
 }
 */
 
-
 /* Disabled, see embedjs.go for its replacement.
 var (
 	// The MD5 checksum of fotoDen.js. Must be defined during build.
@@ -268,32 +267,38 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 	if fileCheck(webconfig.Theme) {
 		verbose("attempting to open given theme as a zip file")
 		z, zs, err := zipFileReader(webconfig.Theme)
-		if checkError(err) { return err }
+		if checkError(err) {
+			return err
+		}
 
 		t, err = openTheme(z, zs)
-		if checkError(err) { return err }
+		if checkError(err) {
+			return err
+		}
 	} else if isEmbed {
 		verbose("no theme given, attempting to use internal default")
 		t, err = openTheme(defaultThemeZipReader(), defaultThemeZipLen)
-		if checkError(err) { return err }
+		if checkError(err) {
+			return err
+		}
 	} else {
 		return fmt.Errorf("could not find theme, aborting")
 	}
 
 	/*
-	if webconfig.Theme == "" {
-		if fileCheck(path.Join(generator.RootConfigDir, "defaulttheme")) {
-			f, err := os.Open(path.Join(generator.RootConfigDir, "defaulttheme"))
-			d, err := ioutil.ReadAll(f)
-			if checkError(err) {
-				return err
-			}
+		if webconfig.Theme == "" {
+			if fileCheck(path.Join(generator.RootConfigDir, "defaulttheme")) {
+				f, err := os.Open(path.Join(generator.RootConfigDir, "defaulttheme"))
+				d, err := ioutil.ReadAll(f)
+				if checkError(err) {
+					return err
+				}
 
-			webconfig.Theme = string(d)
-		} else {
-			return fmt.Errorf("theme does not exist, cannot continue generation")
+				webconfig.Theme = string(d)
+			} else {
+				return fmt.Errorf("theme does not exist, cannot continue generation")
+			}
 		}
-	}
 	*/
 
 	if WizardFlag == true {
@@ -347,11 +352,11 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 	generator.CurrentConfig = webconfig.GeneratorConfig
 
 	/*
-	err = InitializeWebTheme(
-		webconfig.URL,
-		path.Join(generator.RootConfigDir, "theme", webconfig.Theme),
-		path.Join(spath),
-	)
+		err = InitializeWebTheme(
+			webconfig.URL,
+			path.Join(generator.RootConfigDir, "theme", webconfig.Theme),
+			path.Join(spath),
+		)
 	*/
 
 	err = w.WriteWebConfig(path.Join(rootpath, "config.json"))
@@ -376,42 +381,42 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 	)
 
 	/*
-	tpath := path.Join(spath, "theme", webconfig.Theme)
-	t, err := ReadThemeConfig(path.Join(tpath, "theme.json"))
-	if checkError(err) {
-		return err
-	}
+		tpath := path.Join(spath, "theme", webconfig.Theme)
+		t, err := ReadThemeConfig(path.Join(tpath, "theme.json"))
+		if checkError(err) {
+			return err
+		}
 	*/
 
 	// wd, _ := os.Getwd()
 
 	/*
-	os.Chdir(tpath)
-	if len(t.Stylesheets) != 0 {
-		os.Chdir("css")
-		err = generator.BatchCopyFile(t.Stylesheets, path.Join(rootpath, "theme", "css"))
-		if checkError(err) {
-			return err
-		}
 		os.Chdir(tpath)
-	}
-
-	if len(t.Scripts) != 0 {
-		os.Chdir("js")
-		err = generator.BatchCopyFile(t.Scripts, path.Join(rootpath, "theme", "js"))
-		if checkError(err) {
-			return err
+		if len(t.Stylesheets) != 0 {
+			os.Chdir("css")
+			err = generator.BatchCopyFile(t.Stylesheets, path.Join(rootpath, "theme", "css"))
+			if checkError(err) {
+				return err
+			}
+			os.Chdir(tpath)
 		}
-		os.Chdir(tpath)
-	}
 
-	if len(t.Other) != 0 {
-		os.Chdir("etc")
-		err = generator.BatchCopyFile(t.Other, path.Join(rootpath, "theme", "etc"))
-		if checkError(err) {
-			return err
+		if len(t.Scripts) != 0 {
+			os.Chdir("js")
+			err = generator.BatchCopyFile(t.Scripts, path.Join(rootpath, "theme", "js"))
+			if checkError(err) {
+				return err
+			}
+			os.Chdir(tpath)
 		}
-	}
+
+		if len(t.Other) != 0 {
+			os.Chdir("etc")
+			err = generator.BatchCopyFile(t.Other, path.Join(rootpath, "theme", "etc"))
+			if checkError(err) {
+				return err
+			}
+		}
 	*/
 
 	// os.Chdir(wd)

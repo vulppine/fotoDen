@@ -30,8 +30,8 @@ func init() {
 
 var (
 	folderMeta = tool.FolderMeta{}
-	wd, _  = os.Getwd()
-	genCmd = &cobra.Command{
+	wd, _      = os.Getwd()
+	genCmd     = &cobra.Command{
 		Use:   "generate { album | folder } destination",
 		Short: "Generates fotoDen folders/albums",
 	}

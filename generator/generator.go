@@ -38,12 +38,12 @@ var DefaultConfig Config = Config{
 	ImageRootDirectory: "img",
 	ImageMetaDirectory: "meta",
 	ImageSizes: map[string]ImageScale{
-		"small": ImageScale{ScalePercent: 0.25},
+		"small":  ImageScale{ScalePercent: 0.25},
 		"medium": ImageScale{ScalePercent: 0.5},
-		"large": ImageScale{ScalePercent: 0.75},
+		"large":  ImageScale{ScalePercent: 0.75},
 	},
 	ImageSrcDirectory: "src",
-	WebBaseURL:        "",                                 // this should be set during configuration generation
+	WebBaseURL:        "", // this should be set during configuration generation
 }
 
 // CurrentConfig represents the current generator config, and can be used as reference

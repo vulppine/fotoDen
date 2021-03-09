@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
-	"io/ioutil"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -30,9 +30,9 @@ func debug(input interface{}) {
 var (
 	d         = rootCmd.PersistentFlags().Bool("debug", false, "Prints debug information to console.")
 	v         = rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Prints verbose information made by fotoDen")
-	configDir    string
+	configDir string
 	configSrc generator.Config
-	site string
+	site      string
 	rootCmd   = &cobra.Command{
 		Use:   "fotoDen { init | generate | update } args [--config string] [--verbose | -v] [--interactive | -i]",
 		Short: "A static photo gallery generator",

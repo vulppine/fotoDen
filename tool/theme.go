@@ -30,19 +30,23 @@ import (
 type theme struct {
 	a *zip.Reader
 	s struct {
-		ThemeName string
+		ThemeName   string
 		Stylesheets []string
-		Scripts []string
-		Other []string
+		Scripts     []string
+		Other       []string
 	}
 }
 
 func zipFileReader(z string) (io.ReaderAt, int64, error) {
 	f, err := os.Open(z)
-	if checkError(err) { return nil, 0, err }
+	if checkError(err) {
+		return nil, 0, err
+	}
 
 	fi, err := f.Stat()
-	if checkError(err) { return nil, 0, err }
+	if checkError(err) {
+		return nil, 0, err
+	}
 
 	return f, fi.Size(), nil
 }
@@ -150,7 +154,6 @@ func (t *theme) writeDir(n string, d string, files ...string) error {
 // as well as copying over theme.json for later use.
 func (t *theme) copyTheme(d string) error {
 
-
 	return nil
 }
 
@@ -183,20 +186,26 @@ func (t *theme) initTheme(u string, e string, r string) error {
 
 	verbose("writing HTML templates now to: " + e)
 	err = os.MkdirAll(filepath.Join(e, "html"), 0755)
-	if checkError(err) { return err }
+	if checkError(err) {
+		return err
+	}
 	for _, f := range hf {
 		err = generator.ConfigureWebFile(
 			filepath.Join(m, f),
 			filepath.Join(e, "html", f),
 			wvars,
 		)
-		if checkError(err) { return err }
+		if checkError(err) {
+			return err
+		}
 	}
 
 	copyArray := func(f []string, n string) error {
 		if len(f) != 0 {
 			err = t.writeDir(n, r, f...)
-			if checkError(err) { return err }
+			if checkError(err) {
+				return err
+			}
 		}
 
 		return nil

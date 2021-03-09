@@ -2,8 +2,8 @@
 package tool
 
 import (
-	_ "embed"
 	"bytes"
+	_ "embed"
 	"os"
 )
 

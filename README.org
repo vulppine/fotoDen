@@ -1,8 +1,6 @@
 * fotoDen
 /A statically structured, front-end dynamic photo gallery/
 
-Version 0.1.1
-
 ** Using
 
 fotoDen is designed so that it can be used independent of any separate tool, but it works well if you have the fotoDen tool in order to create folders and albums that are directly accessable by fotoDen's front end.

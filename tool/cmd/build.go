@@ -11,9 +11,9 @@ func init() {
 
 var (
 	buildCmd = &cobra.Command{
-		Use: "build buildfile destination",
+		Use:   "build buildfile destination",
 		Short: "Generates a fotoDen folder/album from a valid YAML file",
-		Args: cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			b := new(tool.BuildFile)
 			err := b.OpenBuildYAML(args[0])
