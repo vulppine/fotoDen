@@ -55,6 +55,7 @@ fotoDen relies on a few important dependencies (both front and back), so here ar
 | [[https://github.com/twbs/bootstrap][Bootstrap]]        | Twitter/Bootstrap Team | MIT        |
 | [[https://github.com/flickr/justified-layout][justified-layout]] | Flickr/SmugMug         | MIT        |
 | [[https://github.com/exif-js/exif-js][exif-js]]          | Jacob Seidelin         | MIT        |
+| [[https://github.com/go-yaml/yaml][go-yaml]]          | go-yaml team           | Apache 2.0 |
 
 ** Copyright
 
