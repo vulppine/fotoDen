@@ -19,7 +19,8 @@ func init() {
 
 	genCmd.AddCommand(genAlbumCmd)
 	genAlbumCmd.Flags().StringVar(&tool.Genoptions.Source, "source", "", "source for fotoDen images")
-	genAlbumCmd.Flags().StringVar(&tool.NameFlag, "name", "", "name for fotoDen folders/albums")
+	genAlbumCmd.Flags().StringVar(&folderMeta.Name, "name", "", "name for fotoDen folders/albums")
+	genAlbumCmd.Flags().StringVar(&folderMeta.Desc, "desc", "", "description for fotoDen folders/albums")
 	genAlbumCmd.Flags().StringVar(&tool.ThumbSrc, "thumb", "", "location of the thumbnail for the folder/album")
 	genAlbumCmd.Flags().BoolVar(&tool.Genoptions.Copy, "copy", false, "toggle copying of images from source to fotoDen albums")
 	genAlbumCmd.Flags().BoolVar(&tool.Genoptions.Gensizes, "gensizes", true, "toggle generation of all image sizes from source to fotoDen albums")

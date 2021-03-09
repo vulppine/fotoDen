@@ -15,14 +15,14 @@ func isBlank(input string) bool {
 	return false
 }
 
-func setupWebsite(loc string) (WebsiteConfig, *generator.WebConfig) {
+func setupWebsite(loc string, theme string) (WebsiteConfig, *generator.WebConfig) {
 	fmt.Println("Wizard: Setup fotoDen website")
+	fmt.Println("Some of these are required. Do not try to skip them.")
 	w := WebsiteConfig{}
 	w.RootLocation = loc
 
-	w.Name = ReadInput("What is the name of your website?")
-	w.Theme = ReadInput("What theme do you want to use?")
-	w.URL = ReadInput("What is the URL of your website?")
+	w.Name = ReadInputReq("What is the name of your website? (required)")
+	w.URL = ReadInputReq("What is the URL of your website? (required)")
 	w.GeneratorConfig = setupConfig()
 	w.GeneratorConfig.WebBaseURL = w.URL
 	w.GeneratorConfig.WebSourceLocation, _ = filepath.Abs(
@@ -31,7 +31,7 @@ func setupWebsite(loc string) (WebsiteConfig, *generator.WebConfig) {
 			"sites",
 			w.Name,
 			"theme",
-			w.Theme,
+			theme,
 		))
 
 	src := ReadInput("Are you going to remotely host your images? If so, type in the URL now, otherwise leave it blank to automatically use local hosting for all images")
@@ -44,9 +44,9 @@ func setupWebsite(loc string) (WebsiteConfig, *generator.WebConfig) {
 		fmt.Println(k)
 	}
 	s.ImageRootDir = generator.CurrentConfig.ImageSrcDirectory
-	s.ThumbnailFrom = ReadInput("What size do you want your thumbnails to be?")
-	s.DisplayImageFrom = ReadInput("What size do you want to display your images as in a fotoDen photo viewer?")
-	s.DownloadSizes = ReadInputAsArray("What sizes do you want downlodable?", ",")
+	s.ThumbnailFrom = ReadInputReq("What size do you want your thumbnails to be? (required)")
+	s.DisplayImageFrom = ReadInputReq("What size do you want to display your images as in a fotoDen photo viewer? (required)")
+	s.DownloadSizes = ReadInputAsArray("What sizes do you want easily downloadable?", ",")
 
 	return w, s
 }

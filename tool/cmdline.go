@@ -19,6 +19,15 @@ func ReadInput(message string) string {
 	return scanner.Text()
 }
 
+func ReadInputReq(message string) string {
+	var i string
+	for i == "" {
+		i = ReadInput(message)
+	}
+
+	return i
+}
+
 func ReadInputD(message string, d string) string {
 	m := ReadInput(message)
 	if m == "" {

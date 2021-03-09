@@ -302,7 +302,7 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 	*/
 
 	if WizardFlag == true {
-		webconfig, w = setupWebsite(rootpath)
+		webconfig, w = setupWebsite(rootpath, t.s.ThemeName)
 		generator.CurrentConfig = webconfig.GeneratorConfig
 	} else {
 		webconfig.RootLocation = rootpath
@@ -366,7 +366,7 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 
 	if isEmbed {
 		verbose("copying fotoDen.js from internal embed file")
-		err = writefotoDenJS(path.Join(rootpath, "fotoDen.js"))
+		err = writefotoDenJS(path.Join(rootpath, "js", "fotoDen.js"))
 		checkError(err)
 	} else {
 		verbose("copying fotoDen.js from config dir")

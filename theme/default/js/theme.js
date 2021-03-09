@@ -167,7 +167,7 @@ export function createFolderLink (info) {
 
   folderAnchor.appendChild(folderCard)
   folderAnchor.setAttribute('class', 'text-white text-decoration-none')
-  folderAnchor.href = info.FolderShortName
+  folderAnchor.href = info.shortName
 
   folderCard.appendChild(folderThumb)
   folderCard.appendChild(folderInfoContainer)
@@ -186,15 +186,15 @@ export function createFolderLink (info) {
   folderTitleContainer.appendChild(folderTitle)
   folderTitleContainer.setAttribute('class', 'row')
 
-  if (info.FolderThumbnail === true) {
-    folderThumb.src = info.FolderShortName + '/thumb.jpg'
+  if (info.thumbnail === true) {
+    folderThumb.src = info.shortName + '/thumb.jpg'
   } else {
     folderThumb.classList.add('bg-secondary')
   }
 
   folderItemCountContainer.setAttribute('class', 'row')
 
-  if (info.ItemAmount > 0) {
+  if (info.itemAmount > 0) {
     const folderItemCountPhotos = document.createElement('div')
     folderItemCountContainer.appendChild(folderItemCountPhotos)
     folderItemCountPhotos.setAttribute('class', 'col')
@@ -203,10 +203,10 @@ export function createFolderLink (info) {
     folderItemCountPhotos.appendChild(folderItemCountPhotosText)
     folderItemCountPhotosText.setAttribute('class', 'mb-0 card-text')
 
-    folderItemCountPhotosText.innerHTML = '<i class="bi bi-camera-fill"></i> : ' + info.ItemAmount
+    folderItemCountPhotosText.innerHTML = '<i class="bi bi-camera-fill"></i> : ' + info.itemAmount
   }
 
-  if (info.SubfolderShortNames.length > 0) {
+  if (info.subfolders.length > 0) {
     const folderItemCountFolders = document.createElement('div')
     folderItemCountContainer.appendChild(folderItemCountFolders)
     folderItemCountFolders.setAttribute('class', 'col')
@@ -215,10 +215,10 @@ export function createFolderLink (info) {
     folderItemCountFolders.appendChild(folderItemCountFolderText)
     folderItemCountFolderText.setAttribute('class', 'mb-0 card-text')
 
-    folderItemCountFolderText.innerHTML = '<i class="bi bi-folder-fill"></i> : ' + info.SubfolderShortNames.length
+    folderItemCountFolderText.innerHTML = '<i class="bi bi-folder-fill"></i> : ' + info.subfolders.length
   }
 
-  folderTitle.innerText = info.FolderName
+  folderTitle.innerText = info.name
 
   return folderContainer
 }

@@ -5,25 +5,10 @@
 
 fotoDen is designed so that it can be used independent of any separate tool, but it works well if you have the fotoDen tool in order to create folders and albums that are directly accessable by fotoDen's front end.
 
-Download the latest version of fotoDen, and get started by initializing a configuration file, and copying over fotoDen.js (a minified version is included in release versions):
+Using the pre-built fotoDen tool from release is as simple as initializing a website (with an optional theme - one is already included!)
 
 #+BEGIN_SRC sh
-fotoDen init config
-fotoDen init js fotoDen.min.js
-#+END_SRC
-    
-You will be taken to a wizard that will help you setup fotoDen.
-
-Afterwards, initialize a theme (default_theme.zip is available, and should be unzipped to its own folder)
-
-#+BEGIN_SRC sh
-fotoDen init theme default_theme/
-#+END_SRC
-    
-Afterwards, initialize your first site:
-
-#+BEGIN_SRC sh
-fotoDen init site --name "[ your website name here ]" my_website/
+fotoDen init -i site --name "[ your website name here ]" my_website/
 #+END_SRC
 
 From there, you can start generating folders and albums as you wish:
@@ -33,7 +18,7 @@ fotoDen generate folder --name "[ your folder name here ]" my_website/my_folder/
 fotoDen generate album --name "[ your album name here ]" --source my/images/are/here my_website/my_folder/my_album
 #+END_SRC
 
-Run the fotoDen command for more options. (More detailed information and commands will be added soon!)
+Run the fotoDen command for more options. (More detailed information and commands will be added soon, including use of the build system!)
 
 *** Warning
 

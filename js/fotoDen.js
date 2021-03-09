@@ -514,7 +514,7 @@ class AlbumViewer extends Viewer {
 
     getJSON(getAlbumURL() + 'itemsInfo.json')
       .then((json) => {
-        this.photos = json.itemsInFolder
+        this.photos = json.items
         this.maxPhotos = this.photos.length
         this.pageAmount = Math.ceil(this.maxPhotos / this.imagesPerPage)
 
@@ -627,19 +627,20 @@ const folderLoad = new CustomEvent('fd-folderLoad', { bubbles: true })
 class FolderViewer extends Viewer {
   constructor (container, folder) {
     super(container, folder)
+    this.folder = folder
     this.folderLinks = container.querySelector('.fd-folderLinks')
     this.style = ''
 
     this.type = folder.type
 
-    if (this.folder.type !== 'album') {
+    if (folder.type !== 'album') {
       setTitle([folder.name])
       if (folder.desc !== '') {
         setText(this.desc, folder.desc)
       }
     }
 
-    if (this.folder.shortnames.length > 0) {
+    if (folder.subfolders.length > 0) {
       this.populate()
     } else {
       this.container.remove()
@@ -647,7 +648,7 @@ class FolderViewer extends Viewer {
   }
 
   populate () {
-    this.folder.shortnames.forEach(element => {
+    this.folder.subfolders.forEach(element => {
       getJSON(getFolderURL(0).toString() + element + '/folderInfo.json')
         .then(json => {
           this.folderLinks.appendChild(theme.createFolderLink(json))
@@ -671,7 +672,7 @@ function setConfig () {
   return getJSON(BaseURL + '/config.json')
     .then(async function (json) {
       readConfig(json)
-      if (json.Theme === true) {
+      if (json.theme === true) {
         theme = await import(BaseURL + '/theme/js/theme.js')
         theme.init()
       }
@@ -716,10 +717,10 @@ function readConfig (info) {
   }
 
   info.imageSizes.forEach((i) => {
-    imageSizes.set(i.SizeName, {
-      directory: [imageRootDir, i.Directory].join('/'),
-      prefix: i.SizeName + '_',
-      localBool: i.LocalBool
+    imageSizes.set(i.sizeName, {
+      directory: [imageRootDir, i.dir].join('/'),
+      prefix: i.sizeName + '_',
+      localBool: i.local
     })
   })
 }
