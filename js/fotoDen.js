@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-// fotoDen v0.1.0
+// fotoDen v0.2.0
 //
 // The front-end for a photo gallery.
 
