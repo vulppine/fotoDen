@@ -33,7 +33,7 @@ func IsolateImages(files []string) []string {
 type ImageScale struct {
 	MaxHeight    int
 	MaxWidth     int
-	ScalePercent float32
+	ScalePercent float64
 }
 
 // ResizeImage resizes a single image.
@@ -66,16 +66,16 @@ func ResizeImage(file string, imageName string, scale ImageScale, dest string, i
 	}
 
 	size, err := bimg.NewImage(image).Size()
-	width := float32(size.Width)
-	height := float32(size.Height)
+	width := float64(size.Width)
+	height := float64(size.Height)
 
 	switch {
 	case scale.MaxHeight != 0:
-		scale := float32(scale.MaxHeight) / height
+		scale := float64(scale.MaxHeight) / height
 		width = width * scale
 		height = height * scale
 	case scale.MaxWidth != 0:
-		scale := float32(scale.MaxWidth) / width
+		scale := float64(scale.MaxWidth) / width
 		width = width * scale
 		height = height * scale
 	case scale.ScalePercent != 0:

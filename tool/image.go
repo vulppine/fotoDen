@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"github.com/h2non/bimg"
+	"github.com/vulppine/cmdio-go"
 	"github.com/vulppine/fotoDen/generator"
 )
 
@@ -18,6 +19,11 @@ import (
 //
 // It takes an options struct (which is just a set of options condensed into one struct)
 // and generates an image folder based on the options given (e.g., source, etc.)
+//
+// BUG: The progress bar is continually over-written in verbose mode.
+// This is more likely a cmdio-go problem than a fotoDen problem.
+// The only solution to this right now is to not show a progress bar in verbose mode,
+// which is not preferrable.
 func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 	verbose("GenerateItems: Current generator options: " + fmt.Sprint(options))
 	verbose("Generating item information to " + fpath)
@@ -52,46 +58,85 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 			}())
 		}
 
+		c := make([]chan int, 0)
+		m := make(chan string, 10)
+
 		if options.Copy == true {
-			waitgroup.Add(1)
+			ch := make(chan int, 5)
+			if !Verbose {
+				c = append(c, ch)
+
+				ch <- len(items.ItemsInFolder)
+				waitgroup.Add(1)
+			}
 			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
-				fmt.Println("Copying files...")
-				err = generator.BatchCopyFile(items.ItemsInFolder, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageSrcDirectory))
+				m <- "Copying files..."
+				err = generator.BatchCopyFile(items.ItemsInFolder, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageSrcDirectory), ch)
+				close(ch)
 			}(&waitgroup)
 		}
 
 		if options.Gensizes == true {
 			verbose("Attempting to generate from sizes: " + fmt.Sprint(generator.CurrentConfig.ImageSizes))
+
 			for k, v := range generator.CurrentConfig.ImageSizes {
+				ch := make(chan int, 5)
+				if !Verbose {
+					c = append(c, ch)
+
+					ch <- len(items.ItemsInFolder)
+				}
 				sizeName := k
 				sizeOpts := v
 				waitgroup.Add(1)
 				go func(wg *sync.WaitGroup) {
 					defer wg.Done()
-					fmt.Printf("Generating size %s...\n", sizeName)
-					err = generator.BatchImageConversion(items.ItemsInFolder, sizeName, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, sizeName), sizeOpts)
+					m <- fmt.Sprintf("Generating size %s...", sizeName)
+					err = generator.BatchImageConversion(items.ItemsInFolder, sizeName, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, sizeName), sizeOpts, ch)
+					if !Verbose { close(ch) }
 				}(&waitgroup)
 			}
 		}
 
 		if options.Meta == true {
-			waitgroup.Add(1)
+			ch := make(chan int, 5)
+			if !Verbose {
+				c = append(c, ch)
+
+				ch <- len(items.ItemsInFolder)
+				waitgroup.Add(1)
+			}
 			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
 				verbose("Generating metadata to: " + path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageMetaDirectory))
-				err = generator.BatchImageMeta(items.ItemsInFolder, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageMetaDirectory))
+				err = generator.BatchImageMeta(items.ItemsInFolder, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageMetaDirectory), ch)
+				if !Verbose { close(ch) }
 			}(&waitgroup)
 			items.Metadata = true
+		}
+
+		if !Verbose {
+			cmdio.NewProgressBar(
+				cmdio.ProgressOptions{
+					Counters: true,
+					Percentage: true,
+				},
+				m,
+				c...
+			)
 		}
 
 		err = items.WriteItemsInfo(path.Join(fpath, "itemsInfo.json"))
 		if checkError(err) {
 			return 0, err
 		}
+
+		waitgroup.Wait()
+		close(m)
 	}
 
-	waitgroup.Wait()
+
 	if checkError(err) {
 		panic(err)
 		// if any errors occur, something wrong happened inbetween all of the batch operations
