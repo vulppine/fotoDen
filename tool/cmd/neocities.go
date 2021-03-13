@@ -1,3 +1,5 @@
+// +build all remote neocities
+
 package cmd
 
 import (
