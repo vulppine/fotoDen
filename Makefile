@@ -36,7 +36,7 @@ tool:
 	if [ -e $(BUILDDIR)/$(JSNAME).min.js ]; then\
 		echo "Building with embed minified JS and theme...";\
 		go build -o $(BUILDDIR)/fotoDen\
-		-tags embed all;\
+		-tags embed,all;\
 	else\
 		echo "Building without minified JS...";\
 		go build -o $(BUILDDIR)/fotoDen -tags all;\

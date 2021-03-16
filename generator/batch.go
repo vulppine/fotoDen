@@ -2,10 +2,11 @@ package generator
 
 import (
 	"fmt"
-	"github.com/h2non/bimg"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
+
+	"github.com/h2non/bimg"
 )
 
 // BatchOperationOnFiles takes two arguments, an array of file names, and a function that takes a string and an int.
@@ -25,16 +26,6 @@ func BatchOperationOnFiles(files []string, fn func(string, int) error, ch chan i
 		}
 	}
 
-	/*
-	for {
-		_, c := <- ch
-		if !c {
-			close(ch)
-			break
-		}
-	}
-	*/
-
 	return nil
 }
 
@@ -45,7 +36,7 @@ func BatchCopyFile(files []string, directory string, ch chan int) error {
 	wd, _ := os.Getwd()
 	verbose("Attempting a batch copy from " + wd + " to " + directory)
 	batchCopyFile := func(file string, index int) error {
-		err := CopyFile(file, file, directory)
+		err := CopyFile(file, filepath.Join(directory, file))
 		if err != nil {
 			return err
 		}
@@ -67,7 +58,7 @@ func BatchImageConversion(files []string, prefix string, directory string, Scali
 	wd, _ := os.Getwd()
 	verbose("Generating thumbnails in " + wd + " and placing them in " + directory)
 	batchResizeImage := func(file string, index int) error {
-		err := ResizeImage(file, prefix+"_"+strings.Split(path.Base(file), ".")[0]+".jpg", ScalingOptions, directory, bimg.JPEG)
+		err := ResizeImage(file, prefix+"_"+strings.Split(filepath.Base(file), ".")[0]+".jpg", ScalingOptions, directory, bimg.JPEG)
 		if err != nil && err != fmt.Errorf("skip") {
 			return err
 		}

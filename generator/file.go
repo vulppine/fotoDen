@@ -40,14 +40,14 @@ func GetArrayOfFolders(directory []os.FileInfo) []string {
 // via the current working directory.
 //
 // Returns an error if one occurs - otherwise returns nil.
-func CopyFile(file string, name string, dest string) error {
-	verbose("Copying " + file + " to " + filepath.Join(dest, name))
+func CopyFile(file string, dest string) error {
+	verbose("Copying " + file + " to " + filepath.Join(dest))
 	fileReader, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
 	}
 
-	toWrite, err := os.Create(filepath.Join(dest, name))
+	toWrite, err := os.Create(filepath.Join(dest))
 	defer toWrite.Close()
 	if err != nil {
 		return err

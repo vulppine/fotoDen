@@ -370,7 +370,7 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 		checkError(err)
 	} else {
 		verbose("copying fotoDen.js from config dir")
-		err = generator.CopyFile(path.Join(generator.RootConfigDir, "fotoDen.js"), "fotoDen.js", path.Join(rootpath, "js"))
+		err = generator.CopyFile(path.Join(generator.RootConfigDir, "fotoDen.js"), path.Join(rootpath, "js", "fotoDen.js"))
 		checkError(err)
 	}
 

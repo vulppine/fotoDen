@@ -59,19 +59,16 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 		}
 
 		c := make([]chan int, 0)
-		m := make(chan string, 10)
 
 		if options.Copy == true {
 			ch := make(chan int, 5)
-			if !Verbose {
-				c = append(c, ch)
+			c = append(c, ch)
 
-				ch <- len(items.ItemsInFolder)
-				waitgroup.Add(1)
-			}
+			ch <- len(items.ItemsInFolder)
+			waitgroup.Add(1)
 			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
-				m <- "Copying files..."
+				log.Println("Copying files...")
 				err = generator.BatchCopyFile(items.ItemsInFolder, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageSrcDirectory), ch)
 				close(ch)
 			}(&waitgroup)
@@ -82,50 +79,43 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 
 			for k, v := range generator.CurrentConfig.ImageSizes {
 				ch := make(chan int, 5)
-				if !Verbose {
-					c = append(c, ch)
+				c = append(c, ch)
 
-					ch <- len(items.ItemsInFolder)
-				}
+				ch <- len(items.ItemsInFolder)
 				sizeName := k
 				sizeOpts := v
 				waitgroup.Add(1)
 				go func(wg *sync.WaitGroup) {
 					defer wg.Done()
-					m <- fmt.Sprintf("Generating size %s...", sizeName)
+					log.Printf("Generating size %s...\n", sizeName)
 					err = generator.BatchImageConversion(items.ItemsInFolder, sizeName, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, sizeName), sizeOpts, ch)
-					if !Verbose { close(ch) }
+					close(ch)
 				}(&waitgroup)
 			}
 		}
 
 		if options.Meta == true {
 			ch := make(chan int, 5)
-			if !Verbose {
-				c = append(c, ch)
+			c = append(c, ch)
 
-				ch <- len(items.ItemsInFolder)
-				waitgroup.Add(1)
-			}
+			ch <- len(items.ItemsInFolder)
+			waitgroup.Add(1)
 			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
 				verbose("Generating metadata to: " + path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageMetaDirectory))
 				err = generator.BatchImageMeta(items.ItemsInFolder, path.Join(fpath, generator.CurrentConfig.ImageRootDirectory, generator.CurrentConfig.ImageMetaDirectory), ch)
-				if !Verbose { close(ch) }
+				close(ch)
 			}(&waitgroup)
 			items.Metadata = true
 		}
 
-		if !Verbose {
-			cmdio.NewProgressBar(
-				cmdio.ProgressOptions{
-					Counters: true,
-					Percentage: true,
-				},
-				m,
-				c...
-			)
-		}
+		cmdio.NewProgressBar(
+			cmdio.ProgressOptions{
+				Counters: true,
+				Percentage: true,
+			},
+			c...
+		)
 
 		err = items.WriteItemsInfo(path.Join(fpath, "itemsInfo.json"))
 		if checkError(err) {
@@ -133,7 +123,6 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 		}
 
 		waitgroup.Wait()
-		close(m)
 	}
 
 
@@ -307,11 +296,12 @@ func InsertImage(folder string, mode string, options GeneratorOptions, files ...
 				defer wg.Done()
 				fmt.Println("Copying file...")
 				err = generator.CopyFile(
-					f, f,
+					f,
 					path.Join(
 						folder,
 						generator.CurrentConfig.ImageRootDirectory,
 						generator.CurrentConfig.ImageSrcDirectory,
+						f,
 					),
 				)
 			}(&waitgroup)

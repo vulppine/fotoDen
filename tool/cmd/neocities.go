@@ -1,4 +1,4 @@
-// +build all remote neocities
+// +build all remote,neocities
 
 package cmd
 
