@@ -172,9 +172,10 @@ func (t *theme) initTheme(u string, e string, r string) error {
 	verbose("temp dir created in: " + m)
 
 	wvars, err := generator.NewWebVars(u)
+	wvars.StaticWebVars["pageContent"] = "{{.PageContent}}" // hacky
 	checkError(err)
 
-	hf := []string{"photo-template.html", "album-template.html", "folder-template.html"}
+	hf := []string{"photo-template.html", "album-template.html", "folder-template.html", "page-template.html"}
 
 	verbose("generating temporary template setup files")
 	for _, f := range hf {
