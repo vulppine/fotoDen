@@ -17,7 +17,8 @@
 - [ ] More functions for website templates for static generation (e.g., the ability to create a series of links for web navigation based on another template)
 - [X] Persistant status bar during lengthy generation (e.g., album generation/folder generation) so that the user knows the current progress of generation
   - +Not up to spec, but it is implemented - improve before 0.3.0 (by modifying cmdio-go)+ This is implemented via cmdio-go v0.1.3
-- [ ] Add in static page generation using Markdown (possibly use goldmark?)
+- [X] Add in static page generation using Markdown (possibly use goldmark?)
+  - [ ] Integrate it into fotoDen by creating automated site trees/sidebars/etc.
 - [ ] Add in optional web upload functionality, toggle by flags during build (e.g. NeoCities support, Google Cloud Platform support, so on, so on)
   - In progress:
     - [X] NeoCities

@@ -1,6 +1,8 @@
 * fotoDen
 /A statically structured, front-end dynamic photo gallery/
 
+[[https://github.com/vulppine/fotoDen/wiki][Wiki]]
+
 ** Using
 
 fotoDen is designed so that it can be used independent of any separate tool, but it works well if you have the fotoDen tool in order to create folders and albums that are directly accessable by fotoDen's front end.
@@ -14,8 +16,8 @@ fotoDen init -i site --name "[ your website name here ]" my_website/
 From there, you can start generating folders and albums as you wish:
 
 #+BEGIN_SRC sh
-fotoDen generate folder --name "[ your folder name here ]" my_website/my_folder/
-fotoDen generate album --name "[ your album name here ]" --source my/images/are/here my_website/my_folder/my_album
+fotoDen create folder --name "[ your folder name here ]" my_website/my_folder/
+fotoDen create album --name "[ your album name here ]" my/images/are/here my_website/my_folder/my_album
 #+END_SRC
 
 Run the fotoDen command for more options. (More detailed information and commands will be added soon, including use of the build system!)
@@ -56,6 +58,7 @@ fotoDen relies on a few important dependencies (both front and back), so here ar
 | [[https://github.com/flickr/justified-layout][justified-layout]] | Flickr/SmugMug         | MIT        |
 | [[https://github.com/exif-js/exif-js][exif-js]]          | Jacob Seidelin         | MIT        |
 | [[https://github.com/go-yaml/yaml][go-yaml]]          | go-yaml team           | Apache 2.0 |
+| [[https://github.com/yuin/goldmark][Goldmark]]         | goldmark team          | MIT        |
 
 ** Copyright
 

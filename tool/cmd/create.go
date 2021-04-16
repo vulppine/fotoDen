@@ -38,6 +38,10 @@ func init() {
 //   - Albums
 //   - Pages
 //   - Sites
+//
+// ^ Maybe - splitting creation and site initialization might be
+// a good thing, so that it's more distinct that you
+// 'initialize' a site and 'create' things inside of it.
 
 var (
 	t string
@@ -45,12 +49,12 @@ var (
 	folderMeta = tool.FolderMeta{}
 	wd, _      = os.Getwd()
 	genCmd     = &cobra.Command{
-		Use:   "generate { album | folder | page }",
-		Short: "Generates fotoDen folders/albums",
+		Use:   "create { album | folder | page }",
+		Short: "Creates fotoDen folders/albums/pages",
 	}
 	genFolderCmd = &cobra.Command{
 		Use:   "folder [--name string] [--thumb image] [--static] destination",
-		Short: "Generates a fotoDen folder",
+		Short: "Creates a fotoDen folder",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if folderMeta.Name == "" {
@@ -71,7 +75,7 @@ var (
 	}
 	genAlbumCmd = &cobra.Command{
 		Use:   "album [--name string] [--copy] [--sort] [--gensizes] [--meta] [--thumb image] [--static] source destination",
-		Short: "Generates a fotoDen album",
+		Short: "Creates a fotoDen album",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.ImageGen = true
@@ -95,7 +99,7 @@ var (
 	}
 	genPageCmd = &cobra.Command{
 		Use: "page [--name string] source destination",
-		Short: "Generates a webpage using a fotoDen template and Markdown",
+		Short: "Creates a webpage using a fotoDen template and Markdown (incomplete)",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := tool.GeneratePage(args[1], args[0], t)
