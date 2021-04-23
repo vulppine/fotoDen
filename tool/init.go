@@ -256,7 +256,7 @@ type WebsiteConfig struct {
 func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 	rootpath, _ = filepath.Abs(rootpath)
 
-	err := generator.GenerateWebRoot(rootpath)
+	err := GenerateWebRoot(rootpath)
 	if checkError(err) {
 		panic(err)
 	}

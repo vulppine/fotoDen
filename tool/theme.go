@@ -7,8 +7,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-
-	"github.com/vulppine/fotoDen/generator"
 )
 
 // Note:
@@ -171,7 +169,7 @@ func (t *theme) initTheme(u string, e string, r string) error {
 	}
 	verbose("temp dir created in: " + m)
 
-	wvars, err := generator.NewWebVars(u)
+	wvars, err := NewWebVars(u)
 	wvars.StaticWebVars["pageContent"] = "{{.PageContent}}" // hacky
 	checkError(err)
 
@@ -191,7 +189,7 @@ func (t *theme) initTheme(u string, e string, r string) error {
 		return err
 	}
 	for _, f := range hf {
-		err = generator.ConfigureWebFile(
+		err = ConfigureWebFile(
 			filepath.Join(m, f),
 			filepath.Join(e, "html", f),
 			wvars,

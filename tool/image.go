@@ -36,7 +36,7 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 		if options.Sort == true {
 			sort.Strings(items.ItemsInFolder)
 		}
-		err = generator.MakeAlbumDirectoryStructure(fpath)
+		err = MakeAlbumDirectoryStructure(fpath)
 		if checkError(err) {
 			panic(err)
 		}
@@ -111,10 +111,10 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 
 		cmdio.NewProgressBar(
 			cmdio.ProgressOptions{
-				Counters: true,
+				Counters:   true,
 				Percentage: true,
 			},
-			c...
+			c...,
 		)
 
 		err = items.WriteItemsInfo(path.Join(fpath, "itemsInfo.json"))
@@ -124,7 +124,6 @@ func GenerateItems(fpath string, options GeneratorOptions) (int, error) {
 
 		waitgroup.Wait()
 	}
-
 
 	if checkError(err) {
 		panic(err)

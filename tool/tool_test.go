@@ -83,7 +83,7 @@ func TestImageCRUD(t *testing.T) {
 		wd, _ := os.Getwd()
 		defer os.Chdir(wd)
 		os.Chdir(dir)
-		generator.MakeAlbumDirectoryStructure(dir)
+		MakeAlbumDirectoryStructure(dir)
 	}()
 
 	genopts := GeneratorOptions{
