@@ -2,10 +2,8 @@ package tool
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
 	"io"
-	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -84,61 +82,6 @@ func MakeAlbumDirectoryStructure(rootDirectory string) error {
 	return nil
 }
 
-// WebVars dictate where fotoDen gets its JavaScript and CSS files per page.
-type WebVars struct {
-	BaseURL       string
-	JSLocation    string
-	CSSLocation   string
-	StaticWebVars map[string]string
-}
-
-// NewWebVars creates a WebVars object. Takes a single URL string, and outputs
-// a set of fotoDen compatible URLs.
-//
-// Generates:
-// BaseURL: BaseURL
-// JSLocation: BaseURL/js/fotoDen.js -- This is the only expected JavaScript file.
-// CSSLocation: BaseURL/css/ -- This is expected to be set according to a theme name's CSS
-// 								and needs to be processed during configuration.
-// 								This is really meant for themes that autoconfigure themselves,
-// 								and is mostly an optional path.
-//
-// Also includes a string map that contains all the static vars that a page can have,
-// for when a page is generated to have static parts as well.
-//
-// If an error occurs, returns an empty WebVars and the error, otherwise returns a filled WebVars.
-func NewWebVars(u string) (*WebVars, error) {
-
-	webvars := new(WebVars)
-	url, err := url.Parse(u)
-	jsurl, err := url.Parse(u)
-	cssurl, err := url.Parse(u)
-	if err != nil {
-		return webvars, err
-	}
-
-	webvars.BaseURL = url.String()
-	if len(webvars.BaseURL) > 0 && webvars.BaseURL[len(webvars.BaseURL)-1] == '/' {
-		webvars.BaseURL = webvars.BaseURL[0 : len(webvars.BaseURL)-1]
-	}
-
-	jsurl.Path = path.Join(jsurl.Path, "js", "fotoDen.js")
-	webvars.JSLocation = jsurl.String()
-
-	cssurl.Path = path.Join(cssurl.Path, "css", "theme.css")
-	webvars.CSSLocation = cssurl.String()
-
-	webvars.StaticWebVars = map[string]string{
-		"isStatic": "{{.IsStatic}}",
-		"name":     "{{.PageName}}",
-		"desc":     "{{.PageDesc}}",
-		"auth":     "{{.PageAuthor}}",
-		"sfol":     "{{.PageFolder}}",
-	}
-
-	return webvars, nil
-}
-
 // StaticWebVars are fields that a page can take in order to allow for static page generation.
 // If a folder is marked for dynamic generation, these will all automatically be blank.
 // Otherwise, these will have the relevant information inside. This only applies to folders.
@@ -148,43 +91,6 @@ type StaticWebVars struct {
 	PageDesc   string // the current description of the page
 	PageFolder string // the folder this is contained in
 	PageAuthor string // the author of the page, i.e. the photographer
-}
-
-// NewStaticWebVars creates a new static web var set based on the folder given.
-// Returns a filled webvar set - save for superFolder, which only occurs
-// if the folder above is a fotoDen folder or not.
-//
-// If an error occurs, it returns a potentially incomplete StaticWebVars with an error.
-func NewStaticWebVars(folder string) (*StaticWebVars, error) {
-	swebvars := new(StaticWebVars)
-	f := new(generator.Folder)
-	fpath, _ := filepath.Abs(folder)
-
-	err := f.ReadFolderInfo(filepath.Join(fpath, "folderInfo.json"))
-	if err != nil {
-		return swebvars, err
-	}
-
-	swebvars.IsStatic = true
-	swebvars.PageName = f.Name
-	swebvars.PageDesc = f.Desc
-
-	superFolder := func() bool {
-		_, err := os.Stat(filepath.Join(filepath.Dir(fpath), "folderInfo.json"))
-		return os.IsNotExist(err)
-	}()
-
-	if !superFolder {
-		verbose("Folder above is a fotoDen folder, using that...")
-		err = f.ReadFolderInfo(filepath.Join(filepath.Dir(fpath), "folderInfo.json"))
-		if err != nil {
-			return swebvars, err
-		}
-
-		swebvars.PageFolder = f.Name
-	}
-
-	return swebvars, nil
 }
 
 // ConfigureWebFile configures the web variables in a template by putting it through Go's template system.
@@ -218,14 +124,14 @@ func ConfigureWebFile(source string, dest string, vars interface{}) error {
 // If a folder was marked as static, it will create a StaticWebVars object to put into the page, and generate
 // a more static page - otherwise, it will leave those fields blank, and leave it to the fotoDen front end
 // to generate the rest of the page.
-func GenerateWeb(m string, dest string, f *generator.Folder, opt GeneratorOptions) error {
+/*func GenerateWeb(m string, dest string, f *generator.Folder, opt GeneratorOptions) error {
 	verbose("Generating web pages...")
 	var err error
 	var pageOptions *StaticWebVars
 
 	if opt.Static || f.Static {
 		verbose("Folder/album is static, generating static web vars...")
-		pageOptions, err = NewStaticWebVars(dest)
+		pageOptions, err = NewWebVars(dest)
 		if checkError(err) {
 			return err
 		}
@@ -252,7 +158,7 @@ func GenerateWeb(m string, dest string, f *generator.Folder, opt GeneratorOption
 	}
 
 	return nil
-}
+}*/
 
 // UpdateWeb takes a folder, and updates the webpages inside of that folder.
 func UpdateWeb(folder string) error {
@@ -264,7 +170,7 @@ func UpdateWeb(folder string) error {
 		return err
 	}
 
-	err = GenerateWeb(f.Type, folder, f, Genoptions)
+	err = currentTheme.generateWeb(f.Type, folder)
 	if checkError(err) {
 		return err
 	}

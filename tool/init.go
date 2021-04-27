@@ -285,6 +285,15 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 		return fmt.Errorf("could not find theme, aborting")
 	}
 
+	if !fileCheck(path.Join(generator.RootConfigDir, "defaulttheme")) {
+		f, err := os.Create(path.Join(generator.RootConfigDir, "defaulttheme"))
+		if checkError(err) {
+			return err
+		}
+		f.WriteString(t.s.ThemeName)
+		f.Close()
+	}
+
 	/*
 		if webconfig.Theme == "" {
 			if fileCheck(path.Join(generator.RootConfigDir, "defaulttheme")) {
@@ -427,7 +436,8 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 	err = folder.WriteFolderInfo(path.Join(rootpath, "folderInfo.json"))
 	checkError(err)
 
-	err = GenerateWeb("folder", rootpath, folder, Genoptions)
+	// err = GenerateWeb("folder", rootpath, folder, Genoptions)
+	err = t.generateWeb("folder", rootpath)
 	checkError(err)
 
 	if !fileCheck(path.Join(generator.RootConfigDir, "defaultsite")) {

@@ -20,6 +20,13 @@ type Folder struct {
 	Static     bool     `json:"static"`     // If the folder was generated statically, or has information inserted dynamically.
 }
 
+// Album represents a folder, but with an extra value, ItemAmount attached to it.
+// This currently isn't in use, but will be integrated eventually.
+type Album struct {
+	*Folder
+	ItemAmount int `json:"itemAmount"`
+}
+
 // GenerateFolderInfo generates a Folder object that can be used for folder configuration.
 // If directory is an empty string, it does it in the current directory.
 // Otherwise, it attempts to reach the directory from the current working directory.
