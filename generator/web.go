@@ -8,6 +8,7 @@ type WebConfig struct {
 	ThumbnailFrom    string         `json:"thumbnailSize"`
 	DisplayImageFrom string         `json:"displayImageSize"`
 	Theme            bool           `json:"theme"`
+	Pages            []string       `json:"pages"`
 	DownloadSizes    []string       `json:"downloadableSizes"`
 	ImageSizes       []WebImageSize `json:"imageSizes"`
 }

@@ -82,6 +82,7 @@ func setRootFlags() {
 			os.Exit(1)
 		}
 
+		tool.CurrentConfig = s
 		generator.CurrentConfig = s.GeneratorConfig
 	}
 }

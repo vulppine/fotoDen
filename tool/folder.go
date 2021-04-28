@@ -104,7 +104,7 @@ func GenerateFolder(meta FolderMeta, fpath string, options GeneratorOptions) err
 		}
 	}
 
-	err = currentTheme.generateWeb(folder.Type, fpath)
+	err = currentTheme.generateWeb(folder.Type, fpath, nil)
 	checkError(err)
 
 	fpath, _ = filepath.Abs(fpath)

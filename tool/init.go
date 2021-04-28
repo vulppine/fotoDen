@@ -437,7 +437,7 @@ func InitializefotoDenRoot(rootpath string, webconfig WebsiteConfig) error {
 	checkError(err)
 
 	// err = GenerateWeb("folder", rootpath, folder, Genoptions)
-	err = t.generateWeb("folder", rootpath)
+	err = t.generateWeb("folder", rootpath, nil)
 	checkError(err)
 
 	if !fileCheck(path.Join(generator.RootConfigDir, "defaultsite")) {

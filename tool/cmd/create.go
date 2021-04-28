@@ -29,7 +29,7 @@ func init() {
 	genAlbumCmd.Flags().BoolVar(&opts.Static, "static", false, "toggle more static generation of websites in fotoDen folders/albums")
 
 	genCmd.AddCommand(genPageCmd)
-	genCmd.Flags().StringVar(&t, "name", "", "the name of the webpage (used as title)")
+	genPageCmd.Flags().StringVar(&t, "name", "", "the name of the webpage (used as title)")
 }
 
 // TODO:
@@ -44,8 +44,8 @@ func init() {
 // 'initialize' a site and 'create' things inside of it.
 
 var (
-	t string
-	opts tool.GeneratorOptions
+	t          string
+	opts       tool.GeneratorOptions
 	folderMeta = tool.FolderMeta{}
 	wd, _      = os.Getwd()
 	genCmd     = &cobra.Command{
@@ -98,11 +98,11 @@ var (
 		},
 	}
 	genPageCmd = &cobra.Command{
-		Use: "page [--name string] source destination",
+		Use:   "page [--name string] source",
 		Short: "Creates a webpage using a fotoDen template and Markdown (incomplete)",
-		Args: cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := tool.GeneratePage(args[1], args[0], t)
+			err := tool.GeneratePage(args[0], t)
 			if err != nil {
 				return err
 			}

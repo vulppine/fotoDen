@@ -24,6 +24,11 @@ var Recurse bool
 // URLFlag sets the URL for functions that require a URL. This is mostly used in initialization.
 var URLFlag string
 
+// CurrentConfig represents the current site configuration file being used by fotoDen's tool.
+var CurrentConfig *WebsiteConfig
+
+// TODO: Find everything that uses the Genoptions global var and *refactor*
+
 // GeneratorOptions is a set of options for the generator.
 //
 // Includes:

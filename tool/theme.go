@@ -308,11 +308,26 @@ func (t *theme) configurePage(u, d string, y page, i *webVars) error {
 	return m.Execute(r, i)
 }
 
-func (t *theme) generateWeb(m, dest string) error {
+// generateWeb takes a mode, a destinatination, and an optional map[string]string.
+// If i is not nil, that map will be merged into the WebVars PageVars field.
+func (t *theme) generateWeb(m, dest string, i map[string]string) error {
 	var err error
-	v, err := newWebVars(generator.CurrentConfig.WebBaseURL, dest)
-	if err != nil {
-		return err
+	var v *webVars
+
+	if m == "folder" || m == "album" {
+		v, err = newWebVars(generator.CurrentConfig.WebBaseURL, dest)
+		if err != nil {
+			return err
+		}
+	} else {
+		v = new(webVars)
+		v.PageVars = make(map[string]string)
+	}
+
+	if i != nil {
+		for k, a := range i {
+			v.PageVars[k] = a
+		}
 	}
 
 	switch m {
@@ -328,6 +343,12 @@ func (t *theme) generateWeb(m, dest string) error {
 		}
 
 		err = t.configurePage(generator.CurrentConfig.WebBaseURL, path.Join(dest, "photo.html"), photo, v)
+		if checkError(err) {
+			return err
+		}
+	case "page":
+		err = t.configurePage(generator.CurrentConfig.WebBaseURL, dest, info, v)
+
 		if checkError(err) {
 			return err
 		}

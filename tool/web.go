@@ -2,11 +2,13 @@ package tool
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/vulppine/fotoDen/generator"
 	"github.com/yuin/goldmark"
@@ -170,7 +172,7 @@ func UpdateWeb(folder string) error {
 		return err
 	}
 
-	err = currentTheme.generateWeb(f.Type, folder)
+	err = currentTheme.generateWeb(f.Type, folder, nil)
 	if checkError(err) {
 		return err
 	}
@@ -182,11 +184,19 @@ func UpdateWeb(folder string) error {
 
 // GeneratePage generates a page using a markdown document as a source.
 // It will use the 'page' HTML template in the theme in order to generate
-// a web page. Takes a file destination and a file location.
+// a web page. Takes a source location, and places it at the root of the current site.
 //
-// The page template must have {{.PageContent}} in the location of where
+// The page template must have {{.PageVars.PageContent}} in the location of where
 // you want the parsed document to go.
-func GeneratePage(dest string, src string, title string) error {
+func GeneratePage(src string, title string) error {
+	if title == "" {
+		return fmt.Errorf("you need to give the page a filename/title")
+	}
+
+	if CurrentConfig == nil {
+		return fmt.Errorf("you need to use this in conjunction with a valid fotoDen site")
+	}
+
 	f, err := os.Open(src)
 	if checkError(err) {
 		return err
@@ -217,18 +227,36 @@ func GeneratePage(dest string, src string, title string) error {
 		return err
 	}
 
-	// maybe it isn't a good idea to nest this in an anonymous struct???
-	// then again, the generator package is supposed to be strictly
-	// for fotoDen use, and having static web pages is completely
-	// and utterly optional
-	err = ConfigureWebFile(
-		path.Join(generator.CurrentConfig.WebSourceLocation, "html", "page-template.html"),
-		dest,
-		struct {
-			PageContent string
-			Title       string
-		}{string(r), title},
+	if currentTheme == nil {
+		err = openDefaultTheme()
+		if checkError(err) {
+			return err
+		}
+	}
+
+	title = strings.ToLower(strings.ReplaceAll(title, " ", ""))
+
+	err = currentTheme.generateWeb(
+		"page",
+		filepath.Join(CurrentConfig.RootLocation, title+".html"),
+		map[string]string{
+			"pageContent": string(r),
+			"title":       title,
+		},
 	)
+
+	if checkError(err) {
+		return err
+	}
+
+	c := new(generator.WebConfig)
+	err = c.ReadWebConfig(filepath.Join(CurrentConfig.RootLocation, "config.json"))
+	if checkError(err) {
+		return err
+	}
+
+	c.Pages = append(c.Pages, title+".html")
+	err = c.WriteWebConfig(filepath.Join(CurrentConfig.RootLocation, "config.json"))
 	if checkError(err) {
 		return err
 	}
