@@ -15,7 +15,7 @@ import (
 // Incidentally, this covers the GenerateItems() function too,
 // so there's no need to test that one here.
 
-func TestGenerateFolder(t *testing.T) {
+/*func TestGenerateFolder(t *testing.T) {
 	generator.CurrentConfig = generator.DefaultConfig
 
 	dir := t.TempDir()
@@ -60,7 +60,7 @@ func TestGenerateFolder(t *testing.T) {
 	t.Log(string(j))
 	j, _ = ioutil.ReadFile(path.Join(dir, "with_images", "itemsInfo.json"))
 	t.Log(string(j))
-}
+}*/
 
 // holy shit, CRUD??? who could've ever guessed
 

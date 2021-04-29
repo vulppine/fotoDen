@@ -1,6 +1,4 @@
-// fotoDen tool:
-//
-// Reference implementation for generation of fotoDen-based websites.
+// Package tool is a reference implementation for generation of fotoDen-based websites.
 package tool
 
 import (
