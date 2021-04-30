@@ -234,15 +234,17 @@ func GeneratePage(src string, title string) error {
 		}
 	}
 
+	v := map[string]string{
+		"pageContent": string(r),
+		"title":       title,
+	}
+
 	title = strings.ToLower(strings.ReplaceAll(title, " ", ""))
 
 	err = currentTheme.generateWeb(
 		"page",
 		filepath.Join(CurrentConfig.RootLocation, title+".html"),
-		map[string]string{
-			"pageContent": string(r),
-			"title":       title,
-		},
+		v,
 	)
 
 	if checkError(err) {
