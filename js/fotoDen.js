@@ -755,7 +755,10 @@ function pageInit () {
   if (mobileCheck.matches) { isMobile = true }
   setConfig()
     .then(() => {
-      theme.populateStaticPageLinks()
+      if (document.querySelector('#pageLinks')) {
+        theme.populateStaticPageLinks()
+      }
+
       if (document.querySelectorAll('.fd-viewer').length !== 0) {
         getJSON(getAlbumURL() + 'folderInfo.json')
           .then((info) => {
