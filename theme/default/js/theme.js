@@ -1,4 +1,4 @@
-/* global bootstrap, BaseURL, EXIF, getPageInfo, getAlbumURL, makePhotoURL, imageSizes, thumbnailFrom, websiteTitle */
+/* global bootstrap, BaseURL, EXIF, getPageInfo, getAlbumURL, makePhotoURL, pages, imageSizes, thumbnailFrom, websiteTitle */
 /* eslint-env browser */
 
 /**
@@ -242,6 +242,26 @@ export function createThumbnail (index, name) {
   thumbnailAnchor.classList.add('fd-albumThumbnail', 'text-center')
 
   return thumbnailAnchor
+}
+
+export function populateStaticPageLinks () {
+  if (pages.length === 0) {
+    return
+  }
+
+  document.querySelector('#pageLinksMenu').classList.remove('d-none')
+  const pageLinks = document.querySelector('#pageLinks')
+
+  pages.forEach(i => {
+    const pageLinkItem = document.createElement('li')
+    const pageLink = document.createElement('a')
+    pageLinkItem.appendChild(pageLink)
+
+    pageLink.classList.add('dropdown-item')
+    pageLink.setAttribute('href', i.location)
+    pageLink.innerText = i.title
+    pageLinks.appendChild(pageLinkItem)
+  })
 }
 
 export function init () {

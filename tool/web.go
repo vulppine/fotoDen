@@ -255,7 +255,7 @@ func GeneratePage(src string, title string) error {
 		return err
 	}
 
-	c.Pages = append(c.Pages, title+".html")
+	c.Pages = append(c.Pages, generator.PageLink{Title: title, Location: path.Join(generator.CurrentConfig.WebBaseURL, title+".html")})
 	err = c.WriteWebConfig(filepath.Join(CurrentConfig.RootLocation, "config.json"))
 	if checkError(err) {
 		return err

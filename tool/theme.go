@@ -321,6 +321,7 @@ func (t *theme) generateWeb(m, dest string, i map[string]string) error {
 		}
 	} else {
 		v = new(webVars)
+		v.BaseURL = generator.CurrentConfig.WebBaseURL
 		v.PageVars = make(map[string]string)
 	}
 

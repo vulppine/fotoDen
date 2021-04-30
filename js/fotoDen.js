@@ -45,6 +45,7 @@ let imageRootDir
 let thumbnailFrom
 let displayImageFrom
 let downloadSizes
+let pages // this may be moved later
 const imageSizes = new Map()
 
 // theme
@@ -164,6 +165,18 @@ let theme = {
     }
 
     container.appendChild(newAnchor)
+  },
+
+  populateStaticPageLinks () {
+    const pageLinks = document.querySelector('#pagelinks') // there should only be one of these
+
+    pages.forEach(i => {
+      const pagelink = document.createElement('a')
+      pagelink.setAttribute('href', i.location)
+      pagelink.innerText = i.title
+
+      pageLinks.appendChild(pagelink)
+    })
   }
 }
 
@@ -691,6 +704,7 @@ function readConfig (info) {
   thumbnailFrom = info.thumbnailSize
   imageRootDir = info.imageRoot
   downloadSizes = info.downloadableSizes
+  pages = info.pages
 
   const p = new URL(BaseURL).pathname
   if (p === '' || p === '/') {
@@ -741,33 +755,36 @@ function pageInit () {
   if (mobileCheck.matches) { isMobile = true }
   setConfig()
     .then(() => {
-      getJSON(getAlbumURL() + 'folderInfo.json')
-        .then((info) => {
-          try {
-            const viewers = document.querySelectorAll('.fd-viewer')
-            viewers.forEach((viewer) => {
-              if (viewer.classList.contains('fd-photo')) {
-                const photoViewer = new PhotoViewer(viewer, info)
-                PhotoViewers.push(photoViewer)
-              } else if (viewer.classList.contains('fd-folder')) {
-                const folderViewer = new FolderViewer(viewer, info)
-                FolderViewers.push(folderViewer)
-              } else if (viewer.classList.contains('fd-album')) {
-                const albumViewer = new AlbumViewer(viewer, info)
-                AlbumViewers.push(albumViewer)
-              } else {
-                console.warn('Invalid viewer type detected.')
-              }
-            })
-          } catch (err) {
-            console.error(err)
-          }
-        })
-        .catch(error => {
-          setTitle([error])
-          console.error(error)
-          theme.setError('Error getting folder information: ' + error)
-        })
+      theme.populateStaticPageLinks()
+      if (document.querySelectorAll('.fd-viewer').length !== 0) {
+        getJSON(getAlbumURL() + 'folderInfo.json')
+          .then((info) => {
+            try {
+              const viewers = document.querySelectorAll('.fd-viewer')
+              viewers.forEach((viewer) => {
+                if (viewer.classList.contains('fd-photo')) {
+                  const photoViewer = new PhotoViewer(viewer, info)
+                  PhotoViewers.push(photoViewer)
+                } else if (viewer.classList.contains('fd-folder')) {
+                  const folderViewer = new FolderViewer(viewer, info)
+                  FolderViewers.push(folderViewer)
+                } else if (viewer.classList.contains('fd-album')) {
+                  const albumViewer = new AlbumViewer(viewer, info)
+                  AlbumViewers.push(albumViewer)
+                } else {
+                  console.warn('Invalid viewer type detected.')
+                }
+              })
+            } catch (err) {
+              console.error(err)
+            }
+          })
+          .catch(error => {
+            setTitle([error])
+            console.error(error)
+            theme.setError('Error getting folder information: ' + error)
+          })
+      }
     })
     .catch((status) => {
       setTitle([status])
