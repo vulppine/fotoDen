@@ -245,7 +245,7 @@ func GeneratePage(src string, title string) error {
 		return err
 	}
 
-	u.Path = strings.ToLower(strings.ReplaceAll(title, " ", ""))
+	u.Path = path.Join(u.Path, strings.ToLower(strings.ReplaceAll(title, " ", "")))
 
 	err = currentTheme.generateWeb(
 		"page",
