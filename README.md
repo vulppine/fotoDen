@@ -1,10 +1,12 @@
-fotoDen =======
+fotoDen
+=======
 
 *A statically structured, front-end dynamic photo gallery*
 
 [https://github.com/vulppine/fotoDen/wiki](Wiki)
 
-Using -----
+Using
+-----
 
 fotoDen is designed so that it can be used independent of any separate tool, but
 it works well if you have the fotoDen tool in order to create folders and albums
