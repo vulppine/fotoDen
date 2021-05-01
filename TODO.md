@@ -1,4 +1,5 @@
-* The big todo list
+The big todo list
+=================
 
 - [ ] GUI mode (Qt?)
   - Svelte NodeGUI? (it's Qt based, but it would be a wrapper around fotoDen's tool)
@@ -18,7 +19,7 @@
 - [X] Persistant status bar during lengthy generation (e.g., album generation/folder generation) so that the user knows the current progress of generation
   - +Not up to spec, but it is implemented - improve before 0.3.0 (by modifying cmdio-go)+ This is implemented via cmdio-go v0.1.3
 - [X] Add in static page generation using Markdown (possibly use goldmark?)
-  - [ ] Integrate it into fotoDen by creating automated site trees/sidebars/etc.
+  - [X] Integrate it into fotoDen by creating automated site trees/sidebars/etc.
 - [ ] Add in optional web upload functionality, toggle by flags during build (e.g. NeoCities support, Google Cloud Platform support, so on, so on)
   - In progress:
     - [X] NeoCities

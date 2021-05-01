@@ -249,7 +249,7 @@ func GeneratePage(src string, title string) error {
 
 	err = currentTheme.generateWeb(
 		"page",
-		filepath.Join(CurrentConfig.RootLocation, title+".html"),
+		path.Base(u.Path),
 		v,
 	)
 
