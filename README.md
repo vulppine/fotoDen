@@ -3,7 +3,7 @@ fotoDen
 
 *A statically structured, front-end dynamic photo gallery*
 
-[https://github.com/vulppine/fotoDen/wiki](Wiki)
+[Wiki](https://github.com/vulppine/fotoDen/wiki)
 
 Using
 -----
@@ -22,9 +22,8 @@ fotoDen init -i site --name "[ your website name here ]" my_website/
 From there, you can start generating folders and albums as you wish:
 
 ``` sh
-fotoDen create folder --name "[ your folder name here ]"
-my_website/my_folder/ fotoDen create album --name "[ your album name here ]"
-my/images/are/here my_website/my_folder/my_album
+fotoDen create folder --name "[ your folder name here ]" my_website/my_folder/
+fotoDen create album --name "[ your album name here ]" my/images/are/here my_website/my_folder/my_album
 ```
 
 Run the fotoDen command for more options. (More detailed information and
@@ -43,29 +42,29 @@ Installing
 ----------
 
 You will require the latest version of
-[https://github.com/libvips/libvips](libvips) in order to use fotoDen.
+[libvips](https://github.com/libvips/libvips) in order to use fotoDen.
 
-You can either install from an existing build (which includes fotoDen.js md5
+You can either install from an existing build [which includes fotoDen.js md5
 checksums for both the minified version, and the JS file that came with its
-release), or you can install the tool alone by running ~go install
-github.com/vulppine/fotoDen~.
+release], or you can install the tool alone by running `go install
+github.com/vulppine/fotoDen`.
 
 Building
 --------
 
 You will require the latest version of
-[https://github.com/libvips/libvips](libvips), [https://terser.org](terser), and
-[https://golang.org](Go) in order to build fotoDen from source.
+[libvips](https://github.com/libvips/libvips), [terser](https://terser.org), and
+[Go](https://golang.org) in order to build fotoDen from source.
 
 1. Clone the git repository into a directory of your choice
-2. Run ~make all~ in the resulting folder
+2. Run `make all` in the resulting folder
 3. fotoDen will be located in the **build/** folder in the same directory.
 
 Contributing
 ------------
 
 If you want to contribute, I encourage you to fork and help develop fotoDen!
-Note that fotoDen uses [https://github.com/standard/standard](Standard JS) for
+Note that fotoDen uses [Standard JS](https://github.com/standard/standard) for
 its JavaScript style.
 
 A testing script is included in the root of the repository - run it in your
@@ -105,4 +104,4 @@ fotoDen is copyright 2021 Flipp Syder under the MIT License (see LICENSE for
 more information)
 
 All test images licensed are under the
-[https://creativecommons.org/licenses/by-nc-sa/4.0/](CC-BY-NC-SA)
+[CC-BY-NC-SA](https://creativecommons.org/licenses/by-nc-sa/4.0/)

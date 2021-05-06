@@ -30,7 +30,7 @@
  */
 
 const BaseURL = document.getElementById('fd-script').dataset.fdBaseurl
-const version = '0.2.0'
+const version = '0.3.0'
 
 // global variables
 

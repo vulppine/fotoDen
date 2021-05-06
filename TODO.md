@@ -10,12 +10,14 @@ The big todo list
 - [ ] Document fotoDen.js using JSDoc
 - [ ] Split fotoDen.js into several files and change the makefile to combine all the separate JS files (maybe?)
   - This may require some fotoDen variables to be more *explicitly* global, as some variables need to be accessed by dynamically loaded modules (e.g., themes)
+  - Do this for v0.4.0
 - [ ] Implement some kind of extension system using ES6 import/export (it's nice to have exif data and justified layout in the default theme, but maybe these should be extended to standard functionality without filling the main fotoDen library up with what is essentially a copy and paste of the code)
 - [X] Properly implement image updating
   - [X] Possibly merge the functionality of adding images with updating images, doing a preliminary search through the current available items before deciding whether to add the image, or update the image based on name
 - [X] Selectable themes
 - [X] Ability to build folders and albums from YAML files (JSON will still be kept for front-end purposes)
 - [ ] More functions for website templates for static generation (e.g., the ability to create a series of links for web navigation based on another template)
+  - This is being worked on - however, this is only front-end so far.
 - [X] Persistant status bar during lengthy generation (e.g., album generation/folder generation) so that the user knows the current progress of generation
   - +Not up to spec, but it is implemented - improve before 0.3.0 (by modifying cmdio-go)+ This is implemented via cmdio-go v0.1.3
 - [X] Add in static page generation using Markdown (possibly use goldmark?)
