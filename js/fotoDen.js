@@ -1,11 +1,11 @@
 /* eslint-env browser */
 
-// fotoDen v0.2.0
+// fotoDen v0.3.0
 //
 // The front-end for a photo gallery.
 
 /**
- * @version v0.2.0
+ * @version v0.3.0
  * @license MIT
  *
  * Copyright (c) 2021 Flipp Syder
